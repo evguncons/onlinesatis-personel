@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HEDEF AVM ŞUBE PANELİ</title>
+    <title>HEDEF AVM ONLİNE SATIŞ PERSONEL GİRİŞİ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -16,9 +16,10 @@
             color: #1e293b; 
             min-height: 100vh;
             -webkit-tap-highlight-color: transparent;
-            overflow-x: hidden;
+            overflow-x: hidden; /* Yatay taşmayı engelle */
         }
 
+        /* Cam Efekti - Masaüstü */
         .glass-card {
             background: rgba(255, 255, 255, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.6);
@@ -26,58 +27,71 @@
             box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
         }
 
+        /* Modern Input - Mobil Uyumlu Font Boyutu (16px zoom engellemek için) */
         .modern-input {
             width: 100%; 
             padding: 12px 14px;
-            font-size: 0.95rem;
+            font-size: 1rem; /* Mobilde zoom yapmaması için 16px */
             border: 1px solid #e2e8f0; 
             border-radius: 12px;
             background-color: #f8fafc; 
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
             color: #334155; 
             font-weight: 500;
             appearance: none;
         }
         .modern-input:focus { outline: none; border-color: var(--primary); background-color: #fff; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
-        .modern-input:disabled { background-color: #f1f5f9; cursor: not-allowed; opacity: 0.6; color: #94a3b8; border-color: #e2e8f0; }
+        .modern-input:disabled { background-color: #f1f5f9; cursor: not-allowed; opacity: 0.7; color: #94a3b8; border-color: #e2e8f0; }
         
         .input-error { border-color: #ef4444 !important; background-color: #fff5f5 !important; }
         
+        /* Tablo Stilleri */
         .custom-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
         .custom-table th { color: #64748b; font-weight: 600; font-size: 0.75rem; padding: 0 20px 10px; text-transform: uppercase; letter-spacing: 0.05em; }
         .custom-table td { padding: 16px 20px; font-size: 0.9rem; vertical-align: middle; background: white; }
         .custom-table td:first-child { border-top-left-radius: 16px; border-bottom-left-radius: 16px; }
         .custom-table td:last-child { border-top-right-radius: 16px; border-bottom-right-radius: 16px; }
         
-        .btn-page { padding: 8px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; background: #fff; border: 1px solid #e2e8f0; color: #64748b; transition: all 0.2s; }
+        .btn-page { padding: 10px 14px; border-radius: 10px; font-size: 0.9rem; font-weight: 600; background: #fff; border: 1px solid #e2e8f0; color: #64748b; transition: all 0.2s; }
         .btn-page:hover:not(:disabled) { background: #f8fafc; color: #4f46e5; border-color: #cbd5e1; }
         .btn-page:disabled { opacity: 0.5; }
 
-        .modal-overlay { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); } 
+        .modal-overlay { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); } 
         .status-pill { padding: 4px 10px; border-radius: 30px; font-size: 0.75rem; font-weight: 700; text-transform: lowercase; white-space: nowrap; letter-spacing: 0.025em; }
 
         @media (min-width: 769px) {
             .glass-card { backdrop-filter: blur(10px); }
         }
 
+        /* MOBİL RESPONSIVE AYARLARI */
         @media (max-width: 768px) {
+            /* Mobilde cam efektini kapat, performans artır */
             .glass-card { backdrop-filter: none; background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
             
+            /* Tabloyu Kart Görünümüne Çevir */
             .custom-table thead { display: none; }
             .custom-table, .custom-table tbody, .custom-table tr, .custom-table td { display: block; width: 100%; }
-            .custom-table tr { margin-bottom: 15px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; padding: 15px; background: white; }
+            .custom-table tr { 
+                margin-bottom: 20px; /* Kartlar arası boşluk */
+                border-radius: 16px; 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
+                border: 1px solid #e2e8f0; 
+                padding: 20px; 
+                background: white; 
+            }
             
             .custom-table td { 
-                padding: 10px 0; 
-                border-bottom: 1px dashed #f1f5f9; 
+                padding: 12px 0; 
+                border-bottom: 1px solid #f1f5f9; 
                 display: flex; 
                 justify-content: space-between; 
-                align-items: flex-start;
+                align-items: flex-start; /* İçerik çoksa yukarı hizala */
                 text-align: right;
-                min-height: 40px;
+                min-height: auto;
             }
             .custom-table td:last-child { border-bottom: none; padding-top: 15px; justify-content: flex-end; align-items: center; }
             
+            /* Kart İçi Etiketler */
             .custom-table td::before { 
                 content: attr(data-label); 
                 font-weight: 700; 
@@ -87,22 +101,29 @@
                 text-align: left;
                 flex-shrink: 0;
                 margin-right: 15px;
-                max-width: 35%;
+                max-width: 40%; /* Etiket genişliği */
                 margin-top: 2px;
             }
 
+            /* Kart İçi İçerik */
             .custom-table td > div, .custom-table td > span {
                 text-align: right;
-                word-break: break-word;
+                word-break: break-word; /* Uzun kelimeleri kır */
                 white-space: normal;
-                max-width: 65%;
+                max-width: 60%; /* İçerik genişliği */
             }
             
             .btn-full-mobile { width: 100%; justify-content: center; }
+            
+            /* Giriş Ekranı Mobilde */
+            #loginScreen h1 {
+                font-size: 1.5rem !important; /* Başlığı küçült */
+                line-height: 1.3 !important;
+            }
         }
     </style>
 </head>
-<body class="overflow-x-hidden text-slate-600">
+<body class="overflow-x-hidden text-slate-600 bg-slate-50">
 
     <!-- LOGIN OVERLAY -->
     <div id="loginScreen" class="fixed inset-0 z-[60] bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center p-4">
@@ -113,15 +134,18 @@
                 <div class="w-20 h-20 bg-white rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-xl transform rotate-3">
                     <i class="fas fa-store text-indigo-600 text-3xl"></i>
                 </div>
-                <h1 class="text-2xl md:text-3xl font-bold text-white mb-2 tracking-tight">Hedef AVM Panel</h1>
-                <p class="text-indigo-100 text-sm md:text-base font-medium">Şube seçimi yaparak devam edin</p>
+                <!-- GÜNCELLENDİ: BAŞLIK -->
+                <h1 class="text-xl md:text-3xl font-bold text-white mb-2 tracking-tight leading-tight">
+                    Hedef AVM Online Satış<br>Personel Girişi
+                </h1>
+                <p class="text-indigo-100 text-sm md:text-base font-medium opacity-90">Şube seçimi yaparak devam edin</p>
             </div>
             
-            <form id="loginForm" class="space-y-6 relative z-10">
+            <form id="loginForm" class="space-y-5 relative z-10">
                 <div>
                     <label class="text-white/90 text-xs font-bold uppercase mb-2 block tracking-wider ml-1">Şube Seçiniz</label>
                     <div class="relative">
-                        <select id="loginBranch" class="w-full pl-4 pr-10 py-4 bg-white rounded-xl text-slate-700 font-bold text-lg shadow-lg border-0 focus:ring-4 focus:ring-indigo-400/50 appearance-none cursor-pointer" required>
+                        <select id="loginBranch" class="w-full pl-4 pr-10 py-3.5 bg-white rounded-xl text-slate-700 font-bold text-lg shadow-lg border-0 focus:ring-4 focus:ring-indigo-400/50 appearance-none cursor-pointer" required>
                             <option value="">Yükleniyor...</option>
                         </select>
                         <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
@@ -129,7 +153,7 @@
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-4 rounded-xl transition duration-200 shadow-xl text-lg flex items-center justify-center group border border-white/20">
+                <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3.5 rounded-xl transition duration-200 shadow-xl text-lg flex items-center justify-center group border border-white/20">
                     <span>Giriş Yap</span>
                     <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
                 </button>
@@ -139,23 +163,23 @@
     </div>
 
     <!-- MAIN APP -->
-    <div id="mainApp" class="hidden w-full max-w-[1600px] mx-auto p-3 md:p-6 lg:p-8 pb-20">
+    <div id="mainApp" class="hidden w-full max-w-[1600px] mx-auto p-3 md:p-6 lg:p-8 pb-24">
         
         <!-- HEADER -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-6 md:mb-8 gap-4 bg-white md:bg-transparent p-4 md:p-0 rounded-2xl shadow-sm md:shadow-none border border-slate-100 md:border-none">
+        <header class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-white md:bg-transparent p-4 md:p-0 rounded-2xl shadow-sm md:shadow-none border border-slate-100 md:border-none">
             <div class="flex items-center gap-4 w-full md:w-auto">
                 <div class="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 text-xl shrink-0">
                     <i class="fas fa-store"></i>
                 </div>
                 <div class="flex-1">
-                    <h1 class="text-lg md:text-2xl font-bold text-slate-800 tracking-tight" id="headerTitle">ŞUBE PANELİ</h1>
-                    <div class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mt-0.5">
-                        <span class="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md font-medium text-xs">
+                    <h1 class="text-lg md:text-2xl font-bold text-slate-800 tracking-tight leading-tight" id="headerTitle">ŞUBE PANELİ</h1>
+                    <div class="flex flex-wrap items-center gap-2 text-sm text-slate-500 mt-1">
+                        <span class="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md font-medium text-xs border border-emerald-100">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                             Online
                         </span>
                         <span id="currentUserDisplay" class="font-bold text-slate-700">...</span>
-                        <button onclick="logout()" class="text-rose-500 hover:text-rose-700 text-xs font-bold border border-rose-200 hover:bg-rose-50 px-2 py-0.5 rounded transition ml-auto md:ml-0">Çıkış</button>
+                        <button onclick="logout()" class="text-rose-500 hover:text-rose-700 text-xs font-bold border border-rose-200 bg-white hover:bg-rose-50 px-2 py-0.5 rounded transition ml-auto md:ml-0">Çıkış</button>
                     </div>
                 </div>
             </div>
@@ -178,20 +202,20 @@
                             <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
                                 <i class="fas fa-users text-indigo-500"></i> Müşteri Listesi
                             </h3>
-                            <p class="text-xs text-slate-400 font-medium">Bu aya ait kayıtlar listeleniyor</p>
+                            <p class="text-xs text-slate-400 font-medium mt-1">Bu aya ait kayıtlar listeleniyor</p>
                         </div>
                         
                         <!-- Search & Filter Controls -->
-                        <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                        <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto mt-2 lg:mt-0">
                             <div class="relative w-full sm:w-64">
-                                <input type="text" id="searchInput" onkeyup="renderTable()" placeholder="Ad veya Telefon ara..." class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition">
+                                <input type="text" id="searchInput" onkeyup="renderTable()" placeholder="Ad veya Telefon ara..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition shadow-sm">
                                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
                             </div>
                             <div class="relative w-full sm:w-48">
-                                <select id="filterStatus" onchange="renderTable()" class="w-full pl-3 pr-10 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none appearance-none cursor-pointer">
+                                <select id="filterStatus" onchange="renderTable()" class="w-full pl-3 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none appearance-none cursor-pointer shadow-sm">
                                     <option value="">Tüm Durumlar</option>
-                                    <option value="aranmadı">🔴 aranmadı</option>
-                                    <option value="arandı">🟢 arandı</option>
+                                    <option value="aranmadı">🔴 Aranmadı</option>
+                                    <option value="arandı">🟢 Arandı</option>
                                 </select>
                                 <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
                                     <i class="fas fa-filter text-xs"></i>
@@ -220,10 +244,10 @@
 
                     <!-- Pagination -->
                     <div class="p-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center bg-slate-50/30 rounded-b-[20px] gap-4">
-                        <span class="text-xs font-bold text-slate-400 bg-white px-3 py-1 rounded-lg border border-slate-200 shadow-sm" id="recordCountInfo">0 kayıt</span>
-                        <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
+                        <span class="text-xs font-bold text-slate-500 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm order-2 sm:order-1" id="recordCountInfo">0 kayıt</span>
+                        <div class="flex items-center gap-2 w-full sm:w-auto justify-center order-1 sm:order-2">
                             <button onclick="changePage(-1)" id="btnPrev" class="btn-page flex-1 sm:flex-none justify-center flex items-center gap-2" disabled><i class="fas fa-chevron-left text-[10px]"></i> Önceki</button>
-                            <span id="pageInfo" class="text-xs font-bold bg-white border border-slate-200 px-3 py-2 rounded-lg text-slate-700 min-w-[80px] text-center shadow-sm">Sayfa 1</span>
+                            <span id="pageInfo" class="text-xs font-bold bg-white border border-slate-200 px-3 py-2.5 rounded-lg text-slate-700 min-w-[80px] text-center shadow-sm">Sayfa 1</span>
                             <button onclick="changePage(1)" id="btnNext" class="btn-page flex-1 sm:flex-none justify-center flex items-center gap-2" disabled>Sonraki <i class="fas fa-chevron-right text-[10px]"></i></button>
                         </div>
                     </div>
@@ -239,8 +263,8 @@
             
             <div class="px-6 py-4 border-b border-slate-100 bg-white flex justify-between items-center sticky top-0 z-20 shadow-sm md:shadow-none">
                 <div>
-                    <h3 class="font-bold text-slate-800 text-lg">Müşteri Güncelle</h3>
-                    <p class="text-[10px] text-slate-400 font-medium">Sıralı işlem adımlarını takip edin</p>
+                    <h3 class="font-bold text-slate-800 text-lg md:text-xl">Müşteri Güncelle</h3>
+                    <p class="text-[11px] text-slate-400 font-medium">Sıralı işlem adımlarını takip edin</p>
                 </div>
                 <button onclick="closeEditModal()" class="w-10 h-10 rounded-full bg-slate-50 text-slate-500 hover:bg-rose-100 hover:text-rose-500 transition flex items-center justify-center active:scale-90">
                     <i class="fas fa-times text-lg"></i>
@@ -275,7 +299,7 @@
                         </div>
                         <div>
                             <label class="text-xs font-bold text-slate-500 mb-1.5 block uppercase">Kategori</label>
-                            <select id="m_category" class="modern-input h-11">
+                            <select id="m_category" class="modern-input h-12">
                                 <option>Mobilya</option><option>Baza Yatak Başlık</option><option>Bebek Çocuk</option>
                                 <option>Beyaz Eşya</option><option>Elektrikli Ev Aletleri</option><option>Elektronik</option>
                                 <option>Ev Dekorasyonu</option><option>Halı</option><option>Tekstil</option><option>Züccaciye</option><option>Ayakkabı</option>
@@ -304,8 +328,8 @@
                             <label class="text-sm font-bold text-slate-700 mb-2 block">Aranma Durumu (C)</label>
                             <select id="m_status" class="modern-input h-12 border-indigo-200 focus:border-indigo-500">
                                 <option value="" selected>Seçiniz...</option>
-                                <option value="aranmadı">🔴 aranmadı</option>
-                                <option value="arandı">🟢 arandı</option>
+                                <option value="aranmadı">🔴 Aranmadı</option>
+                                <option value="arandı">🟢 Arandı</option>
                             </select>
                         </div>
                         
@@ -329,7 +353,7 @@
                         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative transition-all" id="step3box">
                             <div class="absolute -top-3 left-4 bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded transition-colors" id="step3badge">3. ADIM</div>
                             <label class="text-sm font-bold text-slate-700 mb-2 block">Görüşme Notu (K)</label>
-                            <textarea id="m_note" rows="2" class="modern-input resize-none" placeholder="Not ekleyin..." disabled></textarea>
+                            <textarea id="m_note" rows="2" class="modern-input resize-none h-12 py-2" placeholder="Not ekleyin..." disabled></textarea>
                             <div class="text-[10px] text-slate-400 mt-1 italic" id="noteHelper">*Beklemede harici not zorunludur.</div>
                         </div>
                     </div>
@@ -355,13 +379,13 @@
                     </div>
                     
                     <!-- Boşluk bırak (Scroll için) -->
-                    <div class="h-10 md:hidden"></div>
+                    <div class="h-16 md:hidden"></div>
                 </form>
             </div>
 
             <div class="p-4 md:p-6 border-t border-slate-100 bg-white flex flex-col md:flex-row justify-end gap-3 sticky bottom-0 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-                <button type="button" onclick="closeEditModal()" class="w-full md:w-auto px-6 py-3.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition border border-slate-200">İptal</button>
-                <button type="submit" form="editForm" id="updateBtn" class="w-full md:w-auto px-8 py-3.5 rounded-xl text-sm font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition active:scale-95 flex justify-center items-center gap-2">
+                <button type="button" onclick="closeEditModal()" class="w-full md:w-auto px-6 py-3.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition border border-slate-200 order-2 md:order-1">İptal</button>
+                <button type="submit" form="editForm" id="updateBtn" class="w-full md:w-auto px-8 py-3.5 rounded-xl text-sm font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition active:scale-95 flex justify-center items-center gap-2 order-1 md:order-2">
                     <i class="fas fa-save"></i> Güncelle
                 </button>
             </div>
