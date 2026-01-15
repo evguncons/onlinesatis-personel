@@ -219,10 +219,12 @@
             .mobile-action-btn { width: 100%; justify-content: center; padding: 12px; }
             
             /* Modal Responsive */
-            #editModal .bg-white { 
+            /* DÜZELTME: Mobilde tam ekran ve scroll sorunu için */
+            #editModal .modal-content-wrapper { 
                 border-radius: 24px 24px 0 0; 
                 margin-top: auto; 
-                min-height: 85vh; /* Mobilde alt çekmece gibi */
+                height: 90vh; /* Tam ekran yerine %90 yükseklik */
+                max-height: 90vh;
             }
         }
     </style>
@@ -246,7 +248,7 @@
                         <i class="fas fa-store text-white text-3xl"></i>
                     </div>
                     <h1 class="text-2xl md:text-3xl font-extrabold text-white mb-2 leading-tight tracking-tight">
-                        Hedef AVM <br><span class="text-indigo-300 font-medium"> ONLİNE SATIŞ PERSONEL GİRİŞİ</span>
+                        Hedef AVM <br><span class="text-indigo-300 font-medium">Online Satış Girişi</span>
                     </h1>
                 </div>
                 
@@ -270,12 +272,33 @@
                 <p id="loginError" class="mt-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-100 text-center text-sm font-medium hidden backdrop-blur-sm"></p>
             </div>
 
-            <!-- LEADERBOARD PREVIEW -->
+            <!-- LEADERBOARD PREVIEW (SKELETON LOADER EKLENDİ - GÜNCELLENDİ) -->
             <div id="loginLeaderboard" class="bg-black/40 backdrop-blur-xl border border-white/10 p-5 rounded-3xl hidden w-full">
                 <h3 class="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-3 text-center border-b border-white/10 pb-2">🏆 Ayın Ciro Şampiyonları</h3>
-                <div class="space-y-2.5" id="leaderboardList">
-                    <!-- JS ile dolacak -->
-                    <div class="text-center text-white/50 text-xs py-2">Veriler yükleniyor...</div>
+                
+                <div class="space-y-3" id="leaderboardList">
+                    <!-- SKELETON LOADER - GÜNCELLENDİ -->
+                    <div class="animate-pulse flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 bg-white/20 rounded-full"></div>
+                            <div class="h-4 bg-white/20 rounded w-24"></div>
+                        </div>
+                        <div class="h-4 bg-white/20 rounded w-16"></div>
+                    </div>
+                    <div class="animate-pulse flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
+                         <div class="flex items-center gap-3">
+                             <div class="w-6 h-6 bg-white/20 rounded-full"></div>
+                             <div class="h-4 bg-white/20 rounded w-24"></div>
+                         </div>
+                         <div class="h-4 bg-white/20 rounded w-16"></div>
+                    </div>
+                    <div class="animate-pulse flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
+                         <div class="flex items-center gap-3">
+                             <div class="w-6 h-6 bg-white/20 rounded-full"></div>
+                             <div class="h-4 bg-white/20 rounded w-24"></div>
+                         </div>
+                         <div class="h-4 bg-white/20 rounded w-16"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -306,7 +329,7 @@
                             Online
                         </span>
                         
-                        <!-- Toplam Ciro Display - GÜNCELLENDİ -->
+                        <!-- Toplam Ciro Display -->
                         <div class="flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg font-bold text-xs border border-indigo-100">
                             <i class="fas fa-wallet"></i>
                             <span id="headerTotalRevenue">0 ₺</span> 
@@ -404,12 +427,13 @@
         </div>
     </div>
 
-    <!-- EDIT MODAL -->
-    <div id="editModal" class="fixed inset-0 modal-overlay z-[70] hidden overflow-y-auto flex items-start md:items-center justify-center">
-        <div class="bg-white w-full max-w-3xl md:rounded-3xl shadow-2xl relative flex flex-col h-full md:h-auto md:max-h-[90vh] transition-all transform duration-200">
+    <!-- EDIT MODAL (MOBIL DÜZELTMESİ YAPILDI) -->
+    <div id="editModal" class="fixed inset-0 modal-overlay z-[70] hidden overflow-y-auto overflow-x-hidden flex justify-center items-end md:items-center p-0 md:p-4">
+        <!-- class: modal-content-wrapper MOBIL UYUMLU CLASS -->
+        <div class="modal-content-wrapper bg-white w-full max-w-3xl md:rounded-3xl shadow-2xl relative flex flex-col h-[90dvh] md:h-auto md:max-h-[90vh] transition-all transform duration-200">
             
             <!-- Modal Header -->
-            <div class="px-6 md:px-8 py-5 border-b border-slate-100 flex justify-between items-center sticky top-0 z-20 bg-white md:rounded-t-3xl">
+            <div class="px-6 md:px-8 py-5 border-b border-slate-100 flex justify-between items-center sticky top-0 z-20 bg-white rounded-t-3xl">
                 <div>
                     <h3 class="font-extrabold text-slate-800 text-xl">Kayıt Düzenle</h3>
                     <p class="text-xs text-slate-400 font-medium">Müşteri detaylarını güncelleyin</p>
@@ -550,7 +574,6 @@
         const API_URL = 'https://script.google.com/macros/s/AKfycbwQ7j5NSTaojKhdVKPehsYKqZSCljBBzvywmCf8S7ZXSAYjz3OsXUOMG-9NnMZdRzht/exec'; 
         
         // --- GLOBAL HELPERS ---
-        // Gelişmiş Sayı Dönüştürücü (Robust) - Farklı formatları (TR/US) ve boşluklu sayıları (1 500) düzeltir
         const parseCurrency = (val) => {
             if (typeof val === 'number') return val;
             if (!val) return 0;
@@ -587,8 +610,6 @@
             return parseFloat(cleanStr) || 0;
         };
 
-        // GÜÇLÜ VERİ YAKALAYICI (Smart Finder)
-        // Backend'den gelen veri ne olursa olsun (O, ciro, revenue) doğru rakamı bulur.
         const getRevenue = (item) => {
             if (!item) return 0;
 
@@ -607,7 +628,6 @@
             for (const key of keys) {
                 const lowerKey = key.toString().toLowerCase().replace(/\s+/g, '').trim();
                 
-                // Anahtar isim kontrolü
                 if (lowerKey.includes('ciro') || lowerKey.includes('revenue') || lowerKey.includes('tutar') || lowerKey.includes('total')) {
                      // Telefon ve ID gibi sayısal ama ciro olmayanları ele
                      if (!lowerKey.includes('tel') && !lowerKey.includes('no') && !lowerKey.includes('id') && !lowerKey.includes('date')) {
@@ -733,6 +753,9 @@
 
         async function fetchBranches() {
             try {
+                // SKELETON LOADER GÖSTER (Zaten default olarak var)
+                document.getElementById('loginLeaderboard').classList.remove('hidden');
+
                 const res = await fetch(`${API_URL}?action=getLeaderboard`, { method: 'GET', redirect: 'follow', cache: 'no-store' });
                 if (!res.ok) throw new Error("Sunucu hatası");
                 const data = await res.json();
@@ -755,6 +778,7 @@
                 console.error("Şube hatası", e); 
                 document.getElementById('loginError').textContent = "Sunucuya bağlanılamadı. Lütfen sayfayı yenileyin.";
                 document.getElementById('loginError').classList.remove('hidden');
+                document.getElementById('loginLeaderboard').classList.add('hidden'); // Hata varsa gizle
             }
         }
 
@@ -775,7 +799,7 @@
             }).slice(0, 3);
             
             if(top3.length > 0) {
-                container.classList.remove('hidden');
+                // SKELETON'u TEMİZLE VE GERÇEK VERİYİ YAZ
                 listEl.innerHTML = top3.map((item, index) => {
                     const revenueVal = parseCurrency(getRevenue(item));
                     
@@ -784,7 +808,7 @@
                     let bgClass = index === 0 ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-yellow-500/30' : 'hover:bg-white/5';
                     
                     return `
-                        <div class="flex justify-between items-center p-3 rounded-xl border border-transparent transition-all ${bgClass}">
+                        <div class="flex justify-between items-center p-3 rounded-xl border border-transparent transition-all ${bgClass} animate-in fade-in slide-in-from-bottom-2 duration-500" style="animation-delay: ${index * 100}ms">
                             <div class="flex items-center gap-3">
                                 <span class="text-2xl filter drop-shadow-lg">${icon}</span>
                                 <span class="${colorClass} text-sm tracking-wide">${item.branch}</span>
