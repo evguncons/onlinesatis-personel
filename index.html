@@ -281,6 +281,19 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Şifre Alanı -->
+                    <div class="space-y-2">
+                        <label class="text-indigo-200 text-xs font-bold uppercase tracking-widest ml-1">Şifre</label>
+                        <div class="relative group">
+                            <!-- type="text" yapıldı: Şifre yazarken görünür olacak -->
+                            <input type="text" id="loginPassword" class="w-full pl-5 pr-12 py-4 bg-white/95 backdrop-blur-sm rounded-2xl text-slate-800 font-bold text-lg shadow-xl border-0 focus:ring-4 focus:ring-indigo-500/50 appearance-none transition-all group-hover:bg-white placeholder-slate-400" placeholder="Şifre Giriniz" required>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none text-indigo-500">
+                                <i class="fas fa-lock-open text-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+
                     <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-500/40 text-lg flex items-center justify-center gap-3 group active:scale-95">
                         <span>Giriş Yap</span>
                         <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
@@ -621,6 +634,21 @@
         let currentPage = 1;
         const rowsPerPage = 10;
 
+        // Şube Şifreleri Tanımlaması
+        const BRANCH_PASSWORDS = {
+            'İnegöl Şubesi': '1601',
+            'Paşabahçe Şubesi': '3401',
+            'Çekmeköy Şubesi': '3403',
+            'İzmit Şubesi': '4104',
+            'Gölcük Şubesi': '4105',
+            'Körfez Şubesi': '4102',
+            'Derince Şubesi': '4103',
+            'Sultanbeyli Şubesi': '3405',
+            'Yenidoğan Şubesi': '3404',
+            'Kavacık Şubesi': '3402',
+            'Çayırova Şubesi': '4101'
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date();
             const year = today.getFullYear();
@@ -633,8 +661,27 @@
             document.getElementById('loginForm').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const branch = document.getElementById('loginBranch').value;
+                const password = document.getElementById('loginPassword').value;
                 const errorMsg = document.getElementById('loginError');
-                if(!branch) { errorMsg.textContent = "Lütfen bir şube seçiniz."; errorMsg.classList.remove('hidden'); return; }
+                
+                if(!branch) { 
+                    errorMsg.textContent = "Lütfen bir şube seçiniz."; 
+                    errorMsg.classList.remove('hidden'); 
+                    return; 
+                }
+
+                // Şifre Kontrolü
+                // Tanımlı şubeler için özel şifre, tanımlı olmayanlar için varsayılan '1234'
+                const correctPassword = BRANCH_PASSWORDS[branch] || '1234';
+
+                if (password !== correctPassword) {
+                    errorMsg.textContent = "Hatalı şifre. Lütfen tekrar deneyiniz.";
+                    errorMsg.classList.remove('hidden');
+                    // Şifre alanını temizle
+                    document.getElementById('loginPassword').value = '';
+                    return;
+                }
+
                 loginSuccess(branch);
             });
         });
