@@ -878,6 +878,9 @@
             const statusFilter = document.getElementById('filterStatus').value.toLocaleLowerCase('tr-TR');
 
             const filteredData = allRecords.filter(item => {
+                // GÜVENLİK KONTROLÜ: İsimsiz/Boş kayıtları gizle
+                if (!item.name || item.name.toString().trim() === "") return false;
+
                 const name = (item.name || "").toString().toLocaleLowerCase('tr-TR');
                 const contact = (item.contact || "").toString().toLocaleLowerCase('tr-TR');
                 const rawStatus = (item.status || "").toString().trim().toLocaleLowerCase('tr-TR');
