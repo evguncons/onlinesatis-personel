@@ -595,11 +595,17 @@
         };
 
         const getRevenue = (item) => {
+            // Önce doğrudan amount kontrolü (en güvenlisi)
+            if (item.amount !== undefined && item.amount !== null && item.amount !== '') return item.amount;
+            
             if (item.revenue !== undefined) return item.revenue;
+            
             const keys = Object.keys(item);
             for (const key of keys) {
                 const clean = key.toString().toLowerCase().replace(/\s+/g, '').trim();
+                // "O" sütunu veya içinde "ciro" geçenler
                 if (clean === 'o' || clean === '0' || clean.includes('ciro') || clean.includes('revenue') || clean.includes('amount')) {
+                     // Telefon ve ID gibi sayısal ama ciro olmayanları ele
                      if (!clean.includes('tel') && !clean.includes('no') && !clean.includes('id') && !clean.includes('date')) {
                          return item[key];
                      }
@@ -744,6 +750,7 @@
                 return;
             }
 
+            // GÜVENLİ SIRALAMA
             const top3 = [...list].sort((a, b) => {
                 const revA = parseCurrency(getRevenue(a));
                 const revB = parseCurrency(getRevenue(b));
@@ -778,15 +785,18 @@
 
         function loginSuccess(branch) {
             currentBranch = branch;
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            
+            const loginScreen = document.getElementById('loginScreen');
+            const mainApp = document.getElementById('mainApp');
             const userDisplay = document.getElementById('currentUserDisplay');
-            if(userDisplay) {
+            const headerTitle = document.getElementById('headerTitle');
+
+            if (loginScreen) loginScreen.classList.add('hidden');
+            if (mainApp) mainApp.classList.remove('hidden');
+            if (userDisplay) {
                 userDisplay.textContent = branch;
                 userDisplay.style.display = 'none'; // Duplicate'i gizle
             }
-            document.getElementById('headerTitle').textContent = branch.toUpperCase();
+            if (headerTitle) headerTitle.textContent = branch.toUpperCase();
             
             refreshData(); 
             setInterval(refreshData, 60000); 
@@ -840,17 +850,20 @@
                     return revB - revA;
                 });
                 const topBranch = sorted[0];
+
                 const badge = document.getElementById('championBadge');
                 
                 const normTopBranch = topBranch ? topBranch.branch.trim().toLowerCase() : '';
                 const normCurrentBranch = currentBranch ? currentBranch.trim().toLowerCase() : '';
 
-                if (normTopBranch === normCurrentBranch) {
-                    badge.classList.remove('hidden');
-                    badge.classList.add('flex');
-                } else {
-                    badge.classList.add('hidden');
-                    badge.classList.remove('flex');
+                if (badge) {
+                    if (normTopBranch === normCurrentBranch) {
+                        badge.classList.remove('hidden');
+                        badge.classList.add('flex');
+                    } else {
+                        badge.classList.add('hidden');
+                        badge.classList.remove('flex');
+                    }
                 }
             }
         }
@@ -870,6 +883,7 @@
 
                 const matchesSearch = name.includes(term) || contact.includes(term);
                 
+                // GELİŞMİŞ FİLTRELEME MANTIĞI - DAHA ESNEK
                 let matchesStatus = false;
                 if (statusFilter === "") {
                     matchesStatus = true;
