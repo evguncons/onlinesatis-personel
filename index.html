@@ -11,62 +11,70 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { 
-            --primary: #4f46e5; 
-            --primary-soft: #eef2ff;
-            --secondary: #64748b;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --bg-color: #f8fafc; 
+            /* Yeni Tema Renkleri: Magenta/Pink/Rose */
+            --primary: #db2777; /* Pink 600 */
+            --primary-soft: #fce7f3; /* Pink 100 */
+            --secondary: #831843; /* Pink 900 */
+            --success: #059669; /* Emerald 600 */
+            --warning: #d97706; /* Amber 600 */
+            --danger: #e11d48; /* Rose 600 */
+            --bg-color: #fff1f2; /* Rose 50 */
             --gold: #fbbf24;
         }
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f1f5f9;
-            color: #1e293b; 
+            background-color: var(--bg-color);
+            color: #1f2937; 
             min-height: 100vh;
             -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
+            background-image: radial-gradient(at 0% 0%, hsla(328,90%,92%,1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(308,83%,93%,1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(347,89%,91%,1) 0, transparent 50%);
+            background-attachment: fixed;
         }
 
-        /* Modern Glass Card */
+        /* Modern Glass Card - Daha Yumuşak ve Beyaz */
         .glass-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             border-radius: 24px;
-            box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 40px -10px rgba(219, 39, 119, 0.1);
         }
 
-        /* Modern Input Styles */
+        /* Modern Input Styles - Pink Focus */
         .modern-input {
             width: 100%; 
             padding: 14px 16px;
             font-size: 0.95rem;
-            border: 1px solid #e2e8f0; 
-            border-radius: 14px;
-            background-color: #f8fafc; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            color: #334155; 
-            font-weight: 500;
+            border: 1px solid #e5e7eb; 
+            border-radius: 16px;
+            background-color: #ffffff; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #374151; 
+            font-weight: 600;
             appearance: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
         .modern-input:focus { 
             outline: none; 
             border-color: var(--primary); 
             background-color: #fff; 
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1); 
+            box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.15); 
+            transform: translateY(-1px);
         }
         .modern-input:disabled { 
-            background-color: #f1f5f9; 
+            background-color: #f9fafb; 
             cursor: not-allowed; 
             opacity: 0.7; 
-            color: #94a3b8; 
-            border-color: #e2e8f0; 
+            color: #9ca3af; 
+            border-color: #e5e7eb; 
+            box-shadow: none;
         }
         .input-error { 
             border-color: var(--danger) !important; 
-            background-color: #fef2f2 !important; 
+            background-color: #fff1f2 !important; 
             animation: shake 0.3s ease-in-out;
         }
 
@@ -79,14 +87,14 @@
         /* Table Styles - Desktop */
         .custom-table { width: 100%; border-collapse: separate; border-spacing: 0 0; }
         .custom-table th { 
-            color: #64748b; 
-            font-weight: 600; 
+            color: #831843; 
+            font-weight: 700; 
             font-size: 0.75rem; 
-            padding: 16px 24px; 
+            padding: 18px 24px; 
             text-transform: uppercase; 
             letter-spacing: 0.05em; 
-            background: #f8fafc;
-            border-bottom: 1px solid #e2e8f0;
+            background: rgba(253, 242, 248, 0.8); /* Pink 50 opacity */
+            border-bottom: 2px solid #fce7f3;
         }
         .custom-table th:first-child { border-top-left-radius: 16px; }
         .custom-table th:last-child { border-top-right-radius: 16px; }
@@ -95,12 +103,15 @@
             padding: 20px 24px; 
             font-size: 0.95rem; 
             vertical-align: middle; 
-            background: white; 
-            border-bottom: 1px solid #f1f5f9;
-            transition: background 0.1s;
+            background: rgba(255, 255, 255, 0.6); 
+            border-bottom: 1px solid #fce7f3;
+            transition: all 0.2s;
         }
         .custom-table tr:last-child td { border-bottom: none; }
-        .custom-table tr:hover td { background-color: #f8fafc; }
+        .custom-table tr:hover td { 
+            background-color: #fff0f7; /* Very light pink hover */
+            transform: scale(1.002);
+        }
 
         /* Status Badge Base */
         .status-badge {
@@ -110,25 +121,27 @@
             padding: 6px 12px;
             border-radius: 9999px;
             font-size: 0.75rem;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.025em;
             transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        /* Avatar Placeholder */
+        /* Avatar Placeholder - Gradient Update */
         .avatar-initials {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 1rem;
+            font-weight: 800;
+            font-size: 1.1rem;
             color: white;
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            box-shadow: 0 4px 10px -2px rgba(236, 72, 153, 0.4);
+            border: 2px solid #fff;
         }
 
         /* Crown Animation */
@@ -139,14 +152,14 @@
         }
         .crown-icon {
             animation: floating 3s ease-in-out infinite;
-            filter: drop-shadow(0 4px 6px rgba(251, 191, 36, 0.4));
+            filter: drop-shadow(0 4px 6px rgba(251, 191, 36, 0.6));
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        /* Scrollbar - Pink Theme */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        ::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f472b6; }
 
         /* MOBIL RESPONSIVE ÖZEL TASARIM */
         @media (max-width: 1024px) {
@@ -162,11 +175,11 @@
             
             /* Mobil Kart Tasarımı */
             .custom-table tr { 
-                margin-bottom: 20px; /* Kartlar arası boşluk arttırıldı */
-                border-radius: 20px; 
+                margin-bottom: 20px; 
+                border-radius: 24px; 
                 background: white; 
-                border: 1px solid #e2e8f0;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+                border: 1px solid #fce7f3;
+                box-shadow: 0 4px 15px -3px rgba(219, 39, 119, 0.08);
                 position: relative;
                 overflow: hidden;
             }
@@ -184,8 +197,8 @@
             }
             
             .custom-table td { 
-                padding: 12px 20px;
-                border-bottom: 1px dashed #f1f5f9;
+                padding: 14px 20px;
+                border-bottom: 1px dashed #fce7f3;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -193,18 +206,18 @@
                 padding-left: 20px; 
             }
             
-            /* İlk TD (Müşteri Adı) için özel stil - Kart Başlığı */
+            /* İlk TD (Müşteri Adı) */
             .custom-table td:first-child {
-                background-color: #f8fafc;
-                border-bottom: 1px solid #e2e8f0;
-                padding-top: 16px;
-                padding-bottom: 16px;
+                background: linear-gradient(to right, #fff1f2, #fff);
+                border-bottom: 1px solid #fbcfe8;
+                padding-top: 18px;
+                padding-bottom: 18px;
                 flex-direction: column;
                 align-items: flex-start;
                 justify-content: center;
                 text-align: left;
             }
-            .custom-table td:first-child::before { display: none; } /* Başlıkta etiket gizle */
+            .custom-table td:first-child::before { display: none; } 
 
             /* Son TD (Butonlar) */
             .custom-table td:last-child { 
@@ -217,18 +230,19 @@
             /* Kart Etiketleri */
             .custom-table td::before { 
                 content: attr(data-label); 
-                font-weight: 700; 
-                color: #94a3b8; 
-                font-size: 0.75rem; 
+                font-weight: 800; 
+                color: #be185d; 
+                font-size: 0.70rem; 
                 text-transform: uppercase; 
                 text-align: left;
                 margin-right: auto;
+                letter-spacing: 0.05em;
             }
 
             /* Kart İçerikleri */
             .custom-table td > div, .custom-table td > span {
                 text-align: right;
-                max-width: 60%;
+                max-width: 65%;
             }
 
             /* Mobil Butonlar */
@@ -243,51 +257,60 @@
                 width: 100%;
             }
             #editModal .modal-overlay {
-                align-items: flex-start; /* Mobilde üstten başla */
+                align-items: flex-start; 
             }
         }
     </style>
 </head>
-<body class="bg-slate-50">
+<body class="bg-rose-50 selection:bg-pink-200 selection:text-pink-900">
 
-    <!-- CHAMPION CELEBRATION OVERLAY (Hidden by default) -->
-    <div id="championOverlay" class="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center hidden transition-opacity duration-500">
-        <div class="text-center animate-[bounce_2s_infinite]">
-            <div class="text-7xl md:text-9xl mb-6 filter drop-shadow-lg">🏆</div>
-            <h1 class="text-4xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-100 to-yellow-500 mb-4 tracking-tighter drop-shadow-sm">HOŞGELDİN</h1>
-            <h2 class="text-3xl md:text-6xl font-bold text-white tracking-widest uppercase bg-slate-900/50 px-8 py-2 rounded-2xl border border-yellow-500/30">ŞAMPİYON!</h2>
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 z-[90] transition-all duration-500 transform translate-y-32 opacity-0 border border-slate-700">
+        <div class="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center text-green-400">
+            <i class="fas fa-check-circle text-lg"></i>
         </div>
+        <span id="toastMessage" class="font-bold text-sm tracking-wide">İşlem Başarılı</span>
+    </div>
+
+    <!-- CHAMPION CELEBRATION OVERLAY -->
+    <div id="championOverlay" class="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center hidden transition-opacity duration-500 backdrop-blur-sm">
+        <div class="text-center animate-[bounce_2s_infinite] relative z-10">
+            <div class="text-7xl md:text-9xl mb-6 filter drop-shadow-[0_0_25px_rgba(251,191,36,0.6)]">🏆</div>
+            <h1 class="text-4xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-200 to-yellow-500 mb-4 tracking-tighter drop-shadow-sm">HOŞGELDİN</h1>
+            <h2 class="text-3xl md:text-6xl font-bold text-white tracking-widest uppercase bg-gradient-to-r from-pink-600/50 to-purple-600/50 px-10 py-4 rounded-3xl border border-white/20 backdrop-blur-md shadow-2xl">ŞAMPİYON!</h2>
+        </div>
+        <!-- Arka plan konfeti canvas'ı js ile eklenecek -->
     </div>
 
     <!-- LOGIN SCREEN -->
-    <div id="loginScreen" class="fixed inset-0 z-[60] bg-gradient-to-br from-slate-900 to-indigo-900 flex flex-col items-center justify-center p-4 overflow-y-auto">
+    <div id="loginScreen" class="fixed inset-0 z-[60] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-purple-900 to-pink-900 flex flex-col items-center justify-center p-4 overflow-y-auto">
         <!-- Arka Plan Efekti -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-            <div class="absolute -top-20 -right-20 w-64 h-64 bg-indigo-500 rounded-full blur-3xl opacity-20"></div>
-            <div class="absolute bottom-0 left-0 w-80 h-80 bg-purple-500 rounded-full blur-3xl opacity-20"></div>
+            <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+            <div class="absolute -top-40 -right-40 w-96 h-96 bg-pink-500 rounded-full blur-[128px] opacity-30 animate-pulse"></div>
+            <div class="absolute bottom-0 left-0 w-80 h-80 bg-purple-600 rounded-full blur-[100px] opacity-30 animate-pulse" style="animation-delay: 1s;"></div>
         </div>
 
         <div class="w-full max-w-md space-y-6 relative z-10">
             <!-- Login Form Card -->
-            <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl shadow-2xl">
+            <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl shadow-2xl ring-1 ring-white/10">
                 <div class="text-center mb-8">
-                    <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-lg shadow-indigo-500/30 transform rotate-6">
-                        <i class="fas fa-store text-white text-3xl"></i>
+                    <div class="w-24 h-24 bg-gradient-to-br from-pink-500 to-purple-600 rounded-3xl mx-auto flex items-center justify-center mb-6 shadow-xl shadow-pink-500/20 transform rotate-3 hover:rotate-0 transition-transform duration-300 border-4 border-white/10">
+                        <i class="fas fa-store text-white text-4xl drop-shadow-md"></i>
                     </div>
-                    <h1 class="text-2xl md:text-3xl font-extrabold text-white mb-2 leading-tight tracking-tight">
-                        Hedef AVM <br><span class="text-indigo-300 font-medium">Online Satış Girişi</span>
+                    <h1 class="text-3xl font-extrabold text-white mb-2 leading-tight tracking-tight">
+                        Hedef AVM <br><span class="text-pink-200 font-medium text-lg">Online Satış Girişi</span>
                     </h1>
                 </div>
                 
                 <form id="loginForm" class="space-y-6">
                     <div class="space-y-2">
-                        <label class="text-indigo-200 text-xs font-bold uppercase tracking-widest ml-1">Şube Seçimi</label>
+                        <label class="text-pink-200/80 text-xs font-bold uppercase tracking-widest ml-1">Şube Seçimi</label>
                         <div class="relative group">
-                            <select id="loginBranch" class="w-full pl-5 pr-12 py-4 bg-white/95 backdrop-blur-sm rounded-2xl text-slate-800 font-bold text-lg shadow-xl border-0 focus:ring-4 focus:ring-indigo-500/50 appearance-none cursor-pointer transition-all group-hover:bg-white" required>
+                            <select id="loginBranch" class="w-full pl-5 pr-12 py-4 bg-white/90 backdrop-blur-sm rounded-2xl text-slate-800 font-bold text-lg shadow-lg border-2 border-transparent focus:border-pink-400 focus:ring-0 appearance-none cursor-pointer transition-all hover:bg-white" required>
                                 <option value="">Yükleniyor...</option>
                             </select>
-                            <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none text-indigo-500">
+                            <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none text-pink-600">
                                 <i class="fas fa-chevron-down text-lg"></i>
                             </div>
                         </div>
@@ -295,16 +318,16 @@
 
                     <!-- Şifre Alanı -->
                     <div class="space-y-2">
-                        <label class="text-indigo-200 text-xs font-bold uppercase tracking-widest ml-1">Şifre</label>
+                        <label class="text-pink-200/80 text-xs font-bold uppercase tracking-widest ml-1">Şifre</label>
                         <div class="relative group">
-                            <input type="text" id="loginPassword" class="w-full pl-5 pr-12 py-4 bg-white/95 backdrop-blur-sm rounded-2xl text-slate-800 font-bold text-lg shadow-xl border-0 focus:ring-4 focus:ring-indigo-500/50 appearance-none transition-all group-hover:bg-white placeholder-slate-400" placeholder="Şifre Giriniz" required>
-                            <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none text-indigo-500">
+                            <input type="text" id="loginPassword" class="w-full pl-5 pr-12 py-4 bg-white/90 backdrop-blur-sm rounded-2xl text-slate-800 font-bold text-lg shadow-lg border-2 border-transparent focus:border-pink-400 focus:ring-0 appearance-none transition-all hover:bg-white placeholder-slate-400" placeholder="Şifre Giriniz" required>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none text-pink-600">
                                 <i class="fas fa-lock-open text-lg"></i>
                             </div>
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-500/40 text-lg flex items-center justify-center gap-3 group active:scale-95">
+                    <button type="submit" class="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-pink-500/30 text-lg flex items-center justify-center gap-3 group active:scale-95 border border-white/10">
                         <span>Giriş Yap</span>
                         <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                     </button>
@@ -313,8 +336,10 @@
             </div>
 
             <!-- LEADERBOARD PREVIEW (SKELETON LOADER İLE) -->
-            <div id="loginLeaderboard" class="bg-black/40 backdrop-blur-xl border border-white/10 p-5 rounded-3xl hidden w-full">
-                <h3 class="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-3 text-center border-b border-white/10 pb-2">🏆 Ayın Ciro Şampiyonları</h3>
+            <div id="loginLeaderboard" class="bg-black/30 backdrop-blur-md border border-white/10 p-6 rounded-3xl hidden w-full">
+                <h3 class="text-pink-200 text-xs font-bold uppercase tracking-widest mb-4 text-center border-b border-white/10 pb-3 flex items-center justify-center gap-2">
+                    <i class="fas fa-trophy text-yellow-400"></i> Ayın Ciro Şampiyonları
+                </h3>
                 
                 <div class="space-y-3" id="leaderboardList">
                     <!-- SKELETON LOADER -->
@@ -324,13 +349,6 @@
                             <div class="h-4 bg-white/20 rounded w-32"></div>
                         </div>
                         <div class="h-4 bg-white/20 rounded w-20"></div>
-                    </div>
-                    <div class="animate-pulse flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
-                         <div class="flex items-center gap-3">
-                             <div class="w-8 h-8 bg-white/20 rounded-full"></div>
-                             <div class="h-4 bg-white/20 rounded w-32"></div>
-                         </div>
-                         <div class="h-4 bg-white/20 rounded w-20"></div>
                     </div>
                 </div>
             </div>
@@ -342,92 +360,104 @@
         
         <!-- HEADER -->
         <header class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-8 md:mb-10">
-            <div class="flex items-center gap-5 w-full xl:w-auto bg-white p-4 md:p-0 rounded-2xl xl:bg-transparent shadow-sm xl:shadow-none border border-slate-100 xl:border-none">
-                <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200 text-indigo-600 text-2xl shrink-0 border border-slate-100 hidden md:flex">
+            <div class="flex items-center gap-5 w-full xl:w-auto bg-white/80 p-4 md:p-5 rounded-3xl xl:bg-transparent shadow-sm xl:shadow-none border border-pink-100 xl:border-none backdrop-blur-sm">
+                <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-pink-200 text-white text-2xl shrink-0 hidden md:flex transform rotate-3 hover:rotate-0 transition-transform">
                     <i class="fas fa-store"></i>
                 </div>
-                <div class="flex-1">
+                <div class="flex-1 w-full">
                     <div class="flex items-center gap-3 flex-wrap">
-                        <h1 class="text-xl md:text-3xl font-extrabold text-slate-800 tracking-tight" id="headerTitle">PANEL</h1>
+                        <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight" id="headerTitle">PANEL</h1>
                         
                         <!-- CROWN BADGE -->
-                        <div id="championBadge" class="hidden items-center gap-1.5 bg-gradient-to-r from-amber-200 to-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow-lg shadow-yellow-200/50 border border-white animate-pulse">
+                        <div id="championBadge" class="hidden items-center gap-1.5 bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 text-yellow-900 px-4 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-yellow-200/50 border border-white animate-pulse">
                             <i class="fas fa-crown crown-icon text-sm"></i> AYIN CİRO 1.Sİ
                         </div>
                     </div>
                     
-                    <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500 mt-2">
-                        <span class="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg font-bold text-xs border border-emerald-100">
+                    <div class="flex flex-wrap items-center gap-3 text-sm text-slate-500 mt-2 w-full">
+                        <span class="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full font-bold text-xs border border-emerald-100 shadow-sm">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                             Online
                         </span>
                         
-                        <!-- Toplam Ciro Display -->
-                        <div class="flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg font-bold text-xs border border-indigo-100">
-                            <i class="fas fa-wallet"></i>
-                            <span id="headerTotalRevenue">0 ₺</span> 
-                            <span id="headerRevenueLabel" class="ml-1 opacity-80">(Bu Ay)</span>
+                        <!-- Toplam Ciro Display - YENİ TASARIM (DAHA BELİRGİN) -->
+                        <div class="flex items-center gap-3 bg-white/80 px-5 py-2 rounded-2xl border border-pink-100 shadow-sm ml-auto sm:ml-0">
+                            <div class="flex flex-col items-end sm:items-start">
+                                <span id="headerRevenueLabel" class="text-[10px] uppercase font-bold text-pink-400 tracking-wider">Bu Ay Ciro</span>
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-wallet text-pink-500 text-xl"></i>
+                                    <span id="headerTotalRevenue" class="text-2xl font-extrabold text-slate-800 tracking-tight">0 ₺</span> 
+                                </div>
+                            </div>
                         </div>
 
                         <span id="currentUserDisplay" class="hidden font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg">...</span>
                         
-                        <button onclick="logout()" class="text-slate-400 hover:text-red-500 text-xs font-bold hover:underline transition ml-1">Çıkış Yap</button>
+                        <!-- Çıkış Butonu - YENİ TASARIM (DAHA BELİRGİN) -->
+                        <button onclick="logout()" class="ml-auto sm:ml-2 bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:text-red-600 px-4 py-2 rounded-xl font-bold transition-all shadow-sm flex items-center gap-2 text-xs group active:scale-95">
+                            <i class="fas fa-sign-out-alt group-hover:-translate-x-0.5 transition-transform"></i> 
+                            <span>Çıkış</span>
+                        </button>
                     </div>
                 </div>
             </div>
             
             <div class="w-full xl:w-auto flex flex-col sm:flex-row gap-3">
-                <button onclick="refreshData()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl font-bold bg-white text-slate-700 shadow-sm border border-slate-200 text-sm hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition flex justify-center items-center gap-2 group active:scale-95">
+                <button onclick="refreshData()" class="w-full sm:w-auto px-6 py-4 rounded-2xl font-bold bg-white text-slate-600 shadow-sm border border-slate-200 text-sm hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition flex justify-center items-center gap-2 group active:scale-95">
                     <i class="fas fa-sync-alt group-hover:rotate-180 transition-transform duration-500"></i> 
                     <span>Yenile</span>
-                    <span id="lastTime" class="text-xs font-normal text-slate-400 ml-2 bg-slate-100 px-2 py-0.5 rounded-md">--:--</span>
+                    <span id="lastTime" class="text-xs font-normal text-slate-400 ml-2 bg-slate-50 px-2 py-0.5 rounded-lg">--:--</span>
                 </button>
             </div>
         </header>
 
         <!-- GECİKMİŞ TAKİP BİLDİRİMİ -->
-        <div id="overdueNotification" class="hidden mb-8 bg-gradient-to-r from-orange-600 to-red-600 rounded-2xl p-5 flex flex-col sm:flex-row items-center sm:items-start gap-5 shadow-xl shadow-orange-500/30 transform hover:scale-[1.01] transition-transform animate-[pulse_3s_infinite]">
-            <div class="w-12 h-12 rounded-full bg-white/20 text-white flex items-center justify-center shrink-0 border-2 border-white/30">
-                <i class="fas fa-bell fa-lg animate-bounce"></i>
+        <div id="overdueNotification" class="hidden mb-8 bg-gradient-to-br from-rose-500 via-pink-600 to-purple-600 rounded-3xl p-1 shadow-xl shadow-pink-500/20 transform hover:scale-[1.01] transition-transform animate-[pulse_3s_infinite]">
+            <div class="bg-white/95 backdrop-blur-xl rounded-[20px] p-5 flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-100 to-pink-100 text-rose-500 flex items-center justify-center shrink-0 border border-rose-200 shadow-inner">
+                    <i class="fas fa-bell fa-lg animate-bounce"></i>
+                </div>
+                <div class="flex-1 text-center sm:text-left">
+                    <h4 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-purple-600 text-lg tracking-tight">Dikkat: Takip Gerektiren Kayıtlar Var!</h4>
+                    <p class="text-slate-500 text-sm mt-1 font-medium leading-relaxed" id="overdueMessage">...</p>
+                </div>
+                <button onclick="filterOverdue()" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-600 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:shadow-pink-500/30 transition flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fas fa-list-ul"></i> Listele
+                </button>
             </div>
-            <div class="flex-1 text-center sm:text-left">
-                <h4 class="font-extrabold text-white text-lg tracking-tight">Dikkat: Takip Gerektiren Kayıtlar Var!</h4>
-                <p class="text-orange-50 text-sm mt-1 font-medium leading-relaxed" id="overdueMessage">...</p>
-            </div>
-            <button onclick="filterOverdue()" class="w-full sm:w-auto px-6 py-3 bg-white text-orange-600 text-sm font-extrabold rounded-xl hover:bg-orange-50 hover:text-orange-700 transition shadow-lg flex items-center justify-center gap-2">
-                <i class="fas fa-list-ul"></i> Listele
-            </button>
         </div>
 
         <!-- CONTENT CARD -->
         <div class="glass-card flex flex-col overflow-hidden min-h-[500px]">
             
             <!-- FILTERS & TITLE -->
-            <div class="p-6 md:p-8 border-b border-slate-100 bg-white/50 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+            <div class="p-6 md:p-8 border-b border-pink-100 bg-white/60 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
                 <div>
-                    <h3 class="font-bold text-slate-800 text-lg md:text-xl flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm"><i class="fas fa-users"></i></span>
+                    <h3 class="font-bold text-slate-800 text-lg md:text-xl flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-100 to-purple-100 text-pink-600 flex items-center justify-center text-lg shadow-sm border border-pink-50">
+                            <i class="fas fa-users"></i>
+                        </span>
                         Müşteri Listesi
                     </h3>
-                    <p class="text-sm text-slate-400 font-medium mt-1 ml-10 hidden md:block">Güncel müşteri aramaları ve durumları</p>
+                    <p class="text-sm text-slate-400 font-medium mt-1 ml-14 hidden md:block">Güncel müşteri aramaları ve durumları</p>
                 </div>
                 
                 <div class="flex flex-col lg:flex-row gap-3 w-full xl:w-auto">
                     <!-- Ay Filtresi -->
                     <div class="relative w-full lg:w-48">
-                        <input type="month" id="monthFilter" onchange="refreshData()" class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition shadow-sm text-slate-600">
-                        <i class="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="month" id="monthFilter" onchange="refreshData()" class="modern-input pl-10 pr-4">
+                        <i class="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-pink-400"></i>
                     </div>
 
                     <!-- Arama -->
                     <div class="relative w-full lg:w-64">
-                        <input type="text" id="searchInput" onkeyup="renderTable()" placeholder="İsim veya Telefon..." class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none transition shadow-sm">
-                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="searchInput" onkeyup="renderTable()" placeholder="İsim veya Telefon..." class="modern-input pl-11 pr-4">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-pink-400"></i>
                     </div>
 
                     <!-- Durum Filtresi -->
                     <div class="relative w-full lg:w-64">
-                        <select id="filterStatus" onchange="renderTable()" class="w-full pl-4 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none appearance-none cursor-pointer shadow-sm">
+                        <select id="filterStatus" onchange="renderTable()" class="modern-input pl-4 pr-10 cursor-pointer">
                             <option value="">Tüm Durumlar</option>
                             <option value="aranmadı">🔴 Aranmadı</option>
                             <option value="arandı">🟡 Arandı</option>
@@ -435,21 +465,21 @@
                             <option value="gelecek">🔵 Mağazaya Gelecek</option>
                             <option value="tekrar">🟣 Tekrar Aranacak</option>
                         </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
+                        <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-pink-500">
                             <i class="fas fa-filter text-xs"></i>
                         </div>
                     </div>
 
-                    <!-- YENİ: Filtreleri Sıfırla Butonu -->
-                    <button onclick="resetFilters()" class="w-full lg:w-auto px-6 py-3 bg-white border border-slate-200 rounded-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-300 transition shadow-sm flex items-center justify-center gap-2 group whitespace-nowrap font-bold text-sm" title="Filtreleri Sıfırla">
+                    <!-- Filtreleri Sıfırla Butonu -->
+                    <button onclick="resetFilters()" class="w-full lg:w-auto px-6 py-3 bg-white border border-slate-200 rounded-2xl text-slate-500 hover:text-pink-600 hover:border-pink-300 hover:bg-pink-50 transition shadow-sm flex items-center justify-center gap-2 group whitespace-nowrap font-bold text-sm h-[52px]" title="Filtreleri Sıfırla">
                         <i class="fas fa-undo group-hover:rotate-180 transition-transform duration-500"></i>
-                        <span>Filtreleri Sıfırla</span>
+                        <span>Sıfırla</span>
                     </button>
                 </div>
             </div>
             
             <!-- TABLE AREA -->
-            <div class="flex-1 p-4 md:p-0 overflow-x-auto bg-white/30">
+            <div class="flex-1 p-0 overflow-x-auto bg-white/40">
                 <table class="custom-table w-full">
                     <thead>
                         <tr>
@@ -462,100 +492,104 @@
                         </tr>
                     </thead>
                     <tbody id="crmTableBody">
-                        <tr><td colspan="6" class="text-center py-20 text-slate-400 font-medium"><i class="fas fa-spinner fa-spin text-2xl mb-2 text-indigo-400"></i><br>Veriler Yükleniyor...</td></tr>
+                        <tr><td colspan="6" class="text-center py-20 text-slate-400 font-medium"><i class="fas fa-spinner fa-spin text-2xl mb-2 text-pink-400"></i><br>Veriler Yükleniyor...</td></tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- PAGINATION -->
-            <div class="p-4 md:p-6 border-t border-slate-100 bg-white/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="p-4 md:p-6 border-t border-pink-100 bg-white/60 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <span class="text-xs font-bold text-slate-500 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm order-2 sm:order-1" id="recordCountInfo">0 kayıt bulundu</span>
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-center order-1 sm:order-2">
-                    <button onclick="changePage(-1)" id="btnPrev" class="btn-page flex-1 sm:flex-none flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled><i class="fas fa-chevron-left text-[10px]"></i> Önceki</button>
+                    <button onclick="changePage(-1)" id="btnPrev" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-bold shadow-sm" disabled><i class="fas fa-chevron-left text-[10px]"></i> Önceki</button>
                     <span id="pageInfo" class="text-xs font-bold bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-slate-700 min-w-[90px] text-center shadow-sm">1 / 1</span>
-                    <button onclick="changePage(1)" id="btnNext" class="btn-page flex-1 sm:flex-none flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>Sonraki <i class="fas fa-chevron-right text-[10px]"></i></button>
+                    <button onclick="changePage(1)" id="btnNext" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-bold shadow-sm" disabled>Sonraki <i class="fas fa-chevron-right text-[10px]"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- EDIT MODAL (TAM EKRAN MOBİL DÜZELTMESİ) -->
-    <div id="editModal" class="fixed inset-0 modal-overlay z-[70] hidden overflow-hidden flex justify-center items-end md:items-center p-0 md:p-4">
+    <div id="editModal" class="fixed inset-0 modal-overlay z-[70] hidden overflow-hidden flex justify-center items-end md:items-center p-0 md:p-4 bg-black/20 backdrop-blur-sm transition-all duration-300">
         <!-- class: modal-content-wrapper -->
-        <div class="modal-content-wrapper bg-white w-full max-w-3xl md:rounded-3xl shadow-2xl relative flex flex-col h-full md:h-auto md:max-h-[90vh] transition-all transform duration-200">
+        <div class="modal-content-wrapper bg-white w-full max-w-3xl md:rounded-[32px] shadow-2xl relative flex flex-col h-full md:h-auto md:max-h-[90vh] transition-all transform duration-200 scale-100">
             
             <!-- Modal Header -->
-            <div class="px-6 md:px-8 py-5 border-b border-slate-100 flex justify-between items-center sticky top-0 z-20 bg-white md:rounded-t-3xl shadow-sm md:shadow-none">
+            <div class="px-6 md:px-8 py-6 border-b border-pink-100 flex justify-between items-center sticky top-0 z-20 bg-white md:rounded-t-[32px]">
                 <div>
-                    <h3 class="font-extrabold text-slate-800 text-xl">Kayıt Düzenle</h3>
-                    <p class="text-xs text-slate-400 font-medium">Müşteri detaylarını güncelleyin</p>
+                    <h3 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600 text-2xl">Kayıt Düzenle</h3>
+                    <p class="text-xs text-slate-400 font-bold mt-1 uppercase tracking-wide">Müşteri Detaylarını Güncelleyin</p>
                 </div>
-                <button onclick="closeEditModal()" class="w-10 h-10 rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition flex items-center justify-center border border-slate-100 md:border-none">
+                <button onclick="closeEditModal()" class="w-10 h-10 rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition flex items-center justify-center border border-slate-200 shadow-sm">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
             
             <!-- Modal Body (Scrollable) -->
-            <div class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50/50 pb-24 md:pb-8">
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 bg-[#fff5f7] pb-24 md:pb-8">
                 <form id="editForm" class="space-y-8">
                     <input type="hidden" id="m_rowIndex"><input type="hidden" id="m_sheetName">
 
                     <!-- Static Info -->
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm grid grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-3xl border border-pink-100 shadow-sm grid grid-cols-2 gap-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-pink-100 to-transparent opacity-50 rounded-bl-full pointer-events-none"></div>
                         <div>
-                            <label class="text-[10px] uppercase font-bold text-indigo-400 block mb-1.5 tracking-wider">Şube</label>
+                            <label class="text-[10px] uppercase font-bold text-pink-400 block mb-1.5 tracking-wider">Şube</label>
                             <input type="text" id="m_branch" class="w-full bg-transparent font-bold text-slate-700 text-sm focus:outline-none" readonly>
                         </div>
                         <div>
-                            <label class="text-[10px] uppercase font-bold text-indigo-400 block mb-1.5 tracking-wider">Tarih</label>
+                            <label class="text-[10px] uppercase font-bold text-pink-400 block mb-1.5 tracking-wider">Tarih</label>
                             <input type="text" id="m_date" class="w-full bg-transparent font-bold text-slate-700 text-sm focus:outline-none" readonly>
                         </div>
                     </div>
 
                     <!-- Müşteri Bilgileri -->
                     <div>
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 pl-1">Müşteri Bilgileri</h4>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 pl-1 flex items-center gap-2">
+                            <i class="fas fa-user-circle text-pink-300"></i> Müşteri Bilgileri
+                        </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <!-- YENİ EKLENEN: Müşteri No -->
                             <div>
-                                <label class="text-sm font-semibold text-slate-600 mb-2 block">Müşteri No</label>
+                                <label class="text-sm font-bold text-slate-600 mb-2 block">Müşteri No</label>
                                 <input type="text" id="m_customerNo" class="modern-input" placeholder="Opsiyonel">
                             </div>
                             <div>
-                                <label class="text-sm font-semibold text-slate-600 mb-2 block">Ad Soyad</label>
+                                <label class="text-sm font-bold text-slate-600 mb-2 block">Ad Soyad</label>
                                 <input type="text" id="m_name" class="modern-input">
                             </div>
                             <div>
-                                <label class="text-sm font-semibold text-slate-600 mb-2 block">Telefon</label>
+                                <label class="text-sm font-bold text-slate-600 mb-2 block">Telefon</label>
                                 <input type="text" id="m_contact" class="modern-input">
                             </div>
                             <div>
-                                <label class="text-sm font-semibold text-slate-600 mb-2 block">Kategori</label>
-                                <select id="m_category" class="modern-input h-[50px]">
+                                <label class="text-sm font-bold text-slate-600 mb-2 block">Kategori</label>
+                                <select id="m_category" class="modern-input h-[52px]">
                                     <option>Mobilya</option><option>Baza Yatak Başlık</option><option>Bebek Çocuk</option>
                                     <option>Beyaz Eşya</option><option>Elektrikli Ev Aletleri</option><option>Elektronik</option>
                                     <option>Ev Dekorasyonu</option><option>Halı</option><option>Tekstil</option><option>Züccaciye</option><option>Ayakkabı</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="text-sm font-semibold text-slate-600 mb-2 block">Ürün</label>
+                                <label class="text-sm font-bold text-slate-600 mb-2 block">Ürün</label>
                                 <input type="text" id="m_product" class="modern-input">
                             </div>
                         </div>
                     </div>
 
-                    <hr class="border-slate-200 border-dashed">
+                    <div class="border-t-2 border-dashed border-pink-200"></div>
 
                     <!-- İşlem Adımları -->
                     <div>
-                        <h4 class="text-xs font-bold text-indigo-500 uppercase tracking-wider mb-4 pl-1 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Arama Sonucu
+                        <h4 class="text-xs font-bold text-pink-600 uppercase tracking-wider mb-4 pl-1 flex items-center gap-2">
+                            <span class="w-6 h-6 rounded-lg bg-pink-100 flex items-center justify-center text-pink-600 text-xs"><i class="fas fa-phone-alt"></i></span> 
+                            Arama Sonucu
                         </h4>
                         <div class="space-y-5">
                             <!-- 1. Adım -->
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm transition-all hover:border-indigo-200 hover:shadow-md" id="step1box">
-                                <label class="text-sm font-bold text-slate-700 mb-3 block">1. Aranma Durumu</label>
-                                <select id="m_status" class="modern-input h-[50px] font-bold text-slate-700">
+                            <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm transition-all hover:border-pink-300 hover:shadow-md group" id="step1box">
+                                <label class="text-sm font-bold text-slate-700 mb-3 block group-hover:text-pink-600 transition-colors">1. Aranma Durumu</label>
+                                <select id="m_status" class="modern-input h-[52px] font-bold text-slate-700">
                                     <option value="" selected>Seçiniz...</option>
                                     <option value="aranmadı">🔴 Aranmadı</option>
                                     <option value="arandı">🟢 Arandı</option>
@@ -563,9 +597,9 @@
                             </div>
                             
                             <!-- 2. Adım -->
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm transition-all" id="step2box">
+                            <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm transition-all" id="step2box">
                                 <label class="text-sm font-bold text-slate-700 mb-3 block">2. Görüşme Sonucu</label>
-                                <select id="m_result" class="modern-input h-[50px]" disabled>
+                                <select id="m_result" class="modern-input h-[52px]" disabled>
                                     <option value="" selected>Seçiniz...</option>
                                     <option value="Beklemede">Beklemede</option>
                                     <option value="Müşteri Mağazaya Gelecek">Müşteri Mağazaya Gelecek</option>
@@ -578,35 +612,37 @@
                             </div>
                             
                             <!-- 3. Adım -->
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm transition-all" id="step3box">
+                            <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm transition-all" id="step3box">
                                 <label class="text-sm font-bold text-slate-700 mb-3 block">3. Görüşme Notu</label>
-                                <textarea id="m_note" class="modern-input resize-none overflow-hidden min-h-[60px]" placeholder="Görüşme detaylarını buraya yazın..." oninput="autoResize(this)" disabled></textarea>
+                                <textarea id="m_note" class="modern-input resize-none overflow-hidden min-h-[80px]" placeholder="Görüşme detaylarını buraya yazın..." oninput="autoResize(this)" disabled></textarea>
                                 <div class="text-[11px] text-slate-400 mt-2 flex items-center gap-1">
-                                    <i class="fas fa-info-circle"></i> <span>Görüşme notu ekleyebilirsiniz.</span>
+                                    <i class="fas fa-info-circle text-pink-300"></i> <span>Görüşme notu ekleyebilirsiniz.</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- 4. Adım (Satış) -->
-                    <div class="bg-emerald-50/50 p-6 rounded-2xl border border-emerald-100 shadow-sm transition-all" id="step4box">
-                        <h4 class="text-sm font-bold text-emerald-800 mb-4 flex items-center gap-2">
-                            <i class="fas fa-cash-register"></i> Satış Onayı
+                    <div class="bg-gradient-to-br from-emerald-50 to-green-50 p-6 rounded-3xl border border-emerald-100 shadow-sm transition-all relative overflow-hidden" id="step4box">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-100 rounded-bl-full opacity-30 pointer-events-none"></div>
+                        <h4 class="text-sm font-bold text-emerald-800 mb-4 flex items-center gap-2 relative z-10">
+                            <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center"><i class="fas fa-cash-register"></i></span>
+                            Satış Onayı
                         </h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10">
                             <div>
-                                <label class="text-xs font-bold text-emerald-700/70 mb-2 block uppercase">Sipariş Durumu</label>
-                                <select id="m_isOrder" class="modern-input border-emerald-200 h-[50px] focus:ring-emerald-200" onchange="toggleAmount()" disabled>
+                                <label class="text-xs font-bold text-emerald-700/70 mb-2 block uppercase tracking-wide">Sipariş Durumu</label>
+                                <select id="m_isOrder" class="modern-input border-emerald-200 h-[52px] focus:ring-emerald-200 focus:border-emerald-400" onchange="toggleAmount()" disabled>
                                     <option value="" selected>Seçiniz...</option>
                                     <option value="Hayır">Hayır</option>
                                     <option value="Evet">Evet, Satış Yapıldı</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-emerald-700/70 mb-2 block uppercase">Toplam Tutar</label>
+                                <label class="text-xs font-bold text-emerald-700/70 mb-2 block uppercase tracking-wide">Toplam Tutar</label>
                                 <div class="relative">
-                                    <input type="number" id="m_amount" class="modern-input border-emerald-200 h-[50px] pl-10 focus:ring-emerald-200 font-bold text-emerald-700" placeholder="0.00" disabled>
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 font-bold">₺</span>
+                                    <input type="number" id="m_amount" class="modern-input border-emerald-200 h-[52px] pl-10 focus:ring-emerald-200 focus:border-emerald-400 font-bold text-emerald-700 text-lg" placeholder="0.00" disabled>
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500 font-bold text-lg">₺</span>
                                 </div>
                             </div>
                         </div>
@@ -615,10 +651,10 @@
             </div>
 
             <!-- Footer (Fixed Bottom for Mobile) -->
-            <div class="p-5 md:p-6 border-t border-slate-100 bg-white md:rounded-b-3xl flex flex-col md:flex-row justify-end gap-3 sticky bottom-0 z-20 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-                <button type="button" onclick="closeEditModal()" class="w-full md:w-auto px-8 py-4 md:py-3.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition border border-transparent hover:border-slate-200 order-2 md:order-1 bg-slate-50 md:bg-white">İptal</button>
-                <button type="submit" form="editForm" id="updateBtn" class="w-full md:w-auto px-10 py-4 md:py-3.5 rounded-xl text-sm font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition active:scale-95 flex justify-center items-center gap-2 order-1 md:order-2">
-                    <i class="fas fa-save"></i> Değişiklikleri Kaydet
+            <div class="p-5 md:p-6 border-t border-pink-100 bg-white md:rounded-b-[32px] flex flex-col md:flex-row justify-end gap-3 sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.03)]">
+                <button type="button" onclick="closeEditModal()" class="w-full md:w-auto px-8 py-4 md:py-3.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition border border-transparent hover:border-slate-200 order-2 md:order-1 bg-slate-50 md:bg-white">Vazgeç</button>
+                <button type="submit" form="editForm" id="updateBtn" class="w-full md:w-auto px-10 py-4 md:py-3.5 rounded-xl text-sm font-bold bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:from-pink-500 hover:to-purple-500 shadow-lg shadow-pink-500/30 transition active:scale-95 flex justify-center items-center gap-2 order-1 md:order-2">
+                    <i class="fas fa-save"></i> Kaydet
                 </button>
             </div>
         </div>
@@ -682,17 +718,17 @@
 
         // Şube Şifreleri Tanımlaması
         const BRANCH_PASSWORDS = {
-            'İnegöl Şubesi': '4323',
-            'Paşabahçe Şubesi': '1234',
-            'Çekmeköy Şubesi': '1234',
-            'İzmit Şubesi': '1234',
-            'Gölcük Şubesi': '1234',
-            'Körfez Şubesi': '1234',
-            'Derince Şubesi': '1234',
-            'Sultanbeyli Şubesi': '1234',
-            'Yenidoğan Şubesi': '1234',
-            'Kavacık Şubesi': '1234',
-            'Çayırova Şubesi': '1234'
+           'İnegöl Şubesi': '1601',
+            'Paşabahçe Şubesi': '3401',
+            'Çekmeköy Şubesi': '3403',
+            'İzmit Şubesi': '4104',
+            'Gölcük Şubesi': '4105',
+            'Körfez Şubesi': '4102',
+            'Derince Şubesi': '4103',
+            'Sultanbeyli Şubesi': '3405',
+            'Yenidoğan Şubesi': '3404',
+            'Kavacık Şubesi': '3402',
+            'Çayırova Şubesi': '4101'
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -793,7 +829,7 @@
                 const box = document.getElementById(boxId);
                 if(box) {
                     box.classList.remove('opacity-50', 'pointer-events-none');
-                    box.classList.add('border-indigo-200', 'shadow-md');
+                    box.classList.add('border-pink-300', 'shadow-md');
                 }
                 if(el) el.disabled = false;
             };
@@ -802,7 +838,7 @@
                 const box = document.getElementById(boxId);
                 if(box) {
                     box.classList.add('opacity-50', 'pointer-events-none');
-                    box.classList.remove('border-indigo-200', 'shadow-md');
+                    box.classList.remove('border-pink-300', 'shadow-md');
                 }
                 if(el) {
                     el.disabled = true;
@@ -854,6 +890,17 @@
             document.getElementById('filterStatus').value = '';
             activeFilterMode = 'default';
             renderTable();
+        }
+
+        // TOAST NOTIFICATION FUNCTİON
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toastMessage');
+            msgEl.textContent = msg;
+            toast.classList.remove('translate-y-32', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-32', 'opacity-0');
+            }, 3000);
         }
 
         async function fetchBranches() {
@@ -1032,6 +1079,7 @@
             document.getElementById('searchInput').value = '';
             document.getElementById('filterStatus').value = '';
             renderTable();
+            showToast("Takip gerektiren (Tekrar Aranacak / Gelecek) müşteriler listelendi.");
         }
 
         function updateChampionBadge() {
