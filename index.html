@@ -160,16 +160,16 @@
             
             /* Mobil Kart Tasarımı */
             .custom-table tr { 
-                margin-bottom: 16px; 
+                margin-bottom: 20px; /* Kartlar arası boşluk arttırıldı */
                 border-radius: 20px; 
                 background: white; 
                 border: 1px solid #e2e8f0;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
                 position: relative;
                 overflow: hidden;
             }
 
-            /* Kart Sol Şerit */
+            /* Kart Sol Şerit - Renk JS ile atanıyor */
             .custom-table tr::before {
                 content: '';
                 position: absolute;
@@ -177,8 +177,8 @@
                 top: 0;
                 bottom: 0;
                 width: 6px;
-                background: #e2e8f0; /* Default */
-                z-index: 1;
+                background: #e2e8f0; 
+                z-index: 2;
             }
             
             .custom-table td { 
@@ -188,13 +188,27 @@
                 justify-content: space-between;
                 align-items: center;
                 text-align: right;
-                padding-left: 24px; /* Şerit için boşluk */
+                padding-left: 20px; 
             }
             
+            /* İlk TD (Müşteri Adı) için özel stil - Kart Başlığı */
+            .custom-table td:first-child {
+                background-color: #f8fafc;
+                border-bottom: 1px solid #e2e8f0;
+                padding-top: 16px;
+                padding-bottom: 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: center;
+                text-align: left;
+            }
+            .custom-table td:first-child::before { display: none; } /* Başlıkta etiket gizle */
+
+            /* Son TD (Butonlar) */
             .custom-table td:last-child { 
                 border-bottom: none; 
-                padding: 16px 20px 20px 24px;
-                background: #fcfcfc;
+                padding: 16px 20px;
+                background: white;
                 justify-content: center;
             }
 
@@ -203,7 +217,7 @@
                 content: attr(data-label); 
                 font-weight: 700; 
                 color: #94a3b8; 
-                font-size: 0.7rem; 
+                font-size: 0.75rem; 
                 text-transform: uppercase; 
                 text-align: left;
                 margin-right: auto;
@@ -212,19 +226,22 @@
             /* Kart İçerikleri */
             .custom-table td > div, .custom-table td > span {
                 text-align: right;
-                max-width: 65%;
+                max-width: 60%;
             }
 
             /* Mobil Butonlar */
-            .mobile-action-btn { width: 100%; justify-content: center; padding: 12px; }
+            .mobile-action-btn { width: 100%; justify-content: center; padding: 14px; font-size: 1rem; }
             
-            /* Modal Responsive */
-            /* DÜZELTME: Mobilde tam ekran ve scroll sorunu için */
+            /* Modal Responsive Tam Ekran */
             #editModal .modal-content-wrapper { 
-                border-radius: 24px 24px 0 0; 
-                margin-top: auto; 
-                height: 90vh; /* Tam ekran yerine %90 yükseklik */
-                max-height: 90vh;
+                border-radius: 0; 
+                margin: 0;
+                height: 100%; 
+                max-height: 100%;
+                width: 100%;
+            }
+            #editModal .modal-overlay {
+                align-items: flex-start; /* Mobilde üstten başla */
             }
         }
     </style>
@@ -272,32 +289,25 @@
                 <p id="loginError" class="mt-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-100 text-center text-sm font-medium hidden backdrop-blur-sm"></p>
             </div>
 
-            <!-- LEADERBOARD PREVIEW (SKELETON LOADER EKLENDİ - GÜNCELLENDİ) -->
+            <!-- LEADERBOARD PREVIEW (SKELETON LOADER İLE) -->
             <div id="loginLeaderboard" class="bg-black/40 backdrop-blur-xl border border-white/10 p-5 rounded-3xl hidden w-full">
                 <h3 class="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-3 text-center border-b border-white/10 pb-2">🏆 Ayın Ciro Şampiyonları</h3>
                 
                 <div class="space-y-3" id="leaderboardList">
-                    <!-- SKELETON LOADER - GÜNCELLENDİ -->
+                    <!-- SKELETON LOADER -->
                     <div class="animate-pulse flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
                         <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 bg-white/20 rounded-full"></div>
-                            <div class="h-4 bg-white/20 rounded w-24"></div>
+                            <div class="w-8 h-8 bg-white/20 rounded-full"></div>
+                            <div class="h-4 bg-white/20 rounded w-32"></div>
                         </div>
-                        <div class="h-4 bg-white/20 rounded w-16"></div>
+                        <div class="h-4 bg-white/20 rounded w-20"></div>
                     </div>
                     <div class="animate-pulse flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
                          <div class="flex items-center gap-3">
-                             <div class="w-6 h-6 bg-white/20 rounded-full"></div>
-                             <div class="h-4 bg-white/20 rounded w-24"></div>
+                             <div class="w-8 h-8 bg-white/20 rounded-full"></div>
+                             <div class="h-4 bg-white/20 rounded w-32"></div>
                          </div>
-                         <div class="h-4 bg-white/20 rounded w-16"></div>
-                    </div>
-                    <div class="animate-pulse flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
-                         <div class="flex items-center gap-3">
-                             <div class="w-6 h-6 bg-white/20 rounded-full"></div>
-                             <div class="h-4 bg-white/20 rounded w-24"></div>
-                         </div>
-                         <div class="h-4 bg-white/20 rounded w-16"></div>
+                         <div class="h-4 bg-white/20 rounded w-20"></div>
                     </div>
                 </div>
             </div>
@@ -317,7 +327,7 @@
                     <div class="flex items-center gap-3 flex-wrap">
                         <h1 class="text-xl md:text-3xl font-extrabold text-slate-800 tracking-tight" id="headerTitle">PANEL</h1>
                         
-                        <!-- CROWN BADGE (1. Olan Şube İçin) -->
+                        <!-- CROWN BADGE -->
                         <div id="championBadge" class="hidden items-center gap-1.5 bg-gradient-to-r from-amber-200 to-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow-lg shadow-yellow-200/50 border border-white animate-pulse">
                             <i class="fas fa-crown crown-icon text-sm"></i> AYIN CİRO 1.Sİ
                         </div>
@@ -336,7 +346,6 @@
                             <span id="headerRevenueLabel" class="ml-1 opacity-80">(Bu Ay)</span>
                         </div>
 
-                        <!-- Gizlenen duplicate user display -->
                         <span id="currentUserDisplay" class="hidden font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg">...</span>
                         
                         <button onclick="logout()" class="text-slate-400 hover:text-red-500 text-xs font-bold hover:underline transition ml-1">Çıkış Yap</button>
@@ -363,7 +372,7 @@
                         <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm"><i class="fas fa-users"></i></span>
                         Müşteri Listesi
                     </h3>
-                    <p class="text-sm text-slate-400 font-medium mt-1 ml-10">Güncel müşteri aramaları ve durumları</p>
+                    <p class="text-sm text-slate-400 font-medium mt-1 ml-10 hidden md:block">Güncel müşteri aramaları ve durumları</p>
                 </div>
                 
                 <div class="flex flex-col lg:flex-row gap-3 w-full xl:w-auto">
@@ -427,24 +436,24 @@
         </div>
     </div>
 
-    <!-- EDIT MODAL (MOBIL DÜZELTMESİ YAPILDI) -->
-    <div id="editModal" class="fixed inset-0 modal-overlay z-[70] hidden overflow-y-auto overflow-x-hidden flex justify-center items-end md:items-center p-0 md:p-4">
-        <!-- class: modal-content-wrapper MOBIL UYUMLU CLASS -->
-        <div class="modal-content-wrapper bg-white w-full max-w-3xl md:rounded-3xl shadow-2xl relative flex flex-col h-[90dvh] md:h-auto md:max-h-[90vh] transition-all transform duration-200">
+    <!-- EDIT MODAL (TAM EKRAN MOBİL DÜZELTMESİ) -->
+    <div id="editModal" class="fixed inset-0 modal-overlay z-[70] hidden overflow-hidden flex justify-center items-end md:items-center p-0 md:p-4">
+        <!-- class: modal-content-wrapper -->
+        <div class="modal-content-wrapper bg-white w-full max-w-3xl md:rounded-3xl shadow-2xl relative flex flex-col h-full md:h-auto md:max-h-[90vh] transition-all transform duration-200">
             
             <!-- Modal Header -->
-            <div class="px-6 md:px-8 py-5 border-b border-slate-100 flex justify-between items-center sticky top-0 z-20 bg-white rounded-t-3xl">
+            <div class="px-6 md:px-8 py-5 border-b border-slate-100 flex justify-between items-center sticky top-0 z-20 bg-white md:rounded-t-3xl shadow-sm md:shadow-none">
                 <div>
                     <h3 class="font-extrabold text-slate-800 text-xl">Kayıt Düzenle</h3>
                     <p class="text-xs text-slate-400 font-medium">Müşteri detaylarını güncelleyin</p>
                 </div>
-                <button onclick="closeEditModal()" class="w-10 h-10 rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition flex items-center justify-center">
+                <button onclick="closeEditModal()" class="w-10 h-10 rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition flex items-center justify-center border border-slate-100 md:border-none">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
             
-            <!-- Modal Body -->
-            <div class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50/50">
+            <!-- Modal Body (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50/50 pb-24 md:pb-8">
                 <form id="editForm" class="space-y-8">
                     <input type="hidden" id="m_rowIndex"><input type="hidden" id="m_sheetName">
 
@@ -554,15 +563,13 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="h-10 md:hidden"></div> <!-- Mobil spacer -->
                 </form>
             </div>
 
-            <!-- Footer -->
-            <div class="p-5 md:p-6 border-t border-slate-100 bg-white md:rounded-b-3xl flex flex-col md:flex-row justify-end gap-3 sticky bottom-0 z-20 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
-                <button type="button" onclick="closeEditModal()" class="w-full md:w-auto px-8 py-3.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition border border-transparent hover:border-slate-200 order-2 md:order-1">İptal</button>
-                <button type="submit" form="editForm" id="updateBtn" class="w-full md:w-auto px-10 py-3.5 rounded-xl text-sm font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition active:scale-95 flex justify-center items-center gap-2 order-1 md:order-2">
+            <!-- Footer (Fixed Bottom for Mobile) -->
+            <div class="p-5 md:p-6 border-t border-slate-100 bg-white md:rounded-b-3xl flex flex-col md:flex-row justify-end gap-3 sticky bottom-0 z-20 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+                <button type="button" onclick="closeEditModal()" class="w-full md:w-auto px-8 py-4 md:py-3.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition border border-transparent hover:border-slate-200 order-2 md:order-1 bg-slate-50 md:bg-white">İptal</button>
+                <button type="submit" form="editForm" id="updateBtn" class="w-full md:w-auto px-10 py-4 md:py-3.5 rounded-xl text-sm font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition active:scale-95 flex justify-center items-center gap-2 order-1 md:order-2">
                     <i class="fas fa-save"></i> Değişiklikleri Kaydet
                 </button>
             </div>
@@ -577,75 +584,30 @@
         const parseCurrency = (val) => {
             if (typeof val === 'number') return val;
             if (!val) return 0;
-            
-            let str = val.toString().trim();
-            if (!/\d/.test(str)) return 0;
-
-            // Boşlukları temizle ("15 000" -> "15000") - ÖNEMLİ DÜZELTME
-            // Sadece sayı, nokta, virgül ve eksi işaretini bırak
-            let cleanStr = str.replace(/\s/g, '').replace(/TL/gi, '').replace(/[^\d.,-]/g, '');
-
-            // Format Tespiti:
-            // 1. Virgül varsa, virgül ondalıktır (TR Standart: 1.500,50)
-            if (cleanStr.includes(',')) {
-                cleanStr = cleanStr.replace(/\./g, '').replace(',', '.');
-            }
-            // 2. Virgül yok, Nokta var
-            else if (cleanStr.includes('.')) {
-                // Eğer birden fazla nokta varsa binliktir (Örn: "1.000.000") -> Sil
-                if ((cleanStr.match(/\./g) || []).length > 1) {
-                    cleanStr = cleanStr.replace(/\./g, '');
+            let str = val.toString().trim().replace(/\s/g, '').replace(/TL/gi, '').replace(/[^\d.,-]/g, '');
+            if (str.includes(',')) { str = str.replace(/\./g, '').replace(',', '.'); } 
+            else if (str.includes('.')) { 
+                if ((str.match(/\./g) || []).length > 1 || (str.split('.')[1] && str.split('.')[1].length === 3)) { 
+                    str = str.replace(/\./g, ''); 
                 } 
-                // Tek nokta varsa
-                else {
-                    const parts = cleanStr.split('.');
-                    // Eğer noktadan sonra 3 basamak varsa (1.500), TR binlik varsay
-                    if (parts[1].length === 3) {
-                        cleanStr = cleanStr.replace(/\./g, '');
-                    } 
-                    // Değilse (1500.5 veya 15.50), ondalık varsay (Dokunma)
-                }
             }
-            
-            return parseFloat(cleanStr) || 0;
+            return parseFloat(str) || 0;
         };
 
         const getRevenue = (item) => {
-            if (!item) return 0;
-
-            // 1. Direkt bilinen anahtarlar (Öncelikli)
-            const directKeys = ['revenue', 'ciro', 'amount', 'total', 'satis', 'O', 'o', '0', 'Toplam CİRO', 'Toplam Ciro', 'toplam ciro', 'toplam_ciro', 'tutar'];
-            for (const key of directKeys) {
-                if (item[key] !== undefined && item[key] !== null && item[key] !== '') {
-                    return item[key];
-                }
-            }
-
-            // 2. Fuzzy Search (İçinde 'ciro' vb geçen her şey)
+            if (item.revenue !== undefined) return item.revenue;
             const keys = Object.keys(item);
-            let candidates = [];
-
             for (const key of keys) {
-                const lowerKey = key.toString().toLowerCase().replace(/\s+/g, '').trim();
-                
-                if (lowerKey.includes('ciro') || lowerKey.includes('revenue') || lowerKey.includes('tutar') || lowerKey.includes('total')) {
-                     // Telefon ve ID gibi sayısal ama ciro olmayanları ele
-                     if (!lowerKey.includes('tel') && !lowerKey.includes('no') && !lowerKey.includes('id') && !lowerKey.includes('date')) {
-                         const val = parseCurrency(item[key]);
-                         if (val > 0) candidates.push(val);
+                const clean = key.toString().toLowerCase().replace(/\s+/g, '').trim();
+                if (clean === 'o' || clean === '0' || clean.includes('ciro') || clean.includes('revenue') || clean.includes('amount')) {
+                     if (!clean.includes('tel') && !clean.includes('no') && !clean.includes('id') && !clean.includes('date')) {
+                         return item[key];
                      }
                 }
             }
-            
-            // Eğer adaylar varsa en büyüğünü döndür (Ciro genelde en büyük sayıdır)
-            if (candidates.length > 0) {
-                return Math.max(...candidates);
-            }
-
             return 0;
         };
 
-        // --- STATE ---
         let currentBranch = null;
         let branchList = [];
         let leaderboardData = []; 
@@ -653,7 +615,6 @@
         let currentPage = 1;
         const rowsPerPage = 10;
 
-        // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date();
             const year = today.getFullYear();
@@ -667,13 +628,7 @@
                 e.preventDefault();
                 const branch = document.getElementById('loginBranch').value;
                 const errorMsg = document.getElementById('loginError');
-
-                if(!branch) { 
-                    errorMsg.textContent = "Lütfen listeden bir şube seçiniz."; 
-                    errorMsg.classList.remove('hidden'); 
-                    return; 
-                }
-                
+                if(!branch) { errorMsg.textContent = "Lütfen bir şube seçiniz."; errorMsg.classList.remove('hidden'); return; }
                 loginSuccess(branch);
             });
         });
@@ -745,15 +700,13 @@
         }
 
         function checkFormState() {
-            if (window.updateModalFlow) {
-                 window.updateModalFlow();
-            }
+            window.updateModalFlow(); 
             toggleAmount(); 
         }
 
         async function fetchBranches() {
             try {
-                // SKELETON LOADER GÖSTER (Zaten default olarak var)
+                // SKELETON LOADER GÖSTER (Default haliyle)
                 document.getElementById('loginLeaderboard').classList.remove('hidden');
 
                 const res = await fetch(`${API_URL}?action=getLeaderboard`, { method: 'GET', redirect: 'follow', cache: 'no-store' });
@@ -791,7 +744,6 @@
                 return;
             }
 
-            // GÜVENLİ SIRALAMA
             const top3 = [...list].sort((a, b) => {
                 const revA = parseCurrency(getRevenue(a));
                 const revB = parseCurrency(getRevenue(b));
@@ -802,7 +754,6 @@
                 // SKELETON'u TEMİZLE VE GERÇEK VERİYİ YAZ
                 listEl.innerHTML = top3.map((item, index) => {
                     const revenueVal = parseCurrency(getRevenue(item));
-                    
                     let icon = index === 0 ? '👑' : (index === 1 ? '🥈' : '🥉');
                     let colorClass = index === 0 ? 'text-yellow-300 font-extrabold' : 'text-white font-bold';
                     let bgClass = index === 0 ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-yellow-500/30' : 'hover:bg-white/5';
@@ -827,18 +778,15 @@
 
         function loginSuccess(branch) {
             currentBranch = branch;
-            const loginScreen = document.getElementById('loginScreen');
-            const mainApp = document.getElementById('mainApp');
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            
             const userDisplay = document.getElementById('currentUserDisplay');
-            const headerTitle = document.getElementById('headerTitle');
-
-            if (loginScreen) loginScreen.classList.add('hidden');
-            if (mainApp) mainApp.classList.remove('hidden');
-            if (userDisplay) {
+            if(userDisplay) {
                 userDisplay.textContent = branch;
                 userDisplay.style.display = 'none'; // Duplicate'i gizle
             }
-            if (headerTitle) headerTitle.textContent = branch.toUpperCase();
+            document.getElementById('headerTitle').textContent = branch.toUpperCase();
             
             refreshData(); 
             setInterval(refreshData, 60000); 
@@ -853,31 +801,27 @@
 
             const selectedMonth = document.getElementById('monthFilter').value; 
             
-            // --- GÜNCELLEME: (Bu Ay) Etiketini Dinamik Yapma ---
+            // (Bu Ay) Etiketini Dinamik Yapma
             const labelEl = document.getElementById('headerRevenueLabel');
             if (labelEl && selectedMonth) {
                 const [y, m] = selectedMonth.split('-');
                 const date = new Date(y, m - 1);
-                // Türkçe ay ismini al
                 const monthName = date.toLocaleDateString('tr-TR', { month: 'long' });
-                // İlk harfi büyüt ve formatla
                 const formattedLabel = `(${monthName.charAt(0).toUpperCase() + monthName.slice(1)} ${y})`;
                 labelEl.textContent = formattedLabel;
             }
-            // ----------------------------------------------------
 
             const tableBody = document.getElementById('crmTableBody');
             if (allRecords.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-slate-400 font-medium"><i class="fas fa-spinner fa-spin text-2xl mb-2 text-indigo-400"></i><br>Veriler Yükleniyor...</td></tr>';
             }
 
-            fetch(`${API_URL}?action=getRecentRecords&branch=${encodeURIComponent(currentBranch)}&month=${selectedMonth}`)
+            fetch(`${API_URL}?action=getRecentRecords&branch=${encodeURIComponent(currentBranch)}&month=${selectedMonth}`, {cache: 'no-store'})
                 .then(res => res.json())
                 .then(data => {
                     allRecords = data.records || [];
                     const totalRevenue = data.totalRevenue || 0;
-                    const headerTotalRevenueEl = document.getElementById('headerTotalRevenue');
-                    if(headerTotalRevenueEl) headerTotalRevenueEl.textContent = formatMoney(totalRevenue);
+                    document.getElementById('headerTotalRevenue').textContent = formatMoney(totalRevenue);
                     
                     renderTable();
                     updateChampionBadge(); 
@@ -896,20 +840,17 @@
                     return revB - revA;
                 });
                 const topBranch = sorted[0];
-
                 const badge = document.getElementById('championBadge');
                 
                 const normTopBranch = topBranch ? topBranch.branch.trim().toLowerCase() : '';
                 const normCurrentBranch = currentBranch ? currentBranch.trim().toLowerCase() : '';
 
-                if (badge) {
-                    if (normTopBranch === normCurrentBranch) {
-                        badge.classList.remove('hidden');
-                        badge.classList.add('flex');
-                    } else {
-                        badge.classList.add('hidden');
-                        badge.classList.remove('flex');
-                    }
+                if (normTopBranch === normCurrentBranch) {
+                    badge.classList.remove('hidden');
+                    badge.classList.add('flex');
+                } else {
+                    badge.classList.add('hidden');
+                    badge.classList.remove('flex');
                 }
             }
         }
@@ -929,7 +870,6 @@
 
                 const matchesSearch = name.includes(term) || contact.includes(term);
                 
-                // GELİŞMİŞ FİLTRELEME MANTIĞI - DAHA ESNEK
                 let matchesStatus = false;
                 if (statusFilter === "") {
                     matchesStatus = true;
