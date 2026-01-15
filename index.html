@@ -605,10 +605,10 @@
                 const clean = key.toString().toLowerCase().replace(/\s+/g, '').trim();
                 // "O" sütunu veya içinde "ciro" geçenler
                 if (clean === 'o' || clean === '0' || clean.includes('ciro') || clean.includes('revenue') || clean.includes('amount')) {
-                     // Telefon ve ID gibi sayısal ama ciro olmayanları ele
-                     if (!clean.includes('tel') && !clean.includes('no') && !clean.includes('id') && !clean.includes('date')) {
-                         return item[key];
-                     }
+                      // Telefon ve ID gibi sayısal ama ciro olmayanları ele
+                      if (!clean.includes('tel') && !clean.includes('no') && !clean.includes('id') && !clean.includes('date')) {
+                          return item[key];
+                      }
                 }
             }
             return 0;
@@ -799,7 +799,13 @@
             if (headerTitle) headerTitle.textContent = branch.toUpperCase();
             
             refreshData(); 
-            setInterval(refreshData, 60000); 
+            // 5 saniyede bir otomatik yenileme (Modal açıkken yenilemez)
+            setInterval(() => {
+                const modal = document.getElementById('editModal');
+                if (modal && modal.classList.contains('hidden')) {
+                    refreshData();
+                }
+            }, 5000); 
         }
 
         function logout() { location.reload(); }
@@ -1147,6 +1153,11 @@
             let resultToSend = resultRaw;
             if(resultToSend === 'Beklemede') resultToSend = '';
 
+            let amountVal = document.getElementById('m_amount').value;
+            if (document.getElementById('m_isOrder').value === 'Hayır') {
+                amountVal = '';
+            }
+
             const formData = {
                 rowIndex: document.getElementById('m_rowIndex').value,
                 sheetName: document.getElementById('m_sheetName').value,
@@ -1160,7 +1171,7 @@
                 result: resultToSend, 
                 note: document.getElementById('m_note').value, 
                 isOrder: document.getElementById('m_isOrder').value,
-                amount: document.getElementById('m_amount').value
+                amount: amountVal
             };
 
             const controller = new AbortController();
