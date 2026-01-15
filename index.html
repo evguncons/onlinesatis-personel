@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Konfeti Efekti İçin Kütüphane -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { 
             --primary: #4f46e5; 
@@ -248,6 +250,15 @@
 </head>
 <body class="bg-slate-50">
 
+    <!-- CHAMPION CELEBRATION OVERLAY (Hidden by default) -->
+    <div id="championOverlay" class="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center hidden transition-opacity duration-500">
+        <div class="text-center animate-[bounce_2s_infinite]">
+            <div class="text-7xl md:text-9xl mb-6 filter drop-shadow-lg">🏆</div>
+            <h1 class="text-4xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-100 to-yellow-500 mb-4 tracking-tighter drop-shadow-sm">HOŞGELDİN</h1>
+            <h2 class="text-3xl md:text-6xl font-bold text-white tracking-widest uppercase bg-slate-900/50 px-8 py-2 rounded-2xl border border-yellow-500/30">ŞAMPİYON!</h2>
+        </div>
+    </div>
+
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="fixed inset-0 z-[60] bg-gradient-to-br from-slate-900 to-indigo-900 flex flex-col items-center justify-center p-4 overflow-y-auto">
         <!-- Arka Plan Efekti -->
@@ -286,7 +297,6 @@
                     <div class="space-y-2">
                         <label class="text-indigo-200 text-xs font-bold uppercase tracking-widest ml-1">Şifre</label>
                         <div class="relative group">
-                            <!-- type="text" yapıldı: Şifre yazarken görünür olacak -->
                             <input type="text" id="loginPassword" class="w-full pl-5 pr-12 py-4 bg-white/95 backdrop-blur-sm rounded-2xl text-slate-800 font-bold text-lg shadow-xl border-0 focus:ring-4 focus:ring-indigo-500/50 appearance-none transition-all group-hover:bg-white placeholder-slate-400" placeholder="Şifre Giriniz" required>
                             <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none text-indigo-500">
                                 <i class="fas fa-lock-open text-lg"></i>
@@ -375,6 +385,20 @@
             </div>
         </header>
 
+        <!-- GECİKMİŞ TAKİP BİLDİRİMİ -->
+        <div id="overdueNotification" class="hidden mb-8 bg-gradient-to-r from-orange-600 to-red-600 rounded-2xl p-5 flex flex-col sm:flex-row items-center sm:items-start gap-5 shadow-xl shadow-orange-500/30 transform hover:scale-[1.01] transition-transform animate-[pulse_3s_infinite]">
+            <div class="w-12 h-12 rounded-full bg-white/20 text-white flex items-center justify-center shrink-0 border-2 border-white/30">
+                <i class="fas fa-bell fa-lg animate-bounce"></i>
+            </div>
+            <div class="flex-1 text-center sm:text-left">
+                <h4 class="font-extrabold text-white text-lg tracking-tight">Dikkat: Takip Gerektiren Kayıtlar Var!</h4>
+                <p class="text-orange-50 text-sm mt-1 font-medium leading-relaxed" id="overdueMessage">...</p>
+            </div>
+            <button onclick="filterOverdue()" class="w-full sm:w-auto px-6 py-3 bg-white text-orange-600 text-sm font-extrabold rounded-xl hover:bg-orange-50 hover:text-orange-700 transition shadow-lg flex items-center justify-center gap-2">
+                <i class="fas fa-list-ul"></i> Listele
+            </button>
+        </div>
+
         <!-- CONTENT CARD -->
         <div class="glass-card flex flex-col overflow-hidden min-h-[500px]">
             
@@ -415,6 +439,12 @@
                             <i class="fas fa-filter text-xs"></i>
                         </div>
                     </div>
+
+                    <!-- YENİ: Filtreleri Sıfırla Butonu -->
+                    <button onclick="resetFilters()" class="w-full lg:w-auto px-6 py-3 bg-white border border-slate-200 rounded-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-300 transition shadow-sm flex items-center justify-center gap-2 group whitespace-nowrap font-bold text-sm" title="Filtreleri Sıfırla">
+                        <i class="fas fa-undo group-hover:rotate-180 transition-transform duration-500"></i>
+                        <span>Filtreleri Sıfırla</span>
+                    </button>
                 </div>
             </div>
             
@@ -632,26 +662,37 @@
             return 0;
         };
 
+        // YENİ EKLENEN: Türk tarih formatı ayrıştırıcı
+        function parseDateTR(str) {
+            if(!str) return new Date();
+            // str format: "15.01.2025 14:30" veya sadece "15.01.2025"
+            const [datePart, timePart] = str.split(' ');
+            const [day, month, year] = datePart.split('.');
+            // Ay 0-indeksli olduğu için month - 1
+            return new Date(year, month - 1, day);
+        }
+
         let currentBranch = null;
         let branchList = [];
         let leaderboardData = []; 
         let allRecords = []; 
         let currentPage = 1;
         const rowsPerPage = 10;
+        let activeFilterMode = 'default'; // default | overdue
 
         // Şube Şifreleri Tanımlaması
         const BRANCH_PASSWORDS = {
-            'İnegöl Şubesi': '1601',
-            'Paşabahçe Şubesi': '3401',
-            'Çekmeköy Şubesi': '3403',
-            'İzmit Şubesi': '4104',
-            'Gölcük Şubesi': '4105',
-            'Körfez Şubesi': '4102',
-            'Derince Şubesi': '4103',
-            'Sultanbeyli Şubesi': '3405',
-            'Yenidoğan Şubesi': '3404',
-            'Kavacık Şubesi': '3402',
-            'Çayırova Şubesi': '4101'
+            'İnegöl Şubesi': '4323',
+            'Paşabahçe Şubesi': '1234',
+            'Çekmeköy Şubesi': '1234',
+            'İzmit Şubesi': '1234',
+            'Gölcük Şubesi': '1234',
+            'Körfez Şubesi': '1234',
+            'Derince Şubesi': '1234',
+            'Sultanbeyli Şubesi': '1234',
+            'Yenidoğan Şubesi': '1234',
+            'Kavacık Şubesi': '1234',
+            'Çayırova Şubesi': '1234'
         };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -676,20 +717,70 @@
                 }
 
                 // Şifre Kontrolü
-                // Tanımlı şubeler için özel şifre, tanımlı olmayanlar için varsayılan '1234'
                 const correctPassword = BRANCH_PASSWORDS[branch] || '1234';
 
                 if (password !== correctPassword) {
                     errorMsg.textContent = "Hatalı şifre. Lütfen tekrar deneyiniz.";
                     errorMsg.classList.remove('hidden');
-                    // Şifre alanını temizle
                     document.getElementById('loginPassword').value = '';
                     return;
                 }
 
-                loginSuccess(branch);
+                // ŞAMPİYON KONTROLÜ VE KUTLAMA
+                const sortedLeaderboard = [...leaderboardData].sort((a, b) => {
+                    const revA = parseCurrency(getRevenue(a));
+                    const revB = parseCurrency(getRevenue(b));
+                    return revB - revA;
+                });
+
+                if (sortedLeaderboard.length > 0 && sortedLeaderboard[0].branch === branch) {
+                    showChampionCelebration(branch);
+                } else {
+                    loginSuccess(branch);
+                }
             });
         });
+
+        // ŞAMPİYON KUTLAMA FONKSİYONU
+        function showChampionCelebration(branch) {
+            const overlay = document.getElementById('championOverlay');
+            overlay.classList.remove('hidden');
+            
+            // Konfeti Patlat
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#fbbf24', '#f59e0b', '#ffffff']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#fbbf24', '#f59e0b', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+
+            // 3.5 saniye sonra giriş yap
+            setTimeout(() => {
+                overlay.classList.add('opacity-0');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('opacity-0');
+                    loginSuccess(branch);
+                }, 500);
+            }, 3500);
+        }
 
         // --- SEQUENTIAL FORM LOGIC ---
         function setupSequentialFlow() {
@@ -735,7 +826,6 @@
 
                 if (resultVal) {
                     activateStep(noteEl, 'step3box');
-                    // GÜNCELLEME: Not girmek zorunlu değil, sonuç seçiliyse sipariş adımı da açılsın
                     activateStep(orderEl, 'step4box');
                 } else {
                     deactivateStep(noteEl, 'step3box');
@@ -756,6 +846,14 @@
         function checkFormState() {
             window.updateModalFlow(); 
             toggleAmount(); 
+        }
+
+        // YENİ EKLENEN: Filtreleri Sıfırla Fonksiyonu
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterStatus').value = '';
+            activeFilterMode = 'default';
+            renderTable();
         }
 
         async function fetchBranches() {
@@ -886,6 +984,9 @@
                     const totalRevenue = data.totalRevenue || 0;
                     document.getElementById('headerTotalRevenue').textContent = formatMoney(totalRevenue);
                     
+                    // Veri geldikten sonra gecikmiş kayıtları kontrol et
+                    checkOverdueFollowUps(allRecords);
+                    
                     renderTable();
                     updateChampionBadge(); 
                 })
@@ -893,6 +994,44 @@
                     console.error(e);
                     tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-rose-400">Veri çekilemedi. Bağlantınızı kontrol edin.</td></tr>';
                 });
+        }
+
+        // YENİ FONKSİYON: Gecikmiş Takip Kontrolü
+        let overdueRecords = []; // Global sakla
+        function checkOverdueFollowUps(records) {
+            const now = new Date();
+            const limit = 5 * 24 * 60 * 60 * 1000; // 5 gün (ms)
+
+            overdueRecords = records.filter(item => {
+                // Tarih formatı: dd.MM.yyyy HH:mm veya dd.MM.yyyy
+                const itemDate = parseDateTR(item.date);
+                const diffTime = now - itemDate;
+                
+                // Durum Kontrolü: Mağazaya gelecek veya Tekrar aranacak
+                const res = (item.result || "").toLowerCase();
+                const isRelevant = res.includes("gelecek") || res.includes("tekrar") || res.includes("ara");
+
+                return isRelevant && diffTime > limit;
+            });
+
+            const notifBox = document.getElementById('overdueNotification');
+            const notifMsg = document.getElementById('overdueMessage');
+
+            if (overdueRecords.length > 0) {
+                notifMsg.innerHTML = `<strong>${overdueRecords.length}</strong> müşterinin takibi 5 günü geçti. Lütfen kontrol ediniz.`;
+                notifBox.classList.remove('hidden');
+            } else {
+                notifBox.classList.add('hidden');
+            }
+        }
+
+        // YENİ FONKSİYON: Sadece gecikmişleri listele
+        function filterOverdue() {
+            activeFilterMode = 'overdue';
+            // Arama ve filtre kutularını sıfırla ki kullanıcı karışıklık yaşamasın
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterStatus').value = '';
+            renderTable();
         }
 
         function updateChampionBadge() {
@@ -928,9 +1067,20 @@
             const term = document.getElementById('searchInput').value.toLocaleLowerCase('tr-TR').trim();
             const statusFilter = document.getElementById('filterStatus').value.toLocaleLowerCase('tr-TR');
 
-            const filteredData = allRecords.filter(item => {
+            // Eğer "Listele" butonuna basıldıysa sadece overdueRecords kullan
+            // Değilse normal filtreleme yap
+            let sourceData = allRecords;
+            if (activeFilterMode === 'overdue') {
+                sourceData = overdueRecords;
+            }
+
+            const filteredData = sourceData.filter(item => {
                 // GÜVENLİK KONTROLÜ: İsimsiz/Boş kayıtları gizle
                 if (!item.name || item.name.toString().trim() === "") return false;
+
+                // Eğer overdue modundaysak zaten filtrelenmiş veri geliyor, tekrar arama yapmaya gerek yok
+                // Ama yine de kullanıcı arama yaparsa içinde arayabilsin
+                if (activeFilterMode === 'overdue') return true; 
 
                 const name = (item.name || "").toString().toLocaleLowerCase('tr-TR');
                 const contact = (item.contact || "").toString().toLocaleLowerCase('tr-TR');
@@ -954,19 +1104,32 @@
                 return matchesSearch && matchesStatus;
             });
 
-            if(filteredData.length === 0) {
+            // Eğer overdue modundaysak ve kullanıcı arama kutusuna bir şey yazarsa
+            // filteredData'yı tekrar term'e göre filtrele
+            let finalData = filteredData;
+            if (activeFilterMode === 'overdue' && term !== "") {
+                 finalData = filteredData.filter(item => {
+                    const name = (item.name || "").toString().toLocaleLowerCase('tr-TR');
+                    const contact = (item.contact || "").toString().toLocaleLowerCase('tr-TR');
+                    return name.includes(term) || contact.includes(term);
+                 });
+            }
+
+            if(finalData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-slate-400 bg-slate-50/50 rounded-xl m-4 border border-dashed border-slate-200">Kayıt bulunamadı.</td></tr>`;
                 updatePaginationControls(0);
+                // Eğer mod overdue ise ve kayıt yoksa modu sıfırla
+                if (activeFilterMode === 'overdue' && overdueRecords.length === 0) activeFilterMode = 'default';
                 return;
             }
 
-            const totalRecords = filteredData.length;
+            const totalRecords = finalData.length;
             const totalPages = Math.ceil(totalRecords / rowsPerPage) || 1;
             if (currentPage > totalPages) currentPage = 1;
 
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = startIndex + rowsPerPage;
-            const pageData = filteredData.slice(startIndex, endIndex);
+            const pageData = finalData.slice(startIndex, endIndex);
 
             pageData.forEach((item, index) => {
                 const tr = document.createElement('tr');
@@ -994,7 +1157,9 @@
                 tr.style.setProperty('--status-color', statusColor);
                 
                 const initials = (item.name || "Müşteri").split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                const originalIndex = allRecords.indexOf(item);
+                // Orijinal index'i bulmak için her zaman ana listeden (allRecords) bakmalıyız
+                // Çünkü modal açarken bu index kullanılıyor
+                const originalIndex = allRecords.findIndex(r => r === item); 
                 
                 const itemAmount = getRevenue(item);
 
