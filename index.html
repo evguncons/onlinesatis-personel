@@ -515,7 +515,7 @@
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbwQ7j5NSTaojKhdVKPehsYKqZSCljBBzvywmCf8S7ZXSAYjz3OsXUOMG-9NnMZdRzht/exec'; 
         
-        // KRİTİK GÜVENLİK FİXİ: Şifreler client tarafından tamamen kaldırıldı.
+        // GÜVENLİK DÜZELTMESİ: Şifreler silinmiş, hata durumunda sadece liste döner
         const FALLBACK_BRANCHES = [
             'İnegöl Şubesi', 'Paşabahçe Şubesi', 'Çekmeköy Şubesi',
             'İzmit Şubesi', 'Gölcük Şubesi', 'Körfez Şubesi',
@@ -567,7 +567,6 @@
             return new Date(parts[2], parts[1] - 1, parts[0]);
         }
 
-        // TÜRKÇE KARAKTER ARAMA FIX'İ
         function normalizeSearchText(str) {
             if (!str) return "";
             return str.toString().toLocaleLowerCase('tr-TR')
@@ -779,7 +778,6 @@
 
                 renderLoginLeaderboard(leaderboardData);
             } catch(e) { 
-                // Ağ hatasında fallback şubelerini kullanıma aç
                 branchList = FALLBACK_BRANCHES;
                 select.innerHTML = '<option value="">Şube Seçiniz...</option>';
                 branchList.forEach(b => {
@@ -827,7 +825,6 @@
             
             refreshData(false, true); 
             
-            // SESSİZ YENİLEME
             setInterval(() => {
                 const modal = document.getElementById('editModal');
                 if (modal && modal.classList.contains('hidden') && document.visibilityState === 'visible') {
@@ -845,7 +842,6 @@
 
         function logout() { sessionStorage.removeItem('authToken'); location.reload(); }
 
-        // SESSİZ GÜNCELLEME KONTROLÜ
         function refreshData(isBackground = false, showLoading = false) {
             if(!currentBranch) return;
             document.getElementById('lastTime').textContent = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
@@ -858,7 +854,8 @@
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-slate-400 font-medium"><i class="fas fa-spinner fa-spin text-2xl mb-2 text-pink-400"></i><br>Veriler Yükleniyor...</td></tr>';
             }
 
-            fetch(`${API_URL}?action=getRecentRecords&branch=${encodeURIComponent(currentBranch)}&month=${selectedMonth}&token=${authToken}`, {cache: 'no-store'})
+            // URL TOKEN FIX: encodeURIComponent eklendi, base64 (+) sorunu kökten çözüldü
+            fetch(`${API_URL}?action=getRecentRecords&branch=${encodeURIComponent(currentBranch)}&month=${selectedMonth}&token=${encodeURIComponent(authToken)}`, {cache: 'no-store'})
                 .then(res => res.json())
                 .then(data => {
                     if (data.error) {
@@ -902,7 +899,6 @@
             showToast("Takip gerektiren müşteriler listelendi.");
         }
 
-        // PERFORMANS FİXİ: DocumentFragment kullanımı ile DOM Reflow önlenmesi
         function renderTable() {
             const tbody = document.getElementById('crmTableBody');
             
@@ -946,7 +942,6 @@
 
             const pageData = filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
             
-            // Fragment ile tek seferlik DOM manipülasyonu
             const fragment = document.createDocumentFragment();
 
             pageData.forEach((item, index) => {
