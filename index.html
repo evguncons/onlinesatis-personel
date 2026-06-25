@@ -208,7 +208,7 @@
                     
                     <form id="loginForm" class="space-y-6">
                         <div class="space-y-2">
-                            <label class="text-pink-200/80 text-xs font-bold uppercase tracking-widest ml-1">Şube Seçimi</label>
+                            <label for="loginBranch" class="text-pink-200/80 text-xs font-bold uppercase tracking-widest ml-1">Şube Seçimi</label>
                             <div class="relative group">
                                 <select id="loginBranch" class="w-full pl-5 pr-12 py-4 bg-white/90 backdrop-blur-sm rounded-2xl text-slate-800 font-bold text-lg shadow-lg border-2 border-transparent focus:border-pink-400 focus:ring-0 appearance-none cursor-pointer transition-all hover:bg-white" required>
                                     <option value="">Yükleniyor...</option>
@@ -218,7 +218,7 @@
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-pink-200/80 text-xs font-bold uppercase tracking-widest ml-1">Şifre</label>
+                            <label for="loginPassword" class="text-pink-200/80 text-xs font-bold uppercase tracking-widest ml-1">Şifre</label>
                             <div class="relative group">
                                 <input type="password" id="loginPassword" class="w-full pl-5 pr-12 py-4 bg-white/90 backdrop-blur-sm rounded-2xl text-slate-800 font-bold text-lg shadow-lg border-2 border-transparent focus:border-pink-400 focus:ring-0 appearance-none transition-all hover:bg-white placeholder-slate-400" placeholder="Şifre Giriniz" required>
                                 <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none text-pink-600"><i class="fas fa-lock-open text-lg"></i></div>
@@ -396,11 +396,11 @@
                     <div class="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl border border-pink-100 shadow-sm grid grid-cols-2 gap-4 md:gap-6 relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-pink-100 to-transparent opacity-50 rounded-bl-full pointer-events-none"></div>
                         <div>
-                            <label class="text-[10px] md:text-xs uppercase font-bold text-pink-400 block mb-1 tracking-wider">Şube</label>
+                            <label for="m_branch" class="text-[10px] md:text-xs uppercase font-bold text-pink-400 block mb-1 tracking-wider">Şube</label>
                             <input type="text" id="m_branch" class="w-full bg-transparent font-bold text-slate-700 text-sm focus:outline-none" readonly>
                         </div>
                         <div>
-                            <label class="text-[10px] md:text-xs uppercase font-bold text-pink-400 block mb-1 tracking-wider">Tarih</label>
+                            <label for="m_date" class="text-[10px] md:text-xs uppercase font-bold text-pink-400 block mb-1 tracking-wider">Tarih</label>
                             <input type="text" id="m_date" class="w-full bg-transparent font-bold text-slate-700 text-sm focus:outline-none" readonly>
                         </div>
                     </div>
@@ -411,19 +411,19 @@
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                             <div>
-                                <label class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Müşteri No</label>
+                                <label for="m_customerNo" class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Müşteri No</label>
                                 <input type="text" id="m_customerNo" class="modern-input" placeholder="Opsiyonel">
                             </div>
                             <div>
-                                <label class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Ad Soyad</label>
+                                <label for="m_name" class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Ad Soyad</label>
                                 <input type="text" id="m_name" class="modern-input">
                             </div>
                             <div>
-                                <label class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Telefon</label>
+                                <label for="m_contact" class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Telefon</label>
                                 <input type="text" id="m_contact" class="modern-input">
                             </div>
                             <div>
-                                <label class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Kategori</label>
+                                <label for="m_category" class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Kategori</label>
                                 <select id="m_category" class="modern-input">
                                     <option>LİMİT ÖĞREN</option>
                                     <option>Mobilya</option><option>Baza Yatak Başlık</option><option>Bebek Çocuk</option>
@@ -432,7 +432,7 @@
                                 </select>
                             </div>
                             <div class="md:col-span-2">
-                                <label class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Ürün</label>
+                                <label for="m_product" class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Ürün</label>
                                 <input type="text" id="m_product" class="modern-input">
                             </div>
                         </div>
@@ -447,7 +447,7 @@
                         </h4>
                         <div class="space-y-4 md:space-y-5">
                             <div class="bg-white p-4 md:p-5 rounded-2xl border border-pink-100 shadow-sm transition-all hover:border-pink-300 hover:shadow-md group" id="step1box">
-                                <label class="text-xs md:text-sm font-bold text-slate-700 mb-2 md:mb-3 block group-hover:text-pink-600 transition-colors">1. Aranma Durumu</label>
+                                <label for="m_status" class="text-xs md:text-sm font-bold text-slate-700 mb-2 md:mb-3 block group-hover:text-pink-600 transition-colors">1. Aranma Durumu</label>
                                 <select id="m_status" class="modern-input font-bold text-slate-700">
                                     <option value="" selected>Seçiniz...</option>
                                     <option value="aranmadı">🔴 Aranmadı</option>
@@ -456,7 +456,7 @@
                             </div>
                             
                             <div class="bg-white p-4 md:p-5 rounded-2xl border border-pink-100 shadow-sm transition-all" id="step2box">
-                                <label class="text-xs md:text-sm font-bold text-slate-700 mb-2 md:mb-3 block">2. Görüşme Sonucu</label>
+                                <label for="m_result" class="text-xs md:text-sm font-bold text-slate-700 mb-2 md:mb-3 block">2. Görüşme Sonucu</label>
                                 <select id="m_result" class="modern-input" disabled>
                                     <option value="" selected>Seçiniz...</option>
                                     <option value="Beklemede">Beklemede</option>
@@ -470,7 +470,7 @@
                             </div>
                             
                             <div class="bg-white p-4 md:p-5 rounded-2xl border border-pink-100 shadow-sm transition-all" id="step3box">
-                                <label class="text-xs md:text-sm font-bold text-slate-700 mb-2 md:mb-3 block">3. Görüşme Notu</label>
+                                <label for="m_note" class="text-xs md:text-sm font-bold text-slate-700 mb-2 md:mb-3 block">3. Görüşme Notu</label>
                                 <textarea id="m_note" class="modern-input resize-none overflow-hidden min-h-[80px]" placeholder="Görüşme detaylarını buraya yazın..." oninput="autoResize(this)" disabled></textarea>
                             </div>
                         </div>
@@ -484,7 +484,7 @@
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 relative z-10">
                             <div>
-                                <label class="text-[10px] md:text-xs font-bold text-emerald-700/70 mb-1.5 block uppercase tracking-wide">Sipariş Durumu</label>
+                                <label for="m_isOrder" class="text-[10px] md:text-xs font-bold text-emerald-700/70 mb-1.5 block uppercase tracking-wide">Sipariş Durumu</label>
                                 <select id="m_isOrder" class="modern-input border-emerald-200 focus:ring-emerald-200 focus:border-emerald-400" onchange="toggleAmount()" disabled>
                                     <option value="" selected>Seçiniz...</option>
                                     <option value="Hayır">Hayır</option>
@@ -492,7 +492,7 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="text-[10px] md:text-xs font-bold text-emerald-700/70 mb-1.5 block uppercase tracking-wide">Toplam Tutar</label>
+                                <label for="m_amount" class="text-[10px] md:text-xs font-bold text-emerald-700/70 mb-1.5 block uppercase tracking-wide">Toplam Tutar</label>
                                 <div class="relative">
                                     <input type="number" id="m_amount" class="modern-input border-emerald-200 pl-10 focus:ring-emerald-200 focus:border-emerald-400 font-bold text-emerald-700 text-lg" placeholder="0" disabled>
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500 font-bold text-lg">₺</span>
@@ -515,20 +515,13 @@
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbwQ7j5NSTaojKhdVKPehsYKqZSCljBBzvywmCf8S7ZXSAYjz3OsXUOMG-9NnMZdRzht/exec'; 
         
-        const BRANCH_PASSWORDS = {
-            'İnegöl Şubesi': 'inegöl16*',
-            'Paşabahçe Şubesi': 'paşabahçe34*',
-            'Çekmeköy Şubesi': 'çekmeköy34*',
-            'İzmit Şubesi': 'izmit41*',
-            'Gölcük Şubesi': 'gölcük41*',
-            'Körfez Şubesi': 'körfez41*',
-            'Derince Şubesi': 'derince41*',
-            'Sultanbeyli Şubesi': 'sultanbeyli34*',
-            'Yenidoğan Şubesi': 'yenidoğan34*',
-            'Kavacık Şubesi': 'kavacik34*',
-            'Çayırova Şubesi': 'çayırova41*',
-            'Gebze Şubesi': 'gebze41*'
-        };
+        // KRİTİK GÜVENLİK FİXİ: Şifreler client tarafından tamamen kaldırıldı.
+        const FALLBACK_BRANCHES = [
+            'İnegöl Şubesi', 'Paşabahçe Şubesi', 'Çekmeköy Şubesi',
+            'İzmit Şubesi', 'Gölcük Şubesi', 'Körfez Şubesi',
+            'Derince Şubesi', 'Sultanbeyli Şubesi', 'Yenidoğan Şubesi',
+            'Kavacık Şubesi', 'Çayırova Şubesi', 'Gebze Şubesi'
+        ];
 
         const parseCurrency = (val) => {
             if (typeof val === 'number') return val;
@@ -568,24 +561,26 @@
         function parseDateTR(str) {
             if(!str) return new Date();
             const [datePart, timePart] = str.split(' ');
-            const [day, month, year] = datePart.split('.');
-            return new Date(year, month - 1, day);
+            if(!datePart) return new Date();
+            const parts = datePart.split('.');
+            if(parts.length !== 3) return new Date();
+            return new Date(parts[2], parts[1] - 1, parts[0]);
         }
 
         // TÜRKÇE KARAKTER ARAMA FIX'İ
         function normalizeSearchText(str) {
             if (!str) return "";
-            // Önce tüm metni küçük harfe çevir, sonra türkçe karakterleri ingilizce karşılıklarına dönüştür
             return str.toString().toLocaleLowerCase('tr-TR')
                 .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
                 .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
-                .replace(/i̇/g, 'i'); // Özel 'i' dönüşümü
+                .replace(/i̇/g, 'i');
         }
 
         let currentBranch = null;
         let branchList = [];
         let leaderboardData = []; 
         let allRecords = []; 
+        let overdueRecords = [];
         let currentPage = 1;
         const rowsPerPage = 10;
         let activeFilterMode = 'default';
@@ -693,7 +688,6 @@
                 const st = statusEl.value;
                 const res = resultEl.value;
                 
-                // MANTIK: Sadece "arandı" seçiliyse 2. Adım aktif olsun.
                 if (st === 'arandı') {
                     setEnabled(resultEl, 'step2box', true);
                 } else {
@@ -706,7 +700,6 @@
                 if (res) {
                     setEnabled(noteEl, 'step3box', true);
                     
-                    // Satış Onayı sadece Satışa Döndü olduğunda açılır.
                     if (res === 'Satışa Döndü') {
                         setEnabled(orderEl, 'step4box', true);
                     } else {
@@ -750,7 +743,6 @@
             const msgEl = document.getElementById('toastMessage');
             msgEl.textContent = msg;
             
-            // Hata rengi destekli
             if (type === 'error') {
                  toast.querySelector('div').className = 'w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center text-red-400';
                  toast.querySelector('i').className = 'fas fa-exclamation-triangle text-lg';
@@ -776,7 +768,7 @@
                 branchList = data.leaderboard ? data.leaderboard.map(b => b.branch) : [];
                 leaderboardData = data.leaderboard || []; 
 
-                if (branchList.length === 0) branchList = Object.keys(BRANCH_PASSWORDS);
+                if (branchList.length === 0) branchList = FALLBACK_BRANCHES;
 
                 select.innerHTML = '<option value="">Şube Seçiniz...</option>';
                 branchList.forEach(b => {
@@ -787,9 +779,17 @@
 
                 renderLoginLeaderboard(leaderboardData);
             } catch(e) { 
-                select.innerHTML = '<option value="">HATA: Bağlantı Kurulamadı!</option>';
+                // Ağ hatasında fallback şubelerini kullanıma aç
+                branchList = FALLBACK_BRANCHES;
+                select.innerHTML = '<option value="">Şube Seçiniz...</option>';
+                branchList.forEach(b => {
+                    const opt = document.createElement('option');
+                    opt.value = b; opt.textContent = b;
+                    select.appendChild(opt);
+                });
+
                 const errorMsg = document.getElementById('loginError');
-                errorMsg.innerHTML = `<strong>Bağlantı Hatası:</strong> Sunucuya ulaşılamadı. Yeniden başlatın.`;
+                errorMsg.innerHTML = `<strong>Uyarı:</strong> Sunucuya ulaşılamadı. Yeniden başlatın.`;
                 errorMsg.classList.remove('hidden');
                 document.getElementById('loginLeaderboard').classList.add('hidden'); 
             }
@@ -827,11 +827,11 @@
             
             refreshData(false, true); 
             
-            // SESSİZ YENİLEME (Sayfa Titremez)
+            // SESSİZ YENİLEME
             setInterval(() => {
                 const modal = document.getElementById('editModal');
                 if (modal && modal.classList.contains('hidden') && document.visibilityState === 'visible') {
-                    refreshData(true); // isBackground = true
+                    refreshData(true); 
                 }
             }, 60000); 
 
@@ -845,7 +845,7 @@
 
         function logout() { sessionStorage.removeItem('authToken'); location.reload(); }
 
-        // SESSİZ GÜNCELLEME (isBackground) KONTROLÜ
+        // SESSİZ GÜNCELLEME KONTROLÜ
         function refreshData(isBackground = false, showLoading = false) {
             if(!currentBranch) return;
             document.getElementById('lastTime').textContent = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
@@ -869,7 +869,7 @@
                     document.getElementById('headerTotalRevenue').textContent = formatMoney(data.totalRevenue || 0);
                     
                     checkOverdueFollowUps(allRecords);
-                    renderTable(); // DOM manipulation, ekrani titretmez
+                    renderTable(); 
                 })
                 .catch(e => {
                     if (!isBackground) {
@@ -902,11 +902,10 @@
             showToast("Takip gerektiren müşteriler listelendi.");
         }
 
+        // PERFORMANS FİXİ: DocumentFragment kullanımı ile DOM Reflow önlenmesi
         function renderTable() {
             const tbody = document.getElementById('crmTableBody');
-            tbody.innerHTML = '';
             
-            // ARAMA DÜZELTMELERİ (Boşluk silme ve Normalize Etme)
             const rawTerm = document.getElementById('searchInput').value.trim();
             const termNorm = normalizeSearchText(rawTerm);
             const termNoSpace = rawTerm.replace(/\s+/g, '');
@@ -946,6 +945,9 @@
             if (currentPage > totalPages) currentPage = 1;
 
             const pageData = filteredData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+            
+            // Fragment ile tek seferlik DOM manipülasyonu
+            const fragment = document.createDocumentFragment();
 
             pageData.forEach((item, index) => {
                 const tr = document.createElement('tr');
@@ -1014,9 +1016,11 @@
                     styleEl.innerHTML = `.custom-table tr:nth-child(${index + 1})::before { background-color: ${statusColor} !important; }`;
                     tr.appendChild(styleEl);
                 }
-                tbody.appendChild(tr);
+                fragment.appendChild(tr);
             });
 
+            tbody.innerHTML = '';
+            tbody.appendChild(fragment);
             updatePaginationControls(totalRecords);
         }
 
@@ -1147,7 +1151,6 @@
                     showToast("Müşteri başarıyla güncellendi!");
                     closeEditModal();
                     
-                    // SESSİZ GÜNCELLEME (DOM MANIPULATION)
                     const targetIndex = allRecords.findIndex(r => String(r.rowIndex) === String(rowIndexStr));
                     if (targetIndex !== -1) {
                         allRecords[targetIndex] = { ...allRecords[targetIndex], ...formData };
