@@ -515,7 +515,6 @@
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbwQ7j5NSTaojKhdVKPehsYKqZSCljBBzvywmCf8S7ZXSAYjz3OsXUOMG-9NnMZdRzht/exec'; 
         
-        // GÜVENLİK DÜZELTMESİ: Şifreler silinmiş, hata durumunda sadece liste döner
         const FALLBACK_BRANCHES = [
             'İnegöl Şubesi', 'Paşabahçe Şubesi', 'Çekmeköy Şubesi',
             'İzmit Şubesi', 'Gölcük Şubesi', 'Körfez Şubesi',
@@ -613,6 +612,7 @@
                 try {
                     const response = await fetch(API_URL, {
                         method: 'POST',
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
                         body: JSON.stringify({ action: 'login', data: { branch, password } })
                     });
                     
@@ -909,7 +909,6 @@
             let sourceData = activeFilterMode === 'overdue' ? overdueRecords : allRecords;
 
             const filteredData = sourceData.filter(item => {
-                // HATA ÇÖZÜMÜ: Sayısal veriler girilme ihtimaline karşı String() koruması eklendi
                 const hasData = (item.name && String(item.name).trim() !== "") || 
                                 (item.contact && String(item.contact).trim() !== "") || 
                                 (item.customerNo && String(item.customerNo).trim() !== "");
@@ -1135,10 +1134,13 @@
 
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000); 
+                const timeoutId = setTimeout(() => controller.abort(), 30000); 
 
                 const response = await fetch(API_URL, {
-                    method: 'POST', body: JSON.stringify({ action: 'updateCustomer', data: formData, token: sessionStorage.getItem('authToken') }),
+                    method: 'POST', 
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    redirect: 'follow',
+                    body: JSON.stringify({ action: 'updateCustomer', data: formData, token: sessionStorage.getItem('authToken') }),
                     signal: controller.signal
                 });
 
