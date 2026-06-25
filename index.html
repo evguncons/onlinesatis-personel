@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <!-- YENİ: EXCEL ÇIKTISI İÇİN SHEETJS KÜTÜPHANESİ -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -342,7 +345,12 @@
                     </div>
 
                     <button onclick="resetFilters()" class="w-full lg:w-auto px-6 py-3 bg-white border border-slate-200 rounded-[16px] text-slate-500 hover:text-pink-600 hover:border-pink-300 hover:bg-pink-50 transition shadow-sm flex items-center justify-center gap-2 group whitespace-nowrap font-bold text-sm h-[52px] order-4" title="Filtreleri Sıfırla">
-                        <i class="fas fa-undo group-hover:rotate-180 transition-transform duration-500"></i> <span>Sıfırla</span>
+                        <i class="fas fa-undo group-hover:rotate-180 transition-transform duration-500"></i> <span class="md:hidden lg:inline">Sıfırla</span>
+                    </button>
+
+                    <!-- YENİ: EXCEL ÇIKTISI ALMA BUTONU -->
+                    <button onclick="exportToExcel()" class="w-full lg:w-auto px-6 py-3 bg-emerald-50 border border-emerald-200 rounded-[16px] text-emerald-600 hover:text-white hover:bg-emerald-500 transition shadow-sm flex items-center justify-center gap-2 group whitespace-nowrap font-bold text-sm h-[52px] order-5" title="Listeyi Excel Olarak İndir">
+                        <i class="fas fa-file-excel group-hover:scale-110 transition-transform duration-300"></i> <span class="md:hidden lg:inline">Excel</span>
                     </button>
                 </div>
             </div>
@@ -579,6 +587,7 @@
         let leaderboardData = []; 
         let allRecords = []; 
         let overdueRecords = [];
+        let currentFilteredData = []; // Aktif filtrelenmiş liste, Excel için
         let currentPage = 1;
         const rowsPerPage = 10;
         let activeFilterMode = 'default';
@@ -931,6 +940,9 @@
                 return matchesSearch && matchesStatus;
             });
 
+            // GÜNCEL FİLTRELENMİŞ VERİYİ EXCEL İÇİN HAFIZADA TUT
+            currentFilteredData = filteredData;
+
             if(filteredData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-slate-400 bg-slate-50/50 rounded-xl m-4 border border-dashed border-slate-200">Kayıt bulunamadı.</td></tr>`;
                 updatePaginationControls(0);
@@ -1173,6 +1185,55 @@
 
         function formatMoney(amount) {
             return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(parseCurrency(amount));
+        }
+
+        // YENİ: EXCEL ÇIKTISI ALMA FONKSİYONU
+        function exportToExcel() {
+            if (!currentFilteredData || currentFilteredData.length === 0) {
+                showToast("Excel'e aktarılacak kayıt bulunamadı.", "error");
+                return;
+            }
+
+            showToast("Excel dosyası hazırlanıyor...", "success");
+
+            // Ekranda görünen filtrelenmiş veriyi Excel formatına uyarlama
+            const exportData = currentFilteredData.map(item => ({
+                "Tarih": item.date || "",
+                "Şube": item.branch || "",
+                "Müşteri No": item.customerNo || "",
+                "Ad Soyad": item.name || "",
+                "Telefon": item.contact || "",
+                "Kategori": item.category || "",
+                "Ürün İlgisi": item.product || "",
+                "Aranma Durumu": item.status ? item.status.toUpperCase() : "",
+                "Görüşme Sonucu": item.result || "",
+                "Görüşme Notu": item.note || "",
+                "Satış Yapıldı mı?": item.isOrder || "Hayır",
+                "Tutar (₺)": item.amount ? parseCurrency(item.amount) : 0
+            }));
+
+            // Worksheet (Sayfa) Oluşturma
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            
+            // Sütun genişliklerini ayarlama
+            const wscols = [
+                {wch: 15}, {wch: 15}, {wch: 15}, {wch: 25}, {wch: 15},
+                {wch: 20}, {wch: 30}, {wch: 15}, {wch: 25}, {wch: 40}, 
+                {wch: 15}, {wch: 15}
+            ];
+            worksheet['!cols'] = wscols;
+
+            // Workbook (Kitap) Oluşturma ve Sayfayı Ekleme
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Müşteri Listesi");
+
+            // Dosya ismini dinamik oluşturma
+            const safeBranchName = currentBranch ? currentBranch.replace(/\s+/g, '_') : "HedefAVM";
+            const dateStr = new Date().toISOString().split('T')[0];
+            const fileName = `Musteri_Listesi_${safeBranchName}_${dateStr}.xlsx`;
+
+            // Excel dosyasını indirme
+            XLSX.writeFile(workbook, fileName);
         }
     </script>
 </body>
