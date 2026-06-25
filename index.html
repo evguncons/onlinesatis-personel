@@ -633,7 +633,7 @@
                         document.getElementById('loginPassword').value = '';
                     }
                 } catch(e) {
-                    errorMsg.textContent = "Sunucu ile bağlantı kurulamadı. Lütfen tekrar deneyin.";
+                    errorMsg.innerHTML = `<strong>Hata:</strong> Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edin.`;
                     errorMsg.classList.remove('hidden');
                 } finally {
                     btn.innerHTML = originalBtnText;
@@ -787,7 +787,7 @@
                 });
 
                 const errorMsg = document.getElementById('loginError');
-                errorMsg.innerHTML = `<strong>Uyarı:</strong> Sunucuya ulaşılamadı. Yeniden başlatın.`;
+                errorMsg.innerHTML = `<strong>Uyarı:</strong> Sunucuya ulaşılamadı. <br><span class="text-xs font-mono mt-1 block">${escapeHTML(e.message)}</span>`;
                 errorMsg.classList.remove('hidden');
                 document.getElementById('loginLeaderboard').classList.add('hidden'); 
             }
@@ -854,7 +854,6 @@
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-slate-400 font-medium"><i class="fas fa-spinner fa-spin text-2xl mb-2 text-pink-400"></i><br>Veriler Yükleniyor...</td></tr>';
             }
 
-            // URL TOKEN FIX: encodeURIComponent eklendi, base64 (+) sorunu kökten çözüldü
             fetch(`${API_URL}?action=getRecentRecords&branch=${encodeURIComponent(currentBranch)}&month=${selectedMonth}&token=${encodeURIComponent(authToken)}`, {cache: 'no-store'})
                 .then(res => res.json())
                 .then(data => {
@@ -870,7 +869,7 @@
                 })
                 .catch(e => {
                     if (!isBackground) {
-                         document.getElementById('crmTableBody').innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold bg-rose-50 rounded-2xl"><i class="fas fa-exclamation-triangle mb-2 text-3xl"></i><br>Veri çekilemedi.</td></tr>`;
+                         document.getElementById('crmTableBody').innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold bg-rose-50 rounded-2xl"><i class="fas fa-exclamation-triangle mb-2 text-3xl"></i><br>Veri çekilemedi.<br><span class="text-[10px] text-rose-400 mt-2 block bg-white/50 p-2 rounded-lg border border-rose-100">${escapeHTML(e.message)}</span></td></tr>`;
                     }
                 });
         }
@@ -910,7 +909,11 @@
             let sourceData = activeFilterMode === 'overdue' ? overdueRecords : allRecords;
 
             const filteredData = sourceData.filter(item => {
-                const hasData = (item.name && item.name.trim()) || (item.contact && item.contact.trim()) || (item.customerNo && item.customerNo.trim());
+                // HATA ÇÖZÜMÜ: Sayısal veriler girilme ihtimaline karşı String() koruması eklendi
+                const hasData = (item.name && String(item.name).trim() !== "") || 
+                                (item.contact && String(item.contact).trim() !== "") || 
+                                (item.customerNo && String(item.customerNo).trim() !== "");
+                                
                 if (!hasData) return false;
                 if (activeFilterMode === 'overdue' && rawTerm === '') return true; 
 
