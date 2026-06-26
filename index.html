@@ -2,15 +2,14 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>HEDEF AVM ONLİNE SATIŞ PERSONEL GİRİŞİ</title>
     
+    <!-- Modern Tailwind, Fontlar ve İkonlar -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
-    <!-- EXCEL ÇIKTISI İÇİN SHEETJS -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script>
@@ -31,22 +30,17 @@
                     animation: {
                         'float': 'floating 3s ease-in-out infinite',
                         'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both',
-                        'slide-up': 'slideUp 0.3s ease-out forwards',
                     },
                     keyframes: {
                         floating: {
                             '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
+                            '50%': { transform: 'translateY(-5px)' },
                         },
                         shake: {
                             '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
                             '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
-                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
-                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
-                        },
-                        slideUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-3px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(3px, 0, 0)' }
                         }
                     }
                 }
@@ -56,9 +50,7 @@
 
     <style>
         :root { 
-            --primary: #db2777; --primary-soft: #fce7f3; --secondary: #831843; 
-            --success: #059669; --warning: #d97706; --danger: #e11d48; 
-            --bg-color: #fff1f2; --gold: #fbbf24;
+            --bg-color: #fff1f2; 
         }
         
         body { 
@@ -75,114 +67,124 @@
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 24px;
-            box-shadow: 0 10px 40px -10px rgba(219, 39, 119, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 28px;
+            box-shadow: 0 15px 45px -10px rgba(219, 39, 119, 0.1);
         }
 
+        /* Input Güzelleştirmeleri */
         .modern-input {
             width: 100%; 
-            padding: 14px 16px;
+            padding: 14px 18px;
             font-size: 0.95rem;
-            border: 1px solid #e5e7eb; 
+            border: 1.5px solid #e5e7eb; 
             border-radius: 16px;
             background-color: #ffffff; 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             color: #374151; 
             font-weight: 600;
             appearance: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-            min-height: 52px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            min-height: 54px;
         }
-        .modern-input:focus { outline: none; border-color: var(--primary); background-color: #fff; box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.15); transform: translateY(-1px); }
-        .modern-input:disabled { background-color: #f9fafb; cursor: not-allowed; opacity: 0.7; color: #9ca3af; border-color: #e5e7eb; box-shadow: none; }
-        .input-error { border-color: var(--danger) !important; background-color: #fff1f2 !important; animation: shake 0.3s ease-in-out; }
+        .modern-input:focus { 
+            outline: none; border-color: #f472b6; background-color: #fff; 
+            box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.15); transform: translateY(-1px); 
+        }
+        .modern-input:disabled { 
+            background-color: #f9fafb; cursor: not-allowed; opacity: 0.8; 
+            color: #9ca3af; border-color: #f3f4f6; box-shadow: none; 
+        }
+        .input-error { 
+            border-color: #e11d48 !important; background-color: #fff1f2 !important; 
+            animation: shake 0.3s ease-in-out; 
+        }
 
-        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0 0; }
-        .custom-table th { color: #831843; font-weight: 700; font-size: 0.75rem; padding: 18px 24px; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(253, 242, 248, 0.8); border-bottom: 2px solid #fce7f3; }
-        .custom-table th:first-child { border-top-left-radius: 16px; }
-        .custom-table th:last-child { border-top-right-radius: 16px; }
-        .custom-table td { padding: 20px 24px; font-size: 0.95rem; vertical-align: middle; background: rgba(255, 255, 255, 0.6); border-bottom: 1px solid #fce7f3; transition: all 0.2s; }
-        .custom-table tr:last-child td { border-bottom: none; }
-        .custom-table tr:hover td { background-color: #fff0f7; transform: scale(1.002); }
+        /* Masaüstü Tablo Tasarımı */
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .custom-table th { 
+            color: #831843; font-weight: 700; font-size: 0.75rem; 
+            padding: 20px 24px; text-transform: uppercase; letter-spacing: 0.05em; 
+            background: rgba(253, 242, 248, 0.8); border-bottom: 2px solid #fce7f3; 
+        }
+        .custom-table td { 
+            padding: 20px 24px; font-size: 0.95rem; vertical-align: middle; 
+            background: rgba(255, 255, 255, 0.7); border-bottom: 1px solid #fce7f3; 
+            transition: all 0.2s ease; 
+        }
+        .custom-table tr:hover td { background-color: #fff0f7; }
 
-        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.025em; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .status-badge { 
+            display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; 
+            border-radius: 9999px; font-size: 0.75rem; font-weight: 800; 
+            text-transform: uppercase; letter-spacing: 0.025em; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+        }
         
-        .avatar-initials { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; color: white; background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); box-shadow: 0 4px 10px -2px rgba(236, 72, 153, 0.4); border: 2px solid #fff; }
-        
-        .crown-icon { animation: floating 3s ease-in-out infinite; filter: drop-shadow(0 4px 6px rgba(251, 191, 36, 0.6)); }
+        .avatar-initials { 
+            width: 46px; height: 46px; border-radius: 14px; display: flex; 
+            align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; 
+            color: white; background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); 
+            box-shadow: 0 4px 10px -2px rgba(236, 72, 153, 0.4); border: 2px solid #fff; 
+        }
 
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #f472b6; }
-
+        /* Mobil Cihazlar İçin Mükemmel Responsive Yapı */
         @media (max-width: 1024px) {
             .glass-card { border: none; box-shadow: none; background: transparent; border-radius: 0; }
             .custom-table thead { display: none; }
             .custom-table, .custom-table tbody, .custom-table tr, .custom-table td { display: block; width: 100%; }
             
             .custom-table tr { 
-                margin-bottom: 20px; border-radius: 20px; background: white; 
-                border: 1px solid #fce7f3; box-shadow: 0 4px 15px -3px rgba(219, 39, 119, 0.08); 
-                position: relative; overflow: hidden; 
+                margin-bottom: 16px; border-radius: 24px; background: white; 
+                border: 1px solid #fce7f3; box-shadow: 0 8px 20px -5px rgba(219, 39, 119, 0.08); 
+                position: relative; overflow: hidden; padding-bottom: 4px;
             }
-            .custom-table tr::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: #e2e8f0; z-index: 2; }
+            .custom-table tr::before { 
+                content: ''; position: absolute; left: 0; top: 0; bottom: 0; 
+                width: 6px; background: #e2e8f0; z-index: 2; 
+            }
             
             .custom-table td { 
-                padding: 14px 16px; border-bottom: 1px dashed #fce7f3; 
+                padding: 14px 20px; border-bottom: 1px solid #f9fafb; 
                 display: flex; justify-content: space-between; align-items: center; 
-                text-align: right; padding-left: 16px; 
+                text-align: right; 
             }
             .custom-table td:first-child { 
-                background: linear-gradient(to right, #fff1f2, #fff); border-bottom: 1px solid #fbcfe8; 
-                padding-top: 16px; padding-bottom: 16px; flex-direction: column; 
-                align-items: flex-start; justify-content: center; text-align: left; 
+                background: linear-gradient(to right, #fff1f2, #fff); border-bottom: 2px dashed #fbcfe8; 
+                padding: 20px; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; 
             }
-            .custom-table td:first-child::before { display: none; } 
-            .custom-table td:last-child { border-bottom: none; padding: 16px; background: white; justify-content: center; }
+            .custom-table td:last-child { border-bottom: none; justify-content: center; padding: 16px; background: #fafaf9; }
             
             .custom-table td::before { 
-                content: attr(data-label); font-weight: 800; color: #be185d; 
+                content: attr(data-label); font-weight: 800; color: #9d174d; 
                 font-size: 0.70rem; text-transform: uppercase; text-align: left; 
                 margin-right: auto; letter-spacing: 0.05em; 
             }
             .custom-table td > div, .custom-table td > span { text-align: right; max-width: 65%; }
-            .mobile-action-btn { width: 100%; justify-content: center; padding: 14px; font-size: 1rem; min-height: 52px; }
+            .mobile-action-btn { width: 100%; justify-content: center; padding: 14px; font-size: 1rem; }
+        }
 
-            /* MOBİL MODAL (POP-UP) DÜZELTMELERİ */
-            #editModal .modal-content-wrapper { 
-                border-bottom-left-radius: 0; border-bottom-right-radius: 0;
-                border-top-left-radius: 32px; border-top-right-radius: 32px;
-                margin-top: auto;
-                max-height: 85dvh; /* Mobilde alt çubukları engellemek için dinamik viewport height */
-                width: 100%;
-            }
-            #editModal .modal-overlay { align-items: flex-end; padding: 0; }
-            
-            .mobile-filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
-            .mobile-filter-grid > *:first-child { grid-column: span 2; } 
-        }
-        
-        @media (max-width: 480px) {
-            .mobile-filter-grid { grid-template-columns: 1fr; }
-            .mobile-filter-grid > *:first-child { grid-column: span 1; }
-        }
+        /* Kaydırma Çubuğu */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f472b6; }
     </style>
 </head>
-<body class="bg-rose-50 selection:bg-pink-200 selection:text-pink-900">
+<body class="bg-rose-50 selection:bg-pink-200 selection:text-pink-900 pb-[env(safe-area-inset-bottom)]">
 
-    <div id="toast" role="alert" aria-live="assertive" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 z-[90] transition-all duration-500 transform translate-y-32 opacity-0 border border-slate-700">
-        <div class="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center text-green-400">
+    <!-- Toast Bildirimi -->
+    <div id="toast" role="alert" aria-live="assertive" class="fixed top-5 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 z-[100] transition-all duration-500 transform -translate-y-32 opacity-0 border border-slate-700 w-[90%] max-w-sm">
+        <div class="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center text-green-400 shrink-0">
             <i class="fas fa-check-circle text-lg"></i>
         </div>
-        <span id="toastMessage" class="font-bold text-sm tracking-wide">İşlem Başarılı</span>
+        <span id="toastMessage" class="font-bold text-sm tracking-wide flex-1">İşlem Başarılı</span>
     </div>
 
-    <div id="championOverlay" class="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center hidden transition-opacity duration-500 backdrop-blur-sm">
+    <!-- Şampiyon Animasyonu -->
+    <div id="championOverlay" class="fixed inset-0 z-[110] bg-black/90 flex flex-col items-center justify-center hidden transition-opacity duration-500 backdrop-blur-sm">
         <div class="text-center animate-[bounce_2s_infinite] relative z-[105]">
             <div class="text-7xl md:text-9xl mb-6 filter drop-shadow-[0_0_25px_rgba(251,191,36,0.6)]">🏆</div>
             <h1 class="text-4xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-200 to-yellow-500 mb-4 tracking-tighter drop-shadow-sm">HOŞGELDİN</h1>
@@ -190,163 +192,150 @@
         </div>
     </div>
 
-    <div id="loginScreen" class="fixed inset-0 z-[60] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-purple-900 to-pink-900 overflow-y-auto">
-        <div class="fixed inset-0 overflow-hidden pointer-events-none">
-            <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
-            <div class="absolute -top-40 -right-40 w-96 h-96 bg-pink-500 rounded-full blur-[128px] opacity-30 animate-pulse"></div>
-            <div class="absolute bottom-0 left-0 w-80 h-80 bg-purple-600 rounded-full blur-[100px] opacity-30 animate-pulse" style="animation-delay: 1s;"></div>
-        </div>
-
-        <div class="min-h-full w-full flex flex-col items-center justify-center p-4 py-12">
-            <div class="w-full max-w-md space-y-6 relative z-10">
-                <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl shadow-2xl ring-1 ring-white/10">
-                    <div class="text-center mb-8">
-                        <div class="w-24 h-24 bg-gradient-to-br from-pink-500 to-purple-600 rounded-3xl mx-auto flex items-center justify-center mb-6 shadow-xl shadow-pink-500/20 transform rotate-3 hover:rotate-0 transition-transform duration-300 border-4 border-white/10">
-                            <i class="fas fa-store text-white text-4xl drop-shadow-md"></i>
-                        </div>
-                        <h1 class="text-3xl font-extrabold text-white mb-2 leading-tight tracking-tight">
-                            Hedef AVM <br><span class="text-pink-200 font-medium text-lg">Online Satış Girişi</span>
-                        </h1>
+    <!-- Giriş Ekranı -->
+    <div id="loginScreen" class="fixed inset-0 z-[60] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-purple-900 to-pink-900 overflow-y-auto flex flex-col items-center justify-center p-4">
+        <div class="w-full max-w-md space-y-6 relative z-10">
+            <!-- Form Kartı -->
+            <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-8 md:p-10 rounded-[32px] shadow-2xl ring-1 ring-white/10">
+                <div class="text-center mb-10">
+                    <div class="w-24 h-24 bg-gradient-to-br from-pink-500 to-purple-600 rounded-[28px] mx-auto flex items-center justify-center mb-6 shadow-xl shadow-pink-500/20 transform rotate-3 hover:rotate-0 transition-transform duration-300 border-4 border-white/10">
+                        <i class="fas fa-store text-white text-4xl drop-shadow-md"></i>
                     </div>
-                    
-                    <form id="loginForm" class="space-y-6">
-                        <div class="space-y-2">
-                            <label class="text-pink-200/80 text-xs font-bold uppercase tracking-widest ml-1">Şube Seçimi</label>
-                            <div class="relative group">
-                                <select id="loginBranch" class="w-full pl-5 pr-12 py-4 bg-white/90 backdrop-blur-sm rounded-2xl text-slate-800 font-bold text-lg shadow-lg border-2 border-transparent focus:border-pink-400 focus:ring-0 appearance-none cursor-pointer transition-all hover:bg-white" required>
-                                    <option value="">Yükleniyor...</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none text-pink-600">
-                                    <i class="fas fa-chevron-down text-lg"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="text-pink-200/80 text-xs font-bold uppercase tracking-widest ml-1">Şifre</label>
-                            <div class="relative group">
-                                <input type="password" id="loginPassword" class="w-full pl-5 pr-12 py-4 bg-white/90 backdrop-blur-sm rounded-2xl text-slate-800 font-bold text-lg shadow-lg border-2 border-transparent focus:border-pink-400 focus:ring-0 appearance-none transition-all hover:bg-white placeholder-slate-400" placeholder="Şifre Giriniz" required>
-                                <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none text-pink-600">
-                                    <i class="fas fa-lock-open text-lg"></i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button type="submit" id="loginBtn" class="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-pink-500/30 text-lg flex items-center justify-center gap-3 group active:scale-95 border border-white/10">
-                            <span>Giriş Yap</span>
-                            <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-                        </button>
-                    </form>
-                    <p id="loginError" class="mt-6 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-100 text-center text-sm font-medium hidden backdrop-blur-sm"></p>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-2 leading-tight tracking-tight">
+                        Hedef AVM
+                    </h1>
+                    <span class="text-pink-200 font-medium text-sm tracking-widest uppercase bg-white/10 px-4 py-1.5 rounded-full inline-block mt-2 border border-white/5">Satış Yönetimi</span>
                 </div>
-
-                <div id="loginLeaderboard" class="bg-black/30 backdrop-blur-md border border-white/10 p-6 rounded-3xl hidden w-full">
-                    <h3 class="text-pink-200 text-xs font-bold uppercase tracking-widest mb-4 text-center border-b border-white/10 pb-3 flex items-center justify-center gap-2">
-                        <i class="fas fa-trophy text-yellow-400"></i> Ayın Ciro Şampiyonları
-                    </h3>
-                    
-                    <div class="space-y-3" id="leaderboardList">
-                        <div class="animate-pulse flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 bg-white/20 rounded-full"></div>
-                                <div class="h-4 bg-white/20 rounded w-32"></div>
+                
+                <form id="loginForm" class="space-y-5">
+                    <div>
+                        <div class="relative group">
+                            <select id="loginBranch" class="w-full pl-5 pr-12 py-4 bg-white/95 backdrop-blur-sm rounded-2xl text-slate-800 font-bold text-lg shadow-lg border-2 border-transparent focus:border-pink-400 focus:ring-0 appearance-none cursor-pointer transition-all h-[60px]" required>
+                                <option value="">Şube Yükleniyor...</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none text-pink-600">
+                                <i class="fas fa-chevron-down text-lg"></i>
                             </div>
-                            <div class="h-4 bg-white/20 rounded w-20"></div>
                         </div>
                     </div>
+
+                    <div>
+                        <div class="relative group">
+                            <input type="password" id="loginPassword" class="w-full pl-5 pr-12 py-4 bg-white/95 backdrop-blur-sm rounded-2xl text-slate-800 font-bold text-lg shadow-lg border-2 border-transparent focus:border-pink-400 focus:ring-0 appearance-none transition-all placeholder-slate-400 h-[60px]" placeholder="Personel Şifresi" required>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none text-pink-600">
+                                <i class="fas fa-lock text-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="loginBtn" class="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-400 hover:to-purple-500 text-white font-extrabold py-4 rounded-2xl transition-all shadow-lg shadow-pink-500/30 text-lg flex items-center justify-center gap-3 group active:scale-95 border border-white/10 h-[60px] mt-4">
+                        <span>Sisteme Gir</span>
+                        <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </form>
+                <p id="loginError" class="mt-6 p-4 bg-red-500/20 border border-red-500/50 rounded-2xl text-red-100 text-center text-sm font-medium hidden backdrop-blur-sm"></p>
+            </div>
+
+            <!-- Lider Tablosu -->
+            <div id="loginLeaderboard" class="bg-black/30 backdrop-blur-md border border-white/10 p-6 rounded-[32px] hidden w-full shadow-2xl">
+                <h3 class="text-pink-200 text-xs font-bold uppercase tracking-widest mb-4 text-center border-b border-white/10 pb-3 flex items-center justify-center gap-2">
+                    <i class="fas fa-trophy text-yellow-400 text-base"></i> Ayın Ciro Şampiyonları
+                </h3>
+                <div class="space-y-2" id="leaderboardList">
+                    <!-- JS ile doldurulacak -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MAIN APP -->
+    <!-- ANA UYGULAMA (MAIN APP) -->
     <div id="mainApp" class="hidden w-full max-w-[1400px] mx-auto p-4 md:p-8 lg:p-10 pb-32">
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-6 mb-6 md:mb-10 w-full bg-white/80 p-4 md:p-6 rounded-[24px] shadow-sm border border-pink-100 backdrop-blur-sm">
-            
-            <!-- Sol Kısım: Logo, Şube Adı ve Durum -->
-            <div class="flex items-start md:items-center gap-4 md:gap-5 w-full md:w-auto">
-                <div class="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-pink-200 text-white text-xl md:text-2xl shrink-0 transform rotate-3 hover:rotate-0 transition-transform mt-1 md:mt-0">
+        
+        <!-- HEADER KISMI -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5 md:gap-6 mb-8 w-full bg-white/80 p-5 md:p-6 rounded-[28px] shadow-sm border border-pink-100 backdrop-blur-md">
+            <!-- Sol Logo ve Şube Adı -->
+            <div class="flex items-center gap-4 md:gap-5 w-full md:w-auto">
+                <div class="w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-pink-200 text-white text-xl md:text-2xl shrink-0 transform rotate-3 transition-transform">
                     <i class="fas fa-store"></i>
                 </div>
-                <div class="flex-1 w-full">
+                <div class="flex-1">
                     <div class="flex items-center gap-2 md:gap-3 flex-wrap">
-                        <h1 class="text-xl md:text-3xl font-extrabold text-slate-800 tracking-tight uppercase" id="headerTitle">PANEL</h1>
-                        <div id="championBadge" class="hidden items-center gap-1.5 bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 text-yellow-900 px-2 md:px-3 py-0.5 md:py-1 rounded-md md:rounded-full text-[10px] md:text-xs font-bold shadow-sm border border-white animate-pulse">
-                            <i class="fas fa-crown crown-icon text-xs md:text-sm"></i> <span class="hidden sm:inline">AYIN CİRO 1.Sİ</span><span class="sm:hidden">LİDER</span>
+                        <h1 class="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight uppercase" id="headerTitle">PANEL</h1>
+                        <div id="championBadge" class="hidden items-center gap-1.5 bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 text-yellow-900 px-3 py-1 rounded-full text-[10px] md:text-xs font-bold shadow-sm border border-white animate-pulse">
+                            <i class="fas fa-crown"></i> <span class="hidden sm:inline">AYIN LİDERİ</span><span class="sm:hidden">LİDER</span>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 md:gap-3 mt-2 flex-wrap">
-                        <span class="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2.5 py-1.5 rounded-lg font-bold text-[10px] md:text-xs border border-emerald-100 shadow-sm h-fit">
+                        <span class="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl font-bold text-[10px] md:text-xs border border-emerald-100 shadow-sm h-fit">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online
                         </span>
                         
-                        <!-- BÜYÜTÜLMÜŞ TOPLAM CİRO ALANI -->
-                        <div class="flex items-center gap-1.5 md:gap-2 bg-gradient-to-r from-pink-50 to-white px-3 md:px-4 py-1 md:py-1.5 rounded-lg md:rounded-xl border border-pink-200 shadow-sm">
-                            <span class="text-[10px] md:text-xs uppercase font-bold text-pink-400 tracking-widest hidden sm:inline-block mr-1">CİRO</span>
-                            <i class="fas fa-wallet text-pink-500 text-sm md:text-base sm:hidden"></i>
-                            <span id="headerTotalRevenueText" class="text-lg md:text-2xl font-black text-slate-800 tracking-tight">0 ₺</span>
+                        <!-- BÜYÜK CİRO GÖSTERGESİ (Tamamen O Sütunu Toplamı) -->
+                        <div class="flex items-center gap-2 bg-gradient-to-r from-pink-50 to-white px-4 py-1.5 rounded-xl border border-pink-200 shadow-sm">
+                            <span class="text-[10px] md:text-xs uppercase font-bold text-pink-400 tracking-widest hidden sm:inline-block mr-1">TOPLAM CİRO</span>
+                            <i class="fas fa-wallet text-pink-500 text-base sm:hidden"></i>
+                            <span id="headerTotalRevenueText" class="text-xl md:text-2xl font-black text-slate-800 tracking-tight">0 ₺</span>
                         </div>
-
-                        <span id="currentUserDisplay" class="hidden text-xs text-slate-400 font-medium"></span>
                     </div>
                 </div>
             </div>
             
-            <!-- Sağ Kısım: Aksiyon Butonları -->
-            <div class="flex items-center justify-between md:justify-end gap-3 w-full md:w-auto mt-2 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-slate-100">
-                <button onclick="refreshData(false)" class="flex-1 md:flex-none px-4 py-3 md:py-3 rounded-xl font-bold bg-white text-slate-600 shadow-sm border border-slate-200 text-sm hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition flex justify-center items-center gap-2 group active:scale-95">
-                    <i class="fas fa-sync-alt group-hover:rotate-180 transition-transform duration-500"></i> 
+            <!-- Sağ Aksiyon Butonları -->
+            <div class="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-slate-100">
+                <button onclick="refreshData(false)" class="flex-1 md:flex-none px-4 py-3.5 rounded-2xl font-bold bg-white text-slate-600 shadow-sm border border-slate-200 text-sm hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition flex justify-center items-center gap-2 active:scale-95">
+                    <i class="fas fa-sync-alt text-pink-500"></i> 
                     <span>Yenile</span>
-                    <span id="lastTime" class="text-[10px] md:text-xs font-normal text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-md hidden sm:inline-block">--:--</span>
                 </button>
-                <button onclick="logout()" class="flex-1 md:flex-none px-4 py-3 md:py-3 rounded-xl font-bold bg-rose-50 text-rose-600 shadow-sm border border-rose-100 text-sm hover:bg-rose-100 hover:text-rose-700 transition flex justify-center items-center gap-2 group active:scale-95">
-                    <i class="fas fa-sign-out-alt group-hover:-translate-x-0.5 transition-transform"></i> 
+                <button onclick="logout()" class="flex-1 md:flex-none px-4 py-3.5 rounded-2xl font-bold bg-rose-50 text-rose-600 shadow-sm border border-rose-100 text-sm hover:bg-rose-100 hover:text-rose-700 transition flex justify-center items-center gap-2 active:scale-95">
+                    <i class="fas fa-sign-out-alt"></i> 
                     <span class="hidden sm:inline">Güvenli Çıkış</span>
                     <span class="sm:hidden">Çıkış</span>
                 </button>
             </div>
         </header>
 
-        <div id="overdueNotification" class="hidden mb-8 bg-gradient-to-br from-rose-500 via-pink-600 to-purple-600 rounded-3xl p-1 shadow-xl shadow-pink-500/20 transform hover:scale-[1.01] transition-transform animate-[pulse_3s_infinite]">
-            <div class="bg-white/95 backdrop-blur-xl rounded-[20px] p-5 flex flex-col sm:flex-row items-center sm:items-start gap-5">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-100 to-pink-100 text-rose-500 flex items-center justify-center shrink-0 border border-rose-200 shadow-inner">
+        <!-- Takip Bildirimi -->
+        <div id="overdueNotification" class="hidden mb-8 bg-gradient-to-br from-rose-500 to-purple-600 rounded-[28px] p-[2px] shadow-xl shadow-pink-500/20 transform hover:scale-[1.01] transition-transform animate-[pulse_3s_infinite]">
+            <div class="bg-white/95 backdrop-blur-xl rounded-[26px] p-5 flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 border border-rose-200 shadow-sm">
                     <i class="fas fa-bell fa-lg animate-bounce"></i>
                 </div>
                 <div class="flex-1 text-center sm:text-left">
-                    <h4 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-purple-600 text-lg tracking-tight">Dikkat: Takip Gerektiren Kayıtlar Var!</h4>
-                    <p class="text-slate-500 text-sm mt-1 font-medium leading-relaxed" id="overdueMessage">...</p>
+                    <h4 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-purple-600 text-lg tracking-tight">Dikkat: Takip Gerektiren Müşteriler Var!</h4>
+                    <p class="text-slate-500 text-sm mt-1 font-medium" id="overdueMessage">...</p>
                 </div>
-                <button onclick="filterOverdue()" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-600 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:shadow-pink-500/30 transition flex items-center justify-center gap-2 active:scale-95">
-                    <i class="fas fa-list-ul"></i> Listele
+                <button onclick="filterOverdue()" class="w-full sm:w-auto px-6 py-3.5 bg-rose-500 text-white text-sm font-bold rounded-xl hover:bg-rose-600 shadow-md transition flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fas fa-list-ul"></i> Hepsini Listele
                 </button>
             </div>
         </div>
 
+        <!-- Müşteri Tablo Kartı -->
         <div class="glass-card flex flex-col overflow-hidden min-h-[500px]">
-            <div class="p-6 md:p-8 border-b border-pink-100 bg-white/60 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+            <div class="p-6 md:p-8 border-b border-pink-100 bg-white/70 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
                 <div>
-                    <h3 class="font-bold text-slate-800 text-lg md:text-xl flex items-center gap-3">
-                        <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-100 to-purple-100 text-pink-600 flex items-center justify-center text-lg shadow-sm border border-pink-50">
+                    <h3 class="font-extrabold text-slate-800 text-xl flex items-center gap-3">
+                        <span class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-100 to-purple-100 text-pink-600 flex items-center justify-center text-lg shadow-sm border border-pink-200">
                             <i class="fas fa-users"></i>
                         </span>
                         Müşteri Listesi
                     </h3>
-                    <p class="text-sm text-slate-400 font-medium mt-1 ml-14 hidden md:block">Güncel müşteri aramaları ve durumları</p>
                 </div>
                 
                 <div class="flex flex-col lg:flex-row gap-3 w-full xl:w-auto">
+                    <!-- Filtreler -->
                     <div class="relative w-full lg:w-48">
-                        <input type="month" id="monthFilter" onchange="refreshData(false)" class="modern-input pl-10 pr-4">
-                        <i class="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-pink-400"></i>
+                        <input type="month" id="monthFilter" onchange="refreshData(false)" class="modern-input pl-11 pr-4">
+                        <i class="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-pink-400 text-lg"></i>
                     </div>
 
                     <div class="relative w-full lg:w-64">
                         <input type="text" id="searchInput" onkeyup="renderTable()" placeholder="İsim veya Telefon..." class="modern-input pl-11 pr-4">
-                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-pink-400"></i>
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-pink-400 text-lg"></i>
                     </div>
 
-                    <div class="relative w-full lg:w-64">
-                        <select id="filterStatus" onchange="renderTable()" class="modern-input pl-4 pr-10 cursor-pointer">
+                    <div class="relative w-full lg:w-56">
+                        <select id="filterStatus" onchange="renderTable()" class="modern-input pl-4 pr-10 cursor-pointer text-sm">
                             <option value="">Tüm Durumlar</option>
                             <option value="aranmadı">🔴 Aranmadı</option>
                             <option value="arandı">🟡 Arandı</option>
@@ -355,103 +344,111 @@
                             <option value="tekrar">🟣 Tekrar Aranacak</option>
                         </select>
                         <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-pink-500">
-                            <i class="fas fa-filter text-xs"></i>
+                            <i class="fas fa-filter text-sm"></i>
                         </div>
                     </div>
 
-                    <button onclick="resetFilters()" class="w-full lg:w-auto px-6 py-3 bg-white border border-slate-200 rounded-2xl text-slate-500 hover:text-pink-600 hover:border-pink-300 hover:bg-pink-50 transition shadow-sm flex items-center justify-center gap-2 group whitespace-nowrap font-bold text-sm h-[52px]" title="Filtreleri Sıfırla">
-                        <i class="fas fa-undo group-hover:rotate-180 transition-transform duration-500"></i>
-                        <span>Sıfırla</span>
-                    </button>
-                    
-                    <button onclick="exportToExcel()" class="w-full lg:w-auto px-6 py-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-600 hover:text-white hover:bg-emerald-500 transition shadow-sm flex items-center justify-center gap-2 group whitespace-nowrap font-bold text-sm h-[52px]" title="Listeyi Excel Olarak İndir">
-                        <i class="fas fa-file-excel group-hover:scale-110 transition-transform duration-300"></i>
-                        <span>Excel</span>
-                    </button>
+                    <!-- Aksiyon Butonları -->
+                    <div class="grid grid-cols-2 lg:flex gap-3 w-full lg:w-auto">
+                        <button onclick="resetFilters()" class="w-full lg:w-auto px-5 py-3.5 bg-white border border-slate-200 rounded-2xl text-slate-600 hover:text-pink-600 hover:border-pink-300 transition shadow-sm flex items-center justify-center gap-2 font-bold text-sm">
+                            <i class="fas fa-undo"></i><span class="lg:hidden xl:inline">Sıfırla</span>
+                        </button>
+                        <button onclick="exportToExcel()" class="w-full lg:w-auto px-5 py-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-700 hover:bg-emerald-500 hover:text-white transition shadow-sm flex items-center justify-center gap-2 font-bold text-sm">
+                            <i class="fas fa-file-excel"></i><span class="lg:hidden xl:inline">Excel</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             
-            <div class="flex-1 p-0 overflow-x-auto bg-white/40">
+            <div class="flex-1 p-0 overflow-x-auto bg-[#fafaf9] lg:bg-white/40">
                 <table class="custom-table w-full">
                     <thead>
                         <tr>
-                            <th class="pl-8">Müşteri Bilgisi</th>
-                            <th>İletişim</th>
-                            <th>Ürün & Kategori</th>
-                            <th>Durum & Sonuç</th>
-                            <th>Satış Tutarı</th>
+                            <th class="pl-8 text-left">Müşteri Bilgisi</th>
+                            <th class="text-left">İletişim</th>
+                            <th class="text-left">Ürün & Kategori</th>
+                            <th class="text-left">Durum & Sonuç</th>
+                            <th class="text-left">Satış Tutarı</th>
                             <th class="text-right pr-8">İşlemler</th>
                         </tr>
                     </thead>
                     <tbody id="crmTableBody">
-                        <tr><td colspan="6" class="text-center py-20 text-slate-400 font-medium"><i class="fas fa-spinner fa-spin text-2xl mb-2 text-pink-400"></i><br>Veriler Yükleniyor...</td></tr>
+                        <tr><td colspan="6" class="text-center py-24 text-slate-400 font-bold"><i class="fas fa-spinner fa-spin text-3xl mb-3 text-pink-400 block"></i> Veriler Yükleniyor...</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <div class="p-4 md:p-6 border-t border-pink-100 bg-white/60 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <span class="text-xs font-bold text-slate-500 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm order-2 sm:order-1" id="recordCountInfo">0 kayıt bulundu</span>
+            <!-- Paginasyon -->
+            <div class="p-5 md:p-6 border-t border-pink-100 bg-white/80 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <span class="text-xs font-bold text-slate-500 bg-white px-4 py-2.5 rounded-xl border border-slate-200 shadow-sm order-2 sm:order-1" id="recordCountInfo">0 kayıt</span>
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-center order-1 sm:order-2">
-                    <button onclick="changePage(-1)" id="btnPrev" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-bold shadow-sm" disabled><i class="fas fa-chevron-left text-[10px]"></i> Önceki</button>
-                    <span id="pageInfo" class="text-xs font-bold bg-white border border-slate-200 px-4 py-2.5 rounded-xl text-slate-700 min-w-[90px] text-center shadow-sm">1 / 1</span>
-                    <button onclick="changePage(1)" id="btnNext" class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-bold shadow-sm" disabled>Sonraki <i class="fas fa-chevron-right text-[10px]"></i></button>
+                    <button onclick="changePage(-1)" id="btnPrev" class="px-5 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-pink-50 hover:text-pink-600 transition disabled:opacity-50 flex items-center gap-2 text-sm font-bold shadow-sm" disabled><i class="fas fa-chevron-left text-[10px]"></i> Önceki</button>
+                    <span id="pageInfo" class="text-sm font-extrabold bg-slate-50 border border-slate-200 px-5 py-3 rounded-xl text-slate-700 min-w-[90px] text-center">1 / 1</span>
+                    <button onclick="changePage(1)" id="btnNext" class="px-5 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-pink-50 hover:text-pink-600 transition disabled:opacity-50 flex items-center gap-2 text-sm font-bold shadow-sm" disabled>Sonraki <i class="fas fa-chevron-right text-[10px]"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- DÜZELTİLMİŞ EDIT MODAL (POP-UP) -->
-    <div id="editModal" class="fixed inset-0 modal-overlay z-[70] hidden flex justify-center items-end md:items-center p-0 md:p-4 bg-black/40 backdrop-blur-sm transition-all duration-300">
-        <div class="modal-content-wrapper bg-white w-full max-w-3xl md:rounded-[32px] shadow-2xl relative flex flex-col max-h-[85dvh] md:max-h-[90vh] transition-all transform duration-200 scale-100 overflow-hidden">
+    <!-- MOBİL UYUMLU MÜKEMMEL MODAL (BOTTOM-SHEET) -->
+    <div id="editModal" class="fixed inset-0 z-[100] hidden flex-col justify-end md:justify-center items-center bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 p-0 md:p-6">
+        
+        <!-- Modal İçerik Kutusu (Mobilde ekranın altından çıkar ve tam oturur, Taşma Engellenmiştir) -->
+        <div id="editModalContent" class="bg-white w-full md:max-w-3xl flex flex-col h-[90dvh] md:h-auto md:max-h-[90vh] rounded-t-[32px] md:rounded-[32px] shadow-2xl transform translate-y-full transition-transform duration-300 ease-out overflow-hidden">
             
-            <!-- HEADER (Sabit Kısım) -->
-            <div class="px-6 md:px-8 py-5 md:py-6 border-b border-pink-100 flex justify-between items-center bg-white shrink-0">
+            <!-- SABİT HEADER -->
+            <div class="px-6 md:px-8 py-5 border-b border-pink-100 flex justify-between items-center bg-white shrink-0 z-10 shadow-sm">
                 <div>
-                    <h3 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600 text-xl md:text-2xl">Kayıt Düzenle</h3>
-                    <p class="text-[10px] md:text-xs text-slate-400 font-bold mt-1 uppercase tracking-wide">Müşteri Detaylarını Güncelleyin</p>
+                    <h3 class="font-extrabold text-slate-800 text-xl md:text-2xl">Kayıt Düzenle</h3>
+                    <p class="text-[10px] md:text-xs text-pink-500 font-bold mt-0.5 uppercase tracking-wider">Müşteri Detaylarını Güncelleyin</p>
                 </div>
-                <button onclick="closeEditModal()" aria-label="Pencereyi Kapat" class="w-10 h-10 rounded-full bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition flex items-center justify-center border border-slate-200 shadow-sm active:scale-90">
+                <button onclick="closeEditModal()" class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-red-100 hover:text-red-600 transition flex items-center justify-center border border-slate-200 active:scale-90">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
             
-            <!-- BODY (Kaydırılabilir İçerik Kısmı) -->
-            <div class="flex-1 overflow-y-auto p-5 md:p-8 bg-[#fff5f7]">
+            <!-- KAYDIRILABİLİR FORM ALANI -->
+            <div class="flex-1 overflow-y-auto p-5 md:p-8 bg-[#fffcfd]">
                 <form id="editForm" class="space-y-6 md:space-y-8">
                     <input type="hidden" id="m_rowIndex"><input type="hidden" id="m_sheetName">
 
-                    <div class="bg-white p-5 md:p-6 rounded-2xl border border-pink-100 shadow-sm grid grid-cols-2 gap-4 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-pink-100 to-transparent opacity-50 rounded-bl-full pointer-events-none"></div>
+                    <!-- Bilgi Kartı -->
+                    <div class="bg-white p-5 rounded-2xl border border-pink-100 shadow-sm grid grid-cols-2 gap-4 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-pink-50 to-transparent rounded-bl-full pointer-events-none"></div>
                         <div>
-                            <label class="text-[10px] md:text-xs uppercase font-bold text-pink-400 block mb-1 tracking-wider">Şube</label>
-                            <input type="text" id="m_branch" class="w-full bg-transparent font-bold text-slate-700 text-xs md:text-sm focus:outline-none" readonly>
+                            <label class="text-[10px] md:text-xs uppercase font-bold text-slate-400 block mb-1">Şube</label>
+                            <input type="text" id="m_branch" class="w-full bg-transparent font-bold text-slate-700 text-sm focus:outline-none" readonly>
                         </div>
                         <div>
-                            <label class="text-[10px] md:text-xs uppercase font-bold text-pink-400 block mb-1 tracking-wider">Tarih</label>
-                            <input type="text" id="m_date" class="w-full bg-transparent font-bold text-slate-700 text-xs md:text-sm focus:outline-none" readonly>
+                            <label class="text-[10px] md:text-xs uppercase font-bold text-slate-400 block mb-1">Kayıt Tarihi</label>
+                            <input type="text" id="m_date" class="w-full bg-transparent font-bold text-slate-700 text-sm focus:outline-none" readonly>
                         </div>
                     </div>
 
+                    <!-- Müşteri Bilgileri -->
                     <div>
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 pl-1 flex items-center gap-2">
-                            <i class="fas fa-user-circle text-pink-300"></i> Müşteri Bilgileri
+                        <h4 class="text-xs font-bold text-pink-500 uppercase tracking-wider mb-3 pl-1 flex items-center gap-2">
+                            <i class="fas fa-user-circle text-lg"></i> Müşteri Bilgileri
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Müşteri No</label>
-                                <input type="text" id="m_customerNo" class="modern-input" placeholder="Opsiyonel">
+                            <div class="md:col-span-2">
+                                <label class="text-xs font-bold text-slate-600 mb-1.5 block">Ad Soyad</label>
+                                <input type="text" id="m_name" class="modern-input border-slate-200">
                             </div>
                             <div>
-                                <label class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Ad Soyad</label>
-                                <input type="text" id="m_name" class="modern-input">
+                                <label class="text-xs font-bold text-slate-600 mb-1.5 block">Müşteri No <span class="text-slate-400 font-normal">(Opsiyonel)</span></label>
+                                <input type="text" id="m_customerNo" class="modern-input border-slate-200">
                             </div>
                             <div>
-                                <label class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Telefon</label>
-                                <input type="text" id="m_contact" class="modern-input">
+                                <label class="text-xs font-bold text-slate-600 mb-1.5 block">Telefon</label>
+                                <div class="relative">
+                                    <input type="tel" id="m_contact" class="modern-input border-slate-200 pl-10">
+                                    <i class="fas fa-phone text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+                                </div>
                             </div>
                             <div>
-                                <label class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Kategori</label>
-                                <select id="m_category" class="modern-input">
+                                <label class="text-xs font-bold text-slate-600 mb-1.5 block">Kategori</label>
+                                <select id="m_category" class="modern-input border-slate-200">
                                     <option value="">Seçiniz...</option>
                                     <option value="LİMİT ÖĞREN">LİMİT ÖĞREN</option>
                                     <option value="Mobilya">Mobilya</option>
@@ -471,23 +468,23 @@
                                     <option value="GENEL ÜRÜN BİLGİSİ">GENEL ÜRÜN BİLGİSİ</option>
                                 </select>
                             </div>
-                            <div class="md:col-span-2">
-                                <label class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Ürün</label>
-                                <input type="text" id="m_product" class="modern-input">
+                            <div>
+                                <label class="text-xs font-bold text-slate-600 mb-1.5 block">Ürün / Detay</label>
+                                <input type="text" id="m_product" class="modern-input border-slate-200">
                             </div>
                         </div>
                     </div>
 
-                    <div class="border-t-2 border-dashed border-pink-200"></div>
+                    <div class="border-t-2 border-dashed border-slate-200 my-4"></div>
 
+                    <!-- Arama Sonucu -->
                     <div>
-                        <h4 class="text-xs font-bold text-pink-600 uppercase tracking-wider mb-3 pl-1 flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-lg bg-pink-100 flex items-center justify-center text-pink-600 text-[10px]"><i class="fas fa-phone-alt"></i></span> 
-                            Arama Sonucu
+                        <h4 class="text-xs font-bold text-pink-500 uppercase tracking-wider mb-3 pl-1 flex items-center gap-2">
+                            <i class="fas fa-headset text-lg"></i> Görüşme Sonucu
                         </h4>
                         <div class="space-y-4">
-                            <div class="bg-white p-4 rounded-xl border border-pink-100 shadow-sm transition-all hover:border-pink-300 hover:shadow-md group" id="step1box">
-                                <label class="text-xs md:text-sm font-bold text-slate-700 mb-2 block group-hover:text-pink-600 transition-colors">1. Aranma Durumu</label>
+                            <div class="bg-white p-4 md:p-5 rounded-2xl border border-pink-100 shadow-sm transition-all" id="step1box">
+                                <label class="text-xs font-bold text-slate-700 mb-2 block">1. Aranma Durumu</label>
                                 <select id="m_status" class="modern-input font-bold text-slate-700">
                                     <option value="" selected>Seçiniz...</option>
                                     <option value="aranmadı">🔴 Aranmadı</option>
@@ -495,8 +492,8 @@
                                 </select>
                             </div>
                             
-                            <div class="bg-white p-4 rounded-xl border border-pink-100 shadow-sm transition-all" id="step2box">
-                                <label class="text-xs md:text-sm font-bold text-slate-700 mb-2 block">2. Görüşme Sonucu</label>
+                            <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-100 shadow-sm transition-all" id="step2box">
+                                <label class="text-xs font-bold text-slate-700 mb-2 block">2. Müşteri Dönüşü</label>
                                 <select id="m_result" class="modern-input" disabled>
                                     <option value="" selected>Seçiniz...</option>
                                     <option value="Beklemede">Beklemede</option>
@@ -509,33 +506,33 @@
                                 </select>
                             </div>
                             
-                            <div class="bg-white p-4 rounded-xl border border-pink-100 shadow-sm transition-all" id="step3box">
-                                <label class="text-xs md:text-sm font-bold text-slate-700 mb-2 block">3. Görüşme Notu</label>
-                                <textarea id="m_note" class="modern-input resize-none overflow-hidden min-h-[60px] md:min-h-[80px]" placeholder="Görüşme detaylarını buraya yazın..." oninput="autoResize(this)" disabled></textarea>
+                            <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-100 shadow-sm transition-all" id="step3box">
+                                <label class="text-xs font-bold text-slate-700 mb-2 block">3. Personel Notu</label>
+                                <textarea id="m_note" class="modern-input resize-none overflow-hidden min-h-[80px]" placeholder="Görüşme detaylarını ekleyin..." oninput="autoResize(this)" disabled></textarea>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-gradient-to-br from-emerald-50 to-green-50 p-5 rounded-2xl border border-emerald-100 shadow-sm transition-all relative overflow-hidden" id="step4box">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-100 rounded-bl-full opacity-30 pointer-events-none"></div>
-                        <h4 class="text-xs md:text-sm font-bold text-emerald-800 mb-3 flex items-center gap-2 relative z-10">
-                            <span class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs"><i class="fas fa-cash-register"></i></span>
-                            Satış Onayı
+                    <!-- Satış Onayı -->
+                    <div class="bg-gradient-to-br from-emerald-50 to-[#ebfef5] p-5 md:p-6 rounded-[24px] border border-emerald-200 shadow-sm transition-all relative overflow-hidden" id="step4box">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-100 rounded-bl-full opacity-40 pointer-events-none"></div>
+                        <h4 class="text-sm font-extrabold text-emerald-800 mb-4 flex items-center gap-2 relative z-10">
+                            <i class="fas fa-check-circle text-xl text-emerald-500"></i> Satış Onayı
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
                             <div>
-                                <label class="text-[10px] md:text-xs font-bold text-emerald-700/70 mb-1.5 block uppercase tracking-wide">Sipariş Durumu</label>
-                                <select id="m_isOrder" class="modern-input border-emerald-200 focus:ring-emerald-200 focus:border-emerald-400" onchange="toggleAmount()" disabled>
+                                <label class="text-xs font-bold text-emerald-700 mb-1.5 block">Sipariş Gerçekleşti mi?</label>
+                                <select id="m_isOrder" class="modern-input border-emerald-300 focus:ring-emerald-400 focus:border-emerald-400 font-bold" onchange="toggleAmount()" disabled>
                                     <option value="" selected>Seçiniz...</option>
                                     <option value="Hayır">Hayır</option>
                                     <option value="Evet">Evet, Satış Yapıldı</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="text-[10px] md:text-xs font-bold text-emerald-700/70 mb-1.5 block uppercase tracking-wide">Toplam Tutar</label>
+                                <label class="text-xs font-bold text-emerald-700 mb-1.5 block">Sepet Tutarı</label>
                                 <div class="relative">
-                                    <input type="number" id="m_amount" class="modern-input border-emerald-200 pl-10 focus:ring-emerald-200 focus:border-emerald-400 font-bold text-emerald-700 text-lg" placeholder="0.00" disabled>
-                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500 font-bold text-lg">₺</span>
+                                    <input type="number" id="m_amount" class="modern-input border-emerald-300 pl-10 focus:ring-emerald-400 focus:border-emerald-400 font-black text-emerald-800 text-lg" placeholder="0" disabled>
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600 font-bold text-lg">₺</span>
                                 </div>
                             </div>
                         </div>
@@ -543,18 +540,18 @@
                 </form>
             </div>
 
-            <!-- FOOTER (Sabit Butonlar) -->
-            <div class="p-4 md:p-6 border-t border-pink-100 bg-white flex flex-col sm:flex-row justify-end gap-3 shrink-0 shadow-[0_-10px_20px_rgba(0,0,0,0.03)]">
-                <button type="button" onclick="closeEditModal()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 bg-slate-50 transition border border-transparent hover:border-slate-200 order-2 sm:order-1 active:scale-95">Vazgeç</button>
-                <button type="submit" form="editForm" id="updateBtn" class="w-full sm:w-auto px-8 py-3.5 rounded-xl text-sm font-bold bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:from-pink-500 hover:to-purple-500 shadow-lg shadow-pink-500/30 transition active:scale-95 flex justify-center items-center gap-2 order-1 sm:order-2">
-                    <i class="fas fa-save"></i> Kaydet
+            <!-- SABİT FOOTER (Mobilde klavye açılsa bile ekrandan kaybolmaz) -->
+            <div class="p-5 border-t border-pink-100 bg-white flex flex-col sm:flex-row justify-end gap-3 shrink-0 shadow-[0_-15px_30px_rgba(0,0,0,0.05)] z-20 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+                <button type="button" onclick="closeEditModal()" class="w-full sm:w-auto px-6 py-4 rounded-xl text-sm font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition order-2 sm:order-1 active:scale-95">Vazgeç</button>
+                <button type="submit" form="editForm" id="updateBtn" class="w-full sm:w-auto px-10 py-4 rounded-xl text-sm font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-400 hover:to-purple-500 shadow-lg shadow-pink-500/40 transition active:scale-95 flex justify-center items-center gap-2 order-1 sm:order-2">
+                    <i class="fas fa-save text-lg"></i> Kaydet
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // LÜTFEN AŞAĞIDAKİ YENİ YAYINLANMIŞ APPS SCRIPT URL'NİZİ GİRDİĞİNİZDEN EMİN OLUN
+        // API URL (Apps Script)
         const API_URL = 'https://script.google.com/macros/s/AKfycbwQ7j5NSTaojKhdVKPehsYKqZSCljBBzvywmCf8S7ZXSAYjz3OsXUOMG-9NnMZdRzht/exec'; 
         
         const parseCurrency = (val) => {
@@ -571,17 +568,9 @@
         };
 
         const getRevenue = (item) => {
+            // Doğrudan O Sütunu (15. Sütun -> API'da 'revenue' olarak döner) baz alınır.
+            if (item.revenue !== undefined && item.revenue !== null && item.revenue !== '') return item.revenue;
             if (item.amount !== undefined && item.amount !== null && item.amount !== '') return item.amount;
-            if (item.revenue !== undefined) return item.revenue;
-            const keys = Object.keys(item);
-            for (const key of keys) {
-                const clean = key.toString().toLowerCase().replace(/\s+/g, '').trim();
-                if (clean === 'o' || clean === '0' || clean.includes('ciro') || clean.includes('revenue') || clean.includes('amount')) {
-                      if (!clean.includes('tel') && !clean.includes('no') && !clean.includes('id') && !clean.includes('date')) {
-                          return item[key];
-                      }
-                }
-            }
             return 0;
         };
 
@@ -594,7 +583,7 @@
 
         function parseDateTR(str) {
             if(!str) return new Date();
-            const [datePart, timePart] = str.split(' ');
+            const [datePart] = str.split(' ');
             const [day, month, year] = datePart.split('.');
             return new Date(year, month - 1, day);
         }
@@ -603,7 +592,7 @@
         let branchList = [];
         let leaderboardData = []; 
         let allRecords = []; 
-        let currentFilteredData = []; // EXCEL için güncel listeyi tutar
+        let currentFilteredData = []; 
         let currentPage = 1;
         const rowsPerPage = 10;
         let activeFilterMode = 'default';
@@ -646,9 +635,7 @@
                         sessionStorage.setItem('authToken', result.token);
                         
                         const sortedLeaderboard = [...leaderboardData].sort((a, b) => {
-                            const revA = parseCurrency(getRevenue(a));
-                            const revB = parseCurrency(getRevenue(b));
-                            return revB - revA;
+                            return parseCurrency(getRevenue(b)) - parseCurrency(getRevenue(a));
                         });
 
                         if (sortedLeaderboard.length > 0 && sortedLeaderboard[0].branch === branch) {
@@ -657,7 +644,7 @@
                             loginSuccess(branch);
                         }
                     } else {
-                        errorMsg.textContent = result.message || "Giriş başarısız.";
+                        errorMsg.textContent = result.message || "Giriş başarısız. Lütfen şifrenizi kontrol ediniz.";
                         errorMsg.classList.remove('hidden');
                         document.getElementById('loginPassword').value = '';
                     }
@@ -675,9 +662,7 @@
             const overlay = document.getElementById('championOverlay');
             overlay.classList.remove('hidden');
             
-            const duration = 3000;
-            const end = Date.now() + duration;
-
+            const end = Date.now() + 3000;
             (function frame() {
                 confetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#fbbf24', '#f59e0b', '#ffffff'], zIndex: 101, disableForReducedMotion: true });
                 confetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#fbbf24', '#f59e0b', '#ffffff'], zIndex: 101, disableForReducedMotion: true });
@@ -704,7 +689,7 @@
                 const box = document.getElementById(boxId);
                 if(box) {
                     box.classList.remove('opacity-50', 'pointer-events-none');
-                    box.classList.add('border-pink-300', 'shadow-md');
+                    box.classList.add('border-pink-400', 'shadow-md');
                 }
                 if(el) el.disabled = false;
             };
@@ -713,7 +698,7 @@
                 const box = document.getElementById(boxId);
                 if(box) {
                     box.classList.add('opacity-50', 'pointer-events-none');
-                    box.classList.remove('border-pink-300', 'shadow-md');
+                    box.classList.remove('border-pink-400', 'shadow-md');
                 }
                 if(el) {
                     el.disabled = true;
@@ -724,7 +709,6 @@
             const updateFlow = () => {
                 const statusVal = statusEl.value;
                 const resultVal = resultEl.value;
-                const noteVal = noteEl.value.trim();
 
                 if (statusVal === 'arandı' || statusVal === 'aranmadı') {
                     activateStep(resultEl, 'step2box');
@@ -738,7 +722,6 @@
 
                 if (resultVal) {
                     activateStep(noteEl, 'step3box');
-                    
                     if (resultVal === 'Satışa Döndü') {
                         activateStep(orderEl, 'step4box');
                     } else {
@@ -750,16 +733,12 @@
                     deactivateStep(noteEl, 'step3box');
                     deactivateStep(orderEl, 'step4box');
                     document.getElementById('m_amount').disabled = true;
-                    return;
                 }
             };
 
             statusEl.addEventListener('change', updateFlow);
             resultEl.addEventListener('change', updateFlow);
-            noteEl.addEventListener('input', () => {
-                autoResize(noteEl);
-                updateFlow();
-            });
+            noteEl.addEventListener('input', () => autoResize(noteEl));
             window.updateModalFlow = updateFlow;
         }
 
@@ -775,13 +754,22 @@
             renderTable();
         }
 
-        function showToast(msg) {
+        function showToast(msg, type = "success") {
             const toast = document.getElementById('toast');
             const msgEl = document.getElementById('toastMessage');
             msgEl.textContent = msg;
-            toast.classList.remove('translate-y-32', 'opacity-0');
+            
+            if (type === "error") {
+                toast.querySelector('div').className = 'w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center text-red-400 shrink-0';
+                toast.querySelector('i').className = 'fas fa-exclamation-circle text-lg';
+            } else {
+                toast.querySelector('div').className = 'w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center text-green-400 shrink-0';
+                toast.querySelector('i').className = 'fas fa-check-circle text-lg';
+            }
+
+            toast.classList.remove('-translate-y-32', 'opacity-0');
             setTimeout(() => {
-                toast.classList.add('translate-y-32', 'opacity-0');
+                toast.classList.add('-translate-y-32', 'opacity-0');
             }, 3000);
         }
 
@@ -791,28 +779,22 @@
                 document.getElementById('loginLeaderboard').classList.remove('hidden');
                 
                 const res = await fetch(`${API_URL}?action=getLeaderboard`, { method: 'GET', redirect: 'follow', cache: 'no-store' });
-                
-                if (!res.ok) throw new Error("Sunucu HTTP hatası döndürdü: " + res.status);
+                if (!res.ok) throw new Error("Sunucu HTTP hatası");
                 
                 const data = await res.json();
-                
-                if (data.error) {
-                    throw new Error(data.error);
-                }
+                if (data.error) throw new Error(data.error);
                 
                 branchList = data.leaderboard ? data.leaderboard.map(b => b.branch) : [];
                 leaderboardData = data.leaderboard || []; 
 
                 if (branchList.length === 0) {
-                     // Veri gelmezse fallback olarak listeyi doldur
                      branchList = ['İnegöl Şubesi', 'Paşabahçe Şubesi', 'Çekmeköy Şubesi', 'İzmit Şubesi', 'Gölcük Şubesi', 'Körfez Şubesi', 'Derince Şubesi', 'Sultanbeyli Şubesi', 'Yenidoğan Şubesi', 'Kavacık Şubesi', 'Çayırova Şubesi', 'Gebze Şubesi'];
                 }
 
-                select.innerHTML = '<option value="">Şube Seçiniz...</option>';
+                select.innerHTML = '<option value="">Lütfen Bir Şube Seçin...</option>';
                 branchList.forEach(b => {
                     const opt = document.createElement('option');
-                    opt.value = b;
-                    opt.textContent = b;
+                    opt.value = b; opt.textContent = b;
                     select.appendChild(opt);
                 });
 
@@ -820,16 +802,9 @@
 
             } catch(e) { 
                 console.error("Şube Yükleme Hatası:", e);
-                // "Yükleniyor..." da kalmaması için select kutusunu hatayla değiştir.
-                select.innerHTML = '<option value="">HATA: Bağlantı Kurulamadı!</option>';
-                
-                const errorMsg = document.getElementById('loginError');
-                errorMsg.innerHTML = `<strong>Bağlantı Hatası:</strong> Sunucuya ulaşılamadı.<br><br>
-                1. <b>API_URL</b> adresinin doğruluğunu kontrol edin.<br>
-                2. Apps Script ayarlarında erişimin <b>"Herkes (Anyone)"</b> olduğundan emin olun.<br>
-                3. Yeni bir Dağıtım (New Deployment) oluşturduğunuzdan emin olun.`;
-                
-                errorMsg.classList.remove('hidden');
+                select.innerHTML = '<option value="">Bağlantı Hatası!</option>';
+                document.getElementById('loginError').innerHTML = `<strong>Sistem Hatası:</strong> Sunucuyla iletişim kurulamıyor.`;
+                document.getElementById('loginError').classList.remove('hidden');
                 document.getElementById('loginLeaderboard').classList.add('hidden'); 
             }
         }
@@ -837,54 +812,31 @@
         function renderLoginLeaderboard(list) {
             const container = document.getElementById('loginLeaderboard');
             const listEl = document.getElementById('leaderboardList');
-            
-            if (!list || list.length === 0) {
-                container.classList.add('hidden');
-                return;
-            }
+            if (!list || list.length === 0) { container.classList.add('hidden'); return; }
 
-            const top3 = [...list].sort((a, b) => {
-                const revA = parseCurrency(getRevenue(a));
-                const revB = parseCurrency(getRevenue(b));
-                return revB - revA;
-            }).slice(0, 3);
-            
+            const top3 = [...list].sort((a, b) => parseCurrency(getRevenue(b)) - parseCurrency(getRevenue(a))).slice(0, 3);
             if(top3.length > 0) {
                 listEl.innerHTML = top3.map((item, index) => {
                     let icon = index === 0 ? '👑' : (index === 1 ? '🥈' : '🥉');
-                    let colorClass = index === 0 ? 'text-yellow-300 font-extrabold' : 'text-white font-bold';
-                    let bgClass = index === 0 ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-yellow-500/30' : 'hover:bg-white/5';
+                    let colorClass = index === 0 ? 'text-yellow-300 font-extrabold text-base' : 'text-white font-bold text-sm';
+                    let bgClass = index === 0 ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-yellow-500/30' : 'bg-white/5 border-transparent';
                     return `
-                        <div class="flex justify-between items-center p-3 rounded-xl border border-transparent transition-all ${bgClass} animate-in fade-in slide-in-from-bottom-2 duration-500" style="animation-delay: ${index * 100}ms">
+                        <div class="flex justify-between items-center p-3 rounded-xl border transition-all ${bgClass}">
                             <div class="flex items-center gap-3">
                                 <span class="text-2xl filter drop-shadow-lg">${icon}</span>
-                                <span class="${colorClass} text-sm tracking-wide">${escapeHTML(item.branch)}</span>
-                            </div>
-                            <div class="flex flex-col items-end">
-                                ${index === 0 ? '<span class="text-xs text-yellow-200/70 font-medium uppercase tracking-widest">Lider</span>' : ''}
+                                <span class="${colorClass} tracking-wide">${escapeHTML(item.branch)}</span>
                             </div>
                         </div>
                     `;
                 }).join('');
-            } else {
-                container.classList.add('hidden');
-            }
+            } else { container.classList.add('hidden'); }
         }
 
         function loginSuccess(branch) {
             currentBranch = branch;
-            const loginScreen = document.getElementById('loginScreen');
-            const mainApp = document.getElementById('mainApp');
-            const userDisplay = document.getElementById('currentUserDisplay');
-            const headerTitle = document.getElementById('headerTitle');
-
-            if (loginScreen) loginScreen.classList.add('hidden');
-            if (mainApp) mainApp.classList.remove('hidden');
-            if (userDisplay) {
-                userDisplay.textContent = branch;
-                userDisplay.style.display = 'none'; 
-            }
-            if (headerTitle) headerTitle.textContent = branch.toUpperCase();
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('headerTitle').textContent = branch.toUpperCase();
             
             refreshData(false); 
             
@@ -908,58 +860,48 @@
             location.reload(); 
         }
 
-        // YENİ EKLENEN: TOPLAM CİRO HESAPLAMA FONKSİYONU
-        function updateTotalRevenue() {
-            let monthRevenue = 0;
-            
-            allRecords.forEach(item => {
-                const amount = parseCurrency(getRevenue(item));
-                const resultStr = String(item.result || "").trim().toLocaleLowerCase('tr-TR');
-                const isSold = resultStr === 'satışa döndü';
-
-                if (isSold && amount > 0) {
-                    monthRevenue += amount;
-                }
-            });
-
+        // KESİN ÇÖZÜM: TOPLAM CİRO HESAPLAMA MANTIĞI (Doğrudan Backend Verisi)
+        function updateTotalRevenue(backendTotalRevenue) {
             const revTextEl = document.getElementById('headerTotalRevenueText');
-            if(revTextEl) {
-                revTextEl.textContent = formatMoney(monthRevenue);
+            if(revTextEl && backendTotalRevenue !== undefined) {
+                revTextEl.textContent = formatMoney(backendTotalRevenue);
             }
         }
 
         function refreshData(isBackground = false) {
             if(!currentBranch) return;
             const timeSpan = document.getElementById('lastTime');
-            timeSpan.textContent = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+            if(timeSpan) {
+                timeSpan.textContent = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+            }
 
             const selectedMonth = document.getElementById('monthFilter').value; 
             const authToken = sessionStorage.getItem('authToken');
-
             const tableBody = document.getElementById('crmTableBody');
             
             if (!isBackground) {
-                tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-slate-400 font-medium"><i class="fas fa-spinner fa-spin text-2xl mb-2 text-pink-400"></i><br>Veriler Yükleniyor...</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="6" class="text-center py-24 text-slate-400 font-bold"><i class="fas fa-spinner fa-spin text-3xl mb-3 text-pink-400 block"></i> Güncel Veriler İndiriliyor...</td></tr>';
             }
 
             fetch(`${API_URL}?action=getRecentRecords&branch=${encodeURIComponent(currentBranch)}&month=${selectedMonth}&token=${authToken}`, {cache: 'no-store'})
                 .then(res => res.json())
                 .then(data => {
                     if (data.error) {
-                        if (data.error === "Yetkisiz erişim." || data.error.includes("Yetkisiz")) logout();
+                        if (data.error.includes("Yetkisiz")) logout();
                         throw new Error(data.error);
                     }
                     allRecords = data.records || [];
                     
-                    updateTotalRevenue(); // Ciro Rozetini Güncelle
+                    // Backend O sütununu tamamen toplayıp gönderiyor. Ekrana bas:
+                    updateTotalRevenue(data.totalRevenue || 0); 
+                    
                     checkOverdueFollowUps(allRecords);
                     renderTable();
                     updateChampionBadge(); 
                 })
                 .catch(e => {
-                    console.error("Veri Çekme Hatası:", e);
                     if (!isBackground) {
-                        tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold bg-rose-50 rounded-2xl"><i class="fas fa-exclamation-triangle mb-2 text-3xl"></i><br>Veri çekilemedi.<br><span class="text-xs font-normal text-slate-500 mt-2 block">İnternet bağlantınızı kontrol edin veya oturumu yeniden başlatın.</span></td></tr>`;
+                        tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold bg-rose-50 rounded-2xl"><i class="fas fa-exclamation-triangle mb-2 text-3xl"></i><br>Veri çekilemedi.<br><span class="text-xs font-normal text-slate-500 mt-2 block">İnternet bağlantınızı kontrol edin.</span></td></tr>`;
                     }
                 });
         }
@@ -972,18 +914,14 @@
             overdueRecords = records.filter(item => {
                 const itemDate = parseDateTR(item.date);
                 const diffTime = now - itemDate;
-                
                 const res = (item.result || "").toLowerCase();
                 const isRelevant = res.includes("gelecek") || res.includes("tekrar") || res.includes("ara");
-
                 return isRelevant && diffTime > limit;
             });
 
             const notifBox = document.getElementById('overdueNotification');
-            const notifMsg = document.getElementById('overdueMessage');
-
             if (overdueRecords.length > 0) {
-                notifMsg.innerHTML = `<strong>${overdueRecords.length}</strong> müşterinin takibi 5 günü geçti. Lütfen kontrol ediniz.`;
+                document.getElementById('overdueMessage').innerHTML = `<strong>${overdueRecords.length}</strong> müşterinin takibi 5 günü geçti.`;
                 notifBox.classList.remove('hidden');
             } else {
                 notifBox.classList.add('hidden');
@@ -995,28 +933,19 @@
             document.getElementById('searchInput').value = '';
             document.getElementById('filterStatus').value = '';
             renderTable();
-            showToast("Takip gerektiren (Tekrar Aranacak / Gelecek) müşteriler listelendi.");
+            showToast("Gecikmiş takipteli müşteriler listelendi.", "success");
         }
 
         function updateChampionBadge() {
             if(leaderboardData.length > 0) {
-                const sorted = [...leaderboardData].sort((a, b) => {
-                    const revA = parseCurrency(getRevenue(a));
-                    const revB = parseCurrency(getRevenue(b));
-                    return revB - revA;
-                });
+                const sorted = [...leaderboardData].sort((a, b) => parseCurrency(getRevenue(b)) - parseCurrency(getRevenue(a)));
                 const topBranch = sorted[0];
                 const badge = document.getElementById('championBadge');
-                const normTopBranch = topBranch ? topBranch.branch.trim().toLowerCase() : '';
-                const normCurrentBranch = currentBranch ? currentBranch.trim().toLowerCase() : '';
-
-                if (badge) {
-                    if (normTopBranch === normCurrentBranch) {
-                        badge.classList.remove('hidden');
-                        badge.classList.add('flex');
+                if (badge && topBranch && currentBranch) {
+                    if (topBranch.branch.trim().toLowerCase() === currentBranch.trim().toLowerCase()) {
+                        badge.classList.remove('hidden'); badge.classList.add('flex');
                     } else {
-                        badge.classList.add('hidden');
-                        badge.classList.remove('flex');
+                        badge.classList.add('hidden'); badge.classList.remove('flex');
                     }
                 }
             }
@@ -1029,18 +958,12 @@
             const term = document.getElementById('searchInput').value.toLocaleLowerCase('tr-TR').trim();
             const statusFilter = document.getElementById('filterStatus').value.toLocaleLowerCase('tr-TR');
 
-            let sourceData = allRecords;
-            if (activeFilterMode === 'overdue') {
-                sourceData = overdueRecords;
-            }
+            let sourceData = activeFilterMode === 'overdue' ? overdueRecords : allRecords;
 
             const filteredData = sourceData.filter(item => {
-                const hasName = item.name && item.name.toString().trim() !== "";
-                const hasContact = item.contact && item.contact.toString().trim() !== "";
-                const hasCustomerNo = item.customerNo && item.customerNo.toString().trim() !== "";
-                
-                if (!hasName && !hasContact && !hasCustomerNo) return false;
-                if (activeFilterMode === 'overdue') return true; 
+                const hasData = (item.name && item.name.toString().trim() !== "") || (item.contact && item.contact.toString().trim() !== "") || (item.customerNo && item.customerNo.toString().trim() !== "");
+                if (!hasData) return false;
+                if (activeFilterMode === 'overdue' && term === '') return true; 
 
                 const name = (item.name || "").toString().toLocaleLowerCase('tr-TR');
                 const contact = (item.contact || "").toString().toLocaleLowerCase('tr-TR');
@@ -1050,116 +973,93 @@
                 const matchesSearch = name.includes(term) || contact.includes(term);
                 
                 let matchesStatus = false;
-                if (statusFilter === "") {
-                    matchesStatus = true;
-                } else if (statusFilter === "aranmadı" || statusFilter === "arandı") {
-                    matchesStatus = rawStatus === statusFilter;
-                } else if (statusFilter === "gelecek") {
-                    matchesStatus = rawResult.includes("gelecek") || rawResult.includes("mağaza");
-                } else if (statusFilter === "tekrar") {
-                    matchesStatus = rawResult.includes("tekrar") || rawResult.includes("ara");
-                }
+                if (statusFilter === "") matchesStatus = true;
+                else if (statusFilter === "aranmadı" || statusFilter === "arandı") matchesStatus = rawStatus === statusFilter;
+                else if (statusFilter === "gelecek") matchesStatus = rawResult.includes("gelecek") || rawResult.includes("mağaza");
+                else if (statusFilter === "tekrar") matchesStatus = rawResult.includes("tekrar") || rawResult.includes("ara");
                 
                 return matchesSearch && matchesStatus;
             });
 
-            currentFilteredData = filteredData; // Filtrelenen listeyi Excel için hafızaya al
+            currentFilteredData = filteredData; 
 
-            let finalData = filteredData;
-            if (activeFilterMode === 'overdue' && term !== "") {
-                 finalData = filteredData.filter(item => {
-                    const name = (item.name || "").toString().toLocaleLowerCase('tr-TR');
-                    const contact = (item.contact || "").toString().toLocaleLowerCase('tr-TR');
-                    return name.includes(term) || contact.includes(term);
-                 });
-            }
-
-            if(finalData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-slate-400 bg-slate-50/50 rounded-xl m-4 border border-dashed border-slate-200">Kayıt bulunamadı.</td></tr>`;
+            if(filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-slate-400 bg-white rounded-3xl m-4 border border-dashed border-slate-200">Kayıt bulunamadı.</td></tr>`;
                 updatePaginationControls(0);
                 if (activeFilterMode === 'overdue' && overdueRecords.length === 0) activeFilterMode = 'default';
                 return;
             }
 
-            const totalRecords = finalData.length;
+            const totalRecords = filteredData.length;
             const totalPages = Math.ceil(totalRecords / rowsPerPage) || 1;
             if (currentPage > totalPages) currentPage = 1;
 
             const startIndex = (currentPage - 1) * rowsPerPage;
-            const endIndex = startIndex + rowsPerPage;
-            const pageData = finalData.slice(startIndex, endIndex);
+            const pageData = filteredData.slice(startIndex, startIndex + rowsPerPage);
+            
+            const fragment = document.createDocumentFragment();
 
             pageData.forEach((item, index) => {
                 const tr = document.createElement('tr');
-                
-                let statusBadge = '';
-                let statusColor = '#e2e8f0'; 
-                
-                const cleanStatus = (item.status || "").trim();
-                const displayStatus = cleanStatus.toLocaleLowerCase('tr-TR');
+                let statusBadge = '', statusColor = '#e2e8f0'; 
+                const displayStatus = (item.status || "").trim().toLocaleLowerCase('tr-TR');
 
                 if (displayStatus === 'arandı') {
-                    statusBadge = '<span class="status-badge bg-yellow-100 text-yellow-800 border border-yellow-200"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> ARANDI</span>'; 
-                    statusColor = '#eab308';
+                    statusBadge = '<span class="status-badge bg-yellow-100 text-yellow-800"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> ARANDI</span>'; statusColor = '#eab308';
                 } else if (!displayStatus || displayStatus === 'aranmadı') {
-                    statusBadge = '<span class="status-badge bg-red-100 text-red-800 border border-red-200"><span class="w-2 h-2 rounded-full bg-red-500"></span> ARANMADI</span>';
-                    statusColor = '#ef4444';
+                    statusBadge = '<span class="status-badge bg-rose-100 text-rose-800"><span class="w-2 h-2 rounded-full bg-rose-500"></span> ARANMADI</span>'; statusColor = '#f43f5e';
                 }
                 
                 if(String(item.isOrder).toLowerCase() === 'evet') {
-                    tr.className = 'bg-emerald-50/40 hover:bg-emerald-50 transition duration-200';
+                    tr.className = 'bg-emerald-50/60 hover:bg-emerald-100/50';
                 } else {
-                    tr.className = 'hover:bg-slate-50 transition duration-200';
+                    tr.className = 'hover:bg-slate-50';
                 }
-                
-                tr.style.setProperty('--status-color', statusColor);
                 
                 const safeName = escapeHTML(item.name || "Müşteri");
                 const initials = safeName.trim().split(/\s+/).map(n => n ? n[0] : '').join('').substring(0, 2).toUpperCase();
-                
                 const originalIndex = allRecords.findIndex(r => r === item); 
-                const itemAmount = getRevenue(item);
 
                 tr.innerHTML = `
-                    <td data-label="Müşteri" class="pl-6 md:pl-8">
+                    <td data-label="Müşteri">
                         <div class="flex items-center gap-4">
                             <div class="avatar-initials shrink-0">${initials}</div>
                             <div>
-                                <div class="font-bold text-slate-800 text-base">${safeName || '-'}</div>
-                                ${item.customerNo ? `<div class="text-xs text-indigo-400 font-mono font-bold mt-0.5">#${escapeHTML(item.customerNo)}</div>` : ''}
-                                <div class="text-xs text-slate-400 font-medium mt-0.5">${escapeHTML(item.date)}</div>
+                                <div class="font-extrabold text-slate-800 text-base">${safeName || '-'}</div>
+                                ${item.customerNo ? `<div class="text-xs text-indigo-500 font-mono font-bold mt-0.5">#${escapeHTML(item.customerNo)}</div>` : ''}
+                                <div class="text-xs text-slate-400 font-medium mt-0.5"><i class="far fa-calendar-alt mr-1"></i>${escapeHTML(item.date)}</div>
                             </div>
                         </div>
                     </td>
                     <td data-label="İletişim">
-                        <div class="text-sm font-semibold text-slate-600 flex items-center justify-end md:justify-start gap-2">
+                        <div class="text-sm font-bold text-slate-600 flex items-center justify-end md:justify-start gap-2">
                             ${escapeHTML(item.contact) || '-'} 
-                            <a href="tel:${escapeHTML(item.contact)}" class="md:hidden w-8 h-8 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-full"><i class="fas fa-phone"></i></a>
+                            <a href="tel:${escapeHTML(item.contact)}" class="md:hidden w-8 h-8 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-full shadow-sm"><i class="fas fa-phone"></i></a>
                         </div>
                     </td>
                     <td data-label="Ürün">
                         <div class="flex flex-col items-end md:items-start">
-                            <div class="text-sm text-slate-700 font-bold">${escapeHTML(item.category)}</div>
-                            <div class="text-xs text-slate-500 mt-0.5">${escapeHTML(item.product) || '-'}</div>
+                            <div class="text-sm text-slate-700 font-extrabold">${escapeHTML(item.category)}</div>
+                            <div class="text-xs text-slate-500 mt-0.5 font-medium">${escapeHTML(item.product) || '-'}</div>
                         </div>
                     </td>
                     <td data-label="Durum">
                         <div class="flex flex-col gap-2 items-end md:items-start w-full">
                             ${statusBadge}
-                            ${item.result ? `<span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200">${escapeHTML(item.result)}</span>` : ''}
+                            ${item.result ? `<span class="text-[10px] font-bold text-slate-600 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm">${escapeHTML(item.result)}</span>` : ''}
                         </div>
                     </td>
                     <td data-label="Satış">
                         ${String(item.isOrder).toLowerCase() === 'evet' ? 
                             `<div class="flex flex-col items-end md:items-start gap-1">
-                                <span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg text-xs font-bold inline-flex items-center gap-1"><i class="fas fa-check-circle"></i> SATILDI</span>
-                                <span class="text-emerald-600 font-bold text-sm tracking-tight">${formatMoney(itemAmount)}</span>
+                                <span class="bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold inline-flex items-center gap-1 shadow-sm"><i class="fas fa-check"></i> SATILDI</span>
+                                <span class="text-emerald-700 font-black text-sm md:text-base tracking-tight">${formatMoney(getRevenue(item))}</span>
                             </div>` : 
-                            `<span class="text-slate-300 text-xs font-bold">-</span>`
+                            `<span class="text-slate-300 text-sm font-bold">-</span>`
                         }
                     </td>
                     <td data-label="İşlem" class="pr-6 md:pr-8">
-                        <button onclick="openEditModal(${originalIndex})" class="mobile-action-btn md:w-auto bg-white border border-slate-200 text-slate-600 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-md hover:-translate-y-0.5 p-2.5 px-4 rounded-xl transition-all shadow-sm text-sm font-bold flex items-center gap-2 group">
+                        <button onclick="openEditModal(${originalIndex})" class="mobile-action-btn md:w-auto bg-white border border-slate-200 text-slate-600 hover:border-pink-300 hover:text-pink-600 hover:shadow-md p-3 px-5 rounded-2xl transition-all shadow-sm text-sm font-bold flex items-center gap-2 group">
                             <i class="fas fa-pen-to-square"></i> <span class="md:hidden lg:inline">Düzenle</span>
                         </button>
                     </td>
@@ -1171,15 +1071,16 @@
                     tr.appendChild(styleEl);
                 }
                 
-                tbody.appendChild(tr);
+                fragment.appendChild(tr);
             });
 
+            tbody.appendChild(fragment);
             updatePaginationControls(totalRecords);
         }
 
         function updatePaginationControls(totalRecords) {
             const totalPages = Math.ceil(totalRecords / rowsPerPage) || 1;
-            document.getElementById('recordCountInfo').textContent = `${totalRecords} kayıt bulundu`;
+            document.getElementById('recordCountInfo').textContent = `${totalRecords} Müşteri`;
             document.getElementById('pageInfo').textContent = `${currentPage} / ${totalPages}`;
             document.getElementById('btnPrev').disabled = currentPage === 1;
             document.getElementById('btnNext').disabled = currentPage >= totalPages;
@@ -1190,70 +1091,78 @@
             renderTable();
         }
 
+        // Modal'ı Aç (Mobilde Slayt Efekti ile)
         function openEditModal(index) {
             try {
                 document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
-                
                 const item = allRecords[index];
                 if(!item) return;
 
-                const fields = ['m_rowIndex','m_sheetName','m_branch','m_date','m_name','m_contact','m_category','m_product'];
-                fields.forEach(id => {
+                ['m_rowIndex','m_sheetName','m_branch','m_date','m_name','m_contact','m_category','m_product'].forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.value = item[id.replace('m_','')]||'';
                 });
                 
-                let statusVal = (item.status || "").trim();
                 const statusSelect = document.getElementById('m_status');
-                
-                statusSelect.value = statusVal;
-                if (!statusSelect.value && statusVal) {
-                    const lowerVal = statusVal.toLocaleLowerCase('tr-TR');
-                    for (let i = 0; i < statusSelect.options.length; i++) {
+                statusSelect.value = (item.status || "").trim();
+                if (!statusSelect.value && item.status) {
+                    const lowerVal = item.status.trim().toLocaleLowerCase('tr-TR');
+                    for (let i=0; i<statusSelect.options.length; i++) {
                         if (statusSelect.options[i].value.toLocaleLowerCase('tr-TR') === lowerVal) {
-                            statusSelect.selectedIndex = i;
-                            break;
+                            statusSelect.selectedIndex = i; break;
                         }
                     }
                 }
 
                 document.getElementById('m_result').value = item.result || ''; 
-                
                 const noteArea = document.getElementById('m_note');
                 noteArea.value = item.note || ''; 
                 autoResize(noteArea);
-
                 document.getElementById('m_isOrder').value = item.isOrder || ''; 
-                
                 document.getElementById('m_amount').value = getRevenue(item) || '';
                 document.getElementById('m_customerNo').value = item.customerNo || '';
 
                 checkFormState(); 
                 
                 const modal = document.getElementById('editModal');
+                const content = document.getElementById('editModalContent');
+                
                 modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
+                modal.classList.add('flex');
+                document.body.style.overflow = 'hidden'; // Arka plan kaymasını engelle
+                
+                setTimeout(() => {
+                    content.classList.remove('translate-y-full');
+                    content.classList.add('translate-y-0');
+                }, 10);
             } catch (e) {
-                console.error("Modal açma hatası:", e);
-                alert("Düzenleme penceresi açılırken bir hata oluştu: " + e.message);
+                alert("Pencere açılamadı: " + e.message);
             }
         }
 
+        // Modal'ı Kapat (Animasyonlu)
         function closeEditModal() { 
-            document.getElementById('editModal').classList.add('hidden'); 
-            document.body.style.overflow = '';
+            const modal = document.getElementById('editModal');
+            const content = document.getElementById('editModalContent');
+            
+            content.classList.remove('translate-y-0');
+            content.classList.add('translate-y-full');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden'); 
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }, 300); // 300ms animasyon süresi
         }
 
         function toggleAmount() {
             const isOrder = document.getElementById('m_isOrder').value;
             const input = document.getElementById('m_amount');
-            const isOrderDisabled = document.getElementById('m_isOrder').disabled;
-            
-            if(!isOrderDisabled && isOrder === 'Evet') {
-                input.disabled = false;
+            if(document.getElementById('m_isOrder').disabled) {
+                input.disabled = true; input.value = '';
             } else {
-                input.disabled = true;
-                input.value = isOrder === 'Hayır' ? '' : input.value; 
+                input.disabled = (isOrder !== 'Evet');
+                if(isOrder !== 'Evet') input.value = ''; 
             }
         }
 
@@ -1279,35 +1188,16 @@
             const amount = amountEl.value;
 
             if(!status) {
-                statusEl.classList.add('input-error');
-                alert("Lütfen 1. Adım: Aranma Durumunu seçiniz.");
-                statusEl.scrollIntoView({behavior: "smooth", block: "center"});
-                return;
+                statusEl.classList.add('input-error'); alert("Aranma Durumunu seçiniz."); return;
             }
-
-            if(status === 'arandı') {
-                if(!resultRaw) { 
-                    resultEl.classList.add('input-error');
-                    alert("Lütfen 2. Adım: Görüşme Sonucunu seçiniz."); 
-                    resultEl.scrollIntoView({behavior: "smooth", block: "center"});
-                    return; 
-                }
+            if(status === 'arandı' && !resultRaw) { 
+                resultEl.classList.add('input-error'); alert("Görüşme Sonucunu seçiniz."); return; 
             }
-
-            if (status === 'arandı' && !isOrder) {
-                 if(!isOrderEl.disabled && !isOrder) {
-                    isOrderEl.classList.add('input-error');
-                    alert("Lütfen 4. Adım: Satış Durumunu seçiniz.");
-                    isOrderEl.scrollIntoView({behavior: "smooth", block: "center"});
-                    return;
-                 }
+            if (status === 'arandı' && !isOrderEl.disabled && !isOrder) {
+                isOrderEl.classList.add('input-error'); alert("Satış Durumunu seçiniz."); return;
             }
-                
             if(isOrder === 'Evet' && (!amount || Number(amount) <= 0)) {
-                amountEl.classList.add('input-error');
-                alert("Satış yapıldıysa lütfen geçerli bir Tutar giriniz.");
-                amountEl.scrollIntoView({behavior: "smooth", block: "center"});
-                return;
+                amountEl.classList.add('input-error'); alert("Geçerli bir Tutar giriniz."); return;
             }
 
             const btn = document.getElementById('updateBtn');
@@ -1315,18 +1205,24 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin animate-spin"></i> Kaydediliyor...'; 
             btn.disabled = true;
 
-            let resultToSend = resultRaw;
-            if(resultToSend === 'Beklemede') resultToSend = '';
-
-            let finalIsOrder = document.getElementById('m_isOrder').value;
-            let finalAmount = document.getElementById('m_amount').value;
+            let resultToSend = resultRaw === 'Beklemede' ? '' : resultRaw;
+            let finalIsOrder = isOrder;
+            let finalAmount = amount;
 
             if (resultToSend !== 'Satışa Döndü') {
-                finalIsOrder = 'Hayır';
-                finalAmount = '';
+                finalIsOrder = 'Hayır'; finalAmount = '';
             } else if (finalIsOrder !== 'Evet') {
                 finalAmount = '';
             }
+
+            let numericAmount = "";
+            if (finalIsOrder === 'Evet') {
+                numericAmount = parseCurrency(finalAmount);
+                if (isNaN(numericAmount) || numericAmount === null) numericAmount = 0;
+            }
+            
+            let finalCategory = document.getElementById('m_category').value;
+            if (finalCategory === "LİMİT ÖĞREN") finalCategory = "'" + finalCategory; 
 
             const formData = {
                 rowIndex: document.getElementById('m_rowIndex').value,
@@ -1335,111 +1231,72 @@
                 date: document.getElementById('m_date').value,
                 name: document.getElementById('m_name').value,
                 contact: document.getElementById('m_contact').value,
-                category: document.getElementById('m_category').value,
+                category: finalCategory,
                 product: document.getElementById('m_product').value,
-                status: document.getElementById('m_status').value,
-                result: resultToSend, 
-                note: document.getElementById('m_note').value, 
-                isOrder: finalIsOrder,
-                amount: finalAmount,
+                status: status, result: resultToSend, note: note, 
+                isOrder: finalIsOrder, amount: numericAmount, 
                 customerNo: document.getElementById('m_customerNo').value
             };
 
             const authToken = sessionStorage.getItem('authToken');
 
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 20000); 
-
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ action: 'updateCustomer', data: formData, token: authToken }),
-                    signal: controller.signal
+                    body: JSON.stringify({ action: 'updateCustomer', data: formData, token: authToken })
                 });
-
-                clearTimeout(timeoutId);
 
                 if (!response.ok) throw new Error("Sunucu yanıt vermedi.");
 
                 const resData = await response.json();
                 if(resData.status === 'success') {
                     btn.innerHTML = '<i class="fas fa-check"></i> Başarılı!';
-                    btn.classList.replace('bg-indigo-600', 'bg-emerald-500');
+                    btn.classList.replace('from-pink-500', 'from-emerald-500');
+                    btn.classList.replace('to-purple-600', 'to-emerald-600');
                     setTimeout(() => {
                         closeEditModal();
+                        // Güncelleme bitince E-tablodaki O sütunu değerini (Ciro) hatasız almak için sunucudan tazele:
+                        refreshData(true);
                         
-                        // Güncel kaydı anında arayüzde (DOM'da) güncellemek için:
-                        const targetIndex = allRecords.findIndex(r => String(r.rowIndex) === String(formData.rowIndex));
-                        if (targetIndex !== -1) {
-                            allRecords[targetIndex] = { ...allRecords[targetIndex], ...formData };
-                            updateTotalRevenue(); // Ciro rakamını anında güncelle
-                            renderTable();
-                            checkOverdueFollowUps(allRecords);
-                        } else {
-                            refreshData(true);
-                        }
-
                         btn.innerHTML = originalContent;
-                        btn.classList.replace('bg-emerald-500', 'bg-indigo-600');
+                        btn.classList.replace('from-emerald-500', 'from-pink-500');
+                        btn.classList.replace('to-emerald-600', 'to-purple-600');
                         btn.disabled = false;
                         showToast("Müşteri başarıyla güncellendi.");
-                    }, 1000);
+                    }, 800);
                 } else {
-                    if (resData.message === "Yetkisiz erişim. Lütfen tekrar giriş yapın.") logout();
+                    if (resData.message && resData.message.includes("Yetkisiz")) logout();
                     throw new Error(resData.message || "Bilinmeyen bir hata oluştu.");
                 }
 
             } catch(e) { 
-                if (e.name === 'AbortError') {
-                    alert("İşlem zaman aşımına uğradı. İnternet bağlantınızı kontrol edip tekrar deneyin.");
-                } else {
-                    alert("Hata: " + e.message); 
-                }
+                alert("Hata: " + e.message); 
                 btn.innerHTML = originalContent; 
                 btn.disabled = false; 
             } 
         });
 
-        // YENİ EKLENEN EXCEL FONKSİYONU
         function exportToExcel() {
             if (!currentFilteredData || currentFilteredData.length === 0) {
-                showToast("Excel'e aktarılacak kayıt bulunamadı.", "error");
-                return;
+                showToast("Excel'e aktarılacak kayıt bulunamadı.", "error"); return;
             }
-
             showToast("Excel dosyası hazırlanıyor...");
-
             const exportData = currentFilteredData.map(item => ({
-                "Tarih": item.date || "",
-                "Şube": item.branch || "",
-                "Müşteri No": item.customerNo || "",
-                "Ad Soyad": item.name || "",
-                "Telefon": item.contact || "",
-                "Kategori": item.category || "",
-                "Ürün İlgisi": item.product || "",
-                "Aranma Durumu": item.status ? item.status.toUpperCase() : "",
-                "Görüşme Sonucu": item.result || "",
-                "Görüşme Notu": item.note || "",
-                "Satış Yapıldı mı?": item.isOrder || "Hayır",
-                "Tutar (₺)": item.amount ? parseCurrency(item.amount) : 0
+                "Tarih": item.date || "", "Şube": item.branch || "", "Müşteri No": item.customerNo || "",
+                "Ad Soyad": item.name || "", "Telefon": item.contact || "", "Kategori": item.category || "",
+                "Ürün İlgisi": item.product || "", "Aranma Durumu": item.status ? item.status.toUpperCase() : "",
+                "Görüşme Sonucu": item.result || "", "Görüşme Notu": item.note || "",
+                "Satış Yapıldı mı?": item.isOrder || "Hayır", "Tutar (₺)": item.amount ? parseCurrency(item.amount) : 0
             }));
-
             const worksheet = XLSX.utils.json_to_sheet(exportData);
-            const wscols = [{wch: 15}, {wch: 15}, {wch: 15}, {wch: 25}, {wch: 15}, {wch: 20}, {wch: 30}, {wch: 15}, {wch: 25}, {wch: 40}, {wch: 15}, {wch: 15}];
-            worksheet['!cols'] = wscols;
-
+            worksheet['!cols'] = [{wch: 15}, {wch: 15}, {wch: 15}, {wch: 25}, {wch: 15}, {wch: 20}, {wch: 30}, {wch: 15}, {wch: 25}, {wch: 40}, {wch: 15}, {wch: 15}];
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Müşteri Listesi");
-
-            const safeBranchName = currentBranch ? currentBranch.replace(/\s+/g, '_') : "HedefAVM";
-            const dateStr = new Date().toISOString().split('T')[0];
-            XLSX.writeFile(workbook, `Musteri_Listesi_${safeBranchName}_${dateStr}.xlsx`);
+            XLSX.writeFile(workbook, `Musteri_Listesi_${(currentBranch||"HedefAVM").replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.xlsx`);
         }
 
         function formatMoney(amount) {
-            const val = parseCurrency(amount);
-            return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(val);
+            return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(parseCurrency(amount));
         }
     </script>
 </body>
