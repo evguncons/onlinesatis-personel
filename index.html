@@ -80,7 +80,7 @@
         .modern-input {
             width: 100%; 
             padding: 14px 18px;
-            font-size: 0.95rem;
+            font-size: 1rem; /* iOS zoom sorununu çözer, mobilde daha okunaklı */
             border: 1.5px solid #e5e7eb; 
             border-radius: 16px;
             background-color: #ffffff; 
@@ -106,12 +106,12 @@
 
         .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .custom-table th { 
-            color: #831843; font-weight: 700; font-size: 0.75rem; 
+            color: #831843; font-weight: 700; font-size: 0.85rem; 
             padding: 20px 24px; text-transform: uppercase; letter-spacing: 0.05em; 
             background: rgba(253, 242, 248, 0.8); border-bottom: 2px solid #fce7f3; 
         }
         .custom-table td { 
-            padding: 20px 24px; font-size: 0.95rem; vertical-align: middle; 
+            padding: 20px 24px; font-size: 1rem; vertical-align: middle; 
             background: rgba(255, 255, 255, 0.8); border-bottom: 1px solid #fce7f3; 
             transition: all 0.2s ease; 
         }
@@ -119,13 +119,13 @@
 
         .status-badge { 
             display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; 
-            border-radius: 9999px; font-size: 0.75rem; font-weight: 800; 
+            border-radius: 9999px; font-size: 0.80rem; font-weight: 800; 
             text-transform: uppercase; letter-spacing: 0.025em; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
         }
         
         .avatar-initials { 
-            width: 46px; height: 46px; border-radius: 14px; display: flex; 
-            align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; 
+            width: 50px; height: 50px; border-radius: 14px; display: flex; 
+            align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; 
             color: white; background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); 
             box-shadow: 0 4px 10px -2px rgba(236, 72, 153, 0.4); border: 2px solid #fff; 
         }
@@ -144,30 +144,30 @@
             }
             .custom-table tr::before { 
                 content: ''; position: absolute; left: 0; top: 0; bottom: 0; 
-                width: 6px; background: #e2e8f0; z-index: 2; 
+                width: 8px; background: #e2e8f0; z-index: 2; 
             }
             
             .custom-table td { 
-                padding: 14px 16px; border-bottom: 1px solid #f9fafb; 
+                padding: 16px; border-bottom: 1px solid #f9fafb; 
                 display: flex; justify-content: space-between; align-items: center; 
                 text-align: right; 
             }
             .custom-table td:first-child { 
                 background: linear-gradient(to right, #fff1f2, #fff); border-bottom: 1px dashed #fbcfe8; 
-                padding: 16px; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; 
+                padding: 18px 16px; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; 
             }
-            .custom-table td:last-child { border-bottom: none; justify-content: center; padding: 12px 16px; background: #fafaf9; }
+            .custom-table td:last-child { border-bottom: none; justify-content: center; padding: 14px 16px; background: #fafaf9; }
             
             .custom-table td::before { 
                 content: attr(data-label); font-weight: 800; color: #9d174d; 
-                font-size: 0.70rem; text-transform: uppercase; text-align: left; 
+                font-size: 0.75rem; text-transform: uppercase; text-align: left; 
                 margin-right: auto; letter-spacing: 0.05em; 
             }
             .custom-table td > div, .custom-table td > span { text-align: right; max-width: 65%; }
-            .mobile-action-btn { width: 100%; justify-content: center; padding: 14px; font-size: 1rem; }
+            .mobile-action-btn { width: 100%; justify-content: center; padding: 16px; font-size: 1.1rem; }
             
-            .mobile-filter-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
-            .filter-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+            .mobile-filter-grid { display: flex; flex-direction: column; gap: 14px; width: 100%; }
+            .filter-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; }
         }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -251,30 +251,30 @@
                 <div class="flex-1">
                     <div class="flex items-center gap-2 md:gap-3 flex-wrap">
                         <h1 class="text-xl md:text-3xl font-extrabold text-slate-800 tracking-tight uppercase" id="headerTitle">PANEL</h1>
-                        <div id="championBadge" class="hidden items-center gap-1.5 bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 text-yellow-900 px-2 py-1 md:px-3 rounded-full text-[9px] md:text-xs font-bold shadow-sm border border-white animate-pulse">
+                        <div id="championBadge" class="hidden items-center gap-1.5 bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 text-yellow-900 px-2 py-1 md:px-3 rounded-full text-[10px] md:text-xs font-bold shadow-sm border border-white animate-pulse">
                             <i class="fas fa-crown"></i> <span class="hidden sm:inline">AYIN LİDERİ</span><span class="sm:hidden">LİDER</span>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 mt-1.5 flex-wrap">
-                        <span class="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg md:rounded-xl font-bold text-[10px] md:text-xs border border-emerald-100 shadow-sm h-fit">
+                        <span class="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-lg md:rounded-xl font-bold text-xs md:text-sm border border-emerald-100 shadow-sm h-fit">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online
                         </span>
                         
                         <div class="flex items-center gap-1.5 bg-gradient-to-r from-pink-50 to-white px-3 py-1 rounded-lg md:rounded-xl border border-pink-200 shadow-sm">
-                            <span class="text-[9px] md:text-[10px] uppercase font-bold text-pink-400 tracking-widest hidden sm:inline-block mr-1">TOPLAM CİRO</span>
-                            <i class="fas fa-wallet text-pink-500 text-sm sm:hidden"></i>
-                            <span id="headerTotalRevenueText" class="text-base md:text-2xl font-black text-slate-800 tracking-tight">0 ₺</span>
+                            <span class="text-[10px] md:text-xs uppercase font-bold text-pink-400 tracking-widest hidden sm:inline-block mr-1">TOPLAM CİRO</span>
+                            <i class="fas fa-wallet text-pink-500 text-base sm:hidden"></i>
+                            <span id="headerTotalRevenueText" class="text-lg md:text-2xl font-black text-slate-800 tracking-tight">0 ₺</span>
                         </div>
                     </div>
                 </div>
             </div>
             
             <div class="flex items-center gap-2 md:gap-3 w-full md:w-auto mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100">
-                <button onclick="refreshData(false)" class="flex-1 md:flex-none px-4 py-3 md:py-3.5 rounded-xl md:rounded-2xl font-bold bg-white text-slate-600 shadow-sm border border-slate-200 text-sm hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition flex justify-center items-center gap-2 active:scale-95">
+                <button onclick="refreshData(false)" class="flex-1 md:flex-none px-4 py-3.5 md:py-3.5 rounded-xl md:rounded-2xl font-bold bg-white text-slate-600 shadow-sm border border-slate-200 text-sm hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition flex justify-center items-center gap-2 active:scale-95">
                     <i class="fas fa-sync-alt text-pink-500"></i> 
                     <span>Yenile</span>
                 </button>
-                <button onclick="logout()" class="flex-1 md:flex-none px-4 py-3 md:py-3.5 rounded-xl md:rounded-2xl font-bold bg-rose-50 text-rose-600 shadow-sm border border-rose-100 text-sm hover:bg-rose-100 hover:text-rose-700 transition flex justify-center items-center gap-2 active:scale-95">
+                <button onclick="logout()" class="flex-1 md:flex-none px-4 py-3.5 md:py-3.5 rounded-xl md:rounded-2xl font-bold bg-rose-50 text-rose-600 shadow-sm border border-rose-100 text-sm hover:bg-rose-100 hover:text-rose-700 transition flex justify-center items-center gap-2 active:scale-95">
                     <i class="fas fa-sign-out-alt"></i> 
                     <span class="hidden sm:inline">Güvenli Çıkış</span>
                     <span class="sm:hidden">Çıkış</span>
@@ -291,9 +291,9 @@
                     </div>
                     <div class="flex-1 text-center sm:text-left">
                         <h4 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-purple-600 text-base md:text-lg tracking-tight">Gecikmiş Takipler Var!</h4>
-                        <p class="text-slate-500 text-xs md:text-sm mt-1 font-medium" id="overdueMessage">...</p>
+                        <p class="text-slate-500 text-sm mt-1 font-medium" id="overdueMessage">...</p>
                     </div>
-                    <button onclick="filterOverdue()" class="w-full sm:w-auto px-5 py-3 bg-rose-500 text-white text-xs md:text-sm font-bold rounded-xl hover:bg-rose-600 shadow-md transition flex items-center justify-center gap-2 active:scale-95">
+                    <button onclick="filterOverdue()" class="w-full sm:w-auto px-5 py-3.5 bg-rose-500 text-white text-sm font-bold rounded-xl hover:bg-rose-600 shadow-md transition flex items-center justify-center gap-2 active:scale-95">
                         <i class="fas fa-list-ul"></i> Hepsini Listele
                     </button>
                 </div>
@@ -307,9 +307,9 @@
                     </div>
                     <div class="flex-1 text-center sm:text-left">
                         <h4 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-600 text-base md:text-lg tracking-tight">Satışa Dönenlerde Eksik Bilgi Var!</h4>
-                        <p class="text-slate-500 text-xs md:text-sm mt-1 font-medium" id="missingInfoMessage">...</p>
+                        <p class="text-slate-500 text-sm mt-1 font-medium" id="missingInfoMessage">...</p>
                     </div>
-                    <button onclick="filterMissingInfo()" class="w-full sm:w-auto px-5 py-3 bg-red-500 text-white text-xs md:text-sm font-bold rounded-xl hover:bg-red-600 shadow-md transition flex items-center justify-center gap-2 active:scale-95">
+                    <button onclick="filterMissingInfo()" class="w-full sm:w-auto px-5 py-3.5 bg-red-500 text-white text-sm font-bold rounded-xl hover:bg-red-600 shadow-md transition flex items-center justify-center gap-2 active:scale-95">
                         <i class="fas fa-search"></i> Eksikleri İncele
                     </button>
                 </div>
@@ -319,8 +319,8 @@
         <div class="glass-card flex flex-col overflow-hidden min-h-[400px] md:min-h-[500px]">
             <div class="p-4 md:p-8 border-b border-pink-100 bg-white/80 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 md:gap-6 rounded-t-3xl">
                 <div>
-                    <h3 class="font-extrabold text-slate-800 text-lg md:text-xl flex items-center gap-2 md:gap-3">
-                        <span class="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-pink-100 to-purple-100 text-pink-600 flex items-center justify-center text-base md:text-lg shadow-sm border border-pink-200">
+                    <h3 class="font-extrabold text-slate-800 text-xl flex items-center gap-2 md:gap-3">
+                        <span class="w-12 h-12 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-gradient-to-br from-pink-100 to-purple-100 text-pink-600 flex items-center justify-center text-lg md:text-lg shadow-sm border border-pink-200">
                             <i class="fas fa-users"></i>
                         </span>
                         Müşteri Listesi
@@ -338,9 +338,8 @@
                         <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-pink-400 text-lg"></i>
                     </div>
 
-                    <!-- Yeni Durum Filtresi (Satışa Dönenler Eklendi) -->
                     <div class="relative w-full xl:w-52">
-                        <select id="filterStatus" onchange="renderTable()" class="modern-input pl-4 pr-10 cursor-pointer text-sm font-bold">
+                        <select id="filterStatus" onchange="renderTable()" class="modern-input pl-4 pr-10 cursor-pointer text-sm md:text-sm font-bold">
                             <option value="">Durum (Tümü)</option>
                             <option value="satış">🟩 Satışa Dönenler</option>
                             <option disabled>──────────</option>
@@ -384,29 +383,31 @@
             </div>
 
             <div class="p-4 md:p-6 border-t border-pink-100 bg-white/90 flex flex-col sm:flex-row justify-between items-center gap-4 rounded-b-3xl">
-                <span class="text-xs font-bold text-slate-500 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-200 shadow-sm w-full sm:w-auto text-center" id="recordCountInfo">0 kayıt</span>
+                <span class="text-sm font-bold text-slate-500 bg-slate-50 px-4 py-3 rounded-xl border border-slate-200 shadow-sm w-full sm:w-auto text-center" id="recordCountInfo">0 kayıt</span>
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
-                    <button onclick="changePage(-1)" id="btnPrev" class="px-4 md:px-5 py-2.5 md:py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-pink-50 hover:text-pink-600 transition disabled:opacity-50 flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-bold shadow-sm" disabled><i class="fas fa-chevron-left text-[10px]"></i> Önceki</button>
-                    <span id="pageInfo" class="text-xs md:text-sm font-extrabold bg-slate-50 border border-slate-200 px-4 md:px-5 py-2.5 md:py-3 rounded-xl text-slate-700 min-w-[70px] md:min-w-[90px] text-center">1/1</span>
-                    <button onclick="changePage(1)" id="btnNext" class="px-4 md:px-5 py-2.5 md:py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-pink-50 hover:text-pink-600 transition disabled:opacity-50 flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-bold shadow-sm" disabled>Sonraki <i class="fas fa-chevron-right text-[10px]"></i></button>
+                    <button onclick="changePage(-1)" id="btnPrev" class="px-4 md:px-5 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-pink-50 hover:text-pink-600 transition disabled:opacity-50 flex items-center gap-1.5 md:gap-2 text-sm font-bold shadow-sm" disabled><i class="fas fa-chevron-left text-xs"></i> Önceki</button>
+                    <span id="pageInfo" class="text-sm font-extrabold bg-slate-50 border border-slate-200 px-4 md:px-5 py-3 rounded-xl text-slate-700 min-w-[70px] md:min-w-[90px] text-center">1/1</span>
+                    <button onclick="changePage(1)" id="btnNext" class="px-4 md:px-5 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-pink-50 hover:text-pink-600 transition disabled:opacity-50 flex items-center gap-1.5 md:gap-2 text-sm font-bold shadow-sm" disabled>Sonraki <i class="fas fa-chevron-right text-xs"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="editModal" class="fixed inset-0 z-[200] hidden flex-col justify-end md:justify-center items-center bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 sm:p-4">
-        <div id="editModalContent" class="bg-white w-full sm:w-[95%] md:max-w-3xl flex flex-col max-h-[92vh] md:max-h-[90vh] rounded-t-[28px] md:rounded-[28px] shadow-2xl transform translate-y-full transition-transform duration-300 ease-out overflow-hidden mt-4 md:mt-0">
+        <!-- max-h değiştirildi ve padding eklendi -->
+        <div id="editModalContent" class="bg-white w-full sm:w-[95%] md:max-w-3xl flex flex-col max-h-[90vh] md:max-h-[85vh] rounded-t-[28px] md:rounded-[28px] shadow-2xl transform translate-y-full transition-transform duration-300 ease-out overflow-hidden mt-4 md:mt-0">
             
             <div class="px-5 md:px-8 py-4 md:py-5 border-b border-pink-100 flex justify-between items-center bg-white shrink-0 z-20 shadow-sm">
                 <div>
-                    <h3 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600 text-lg md:text-2xl">Kayıt Düzenle</h3>
-                    <p class="text-[10px] md:text-xs text-pink-500 font-bold mt-0.5 uppercase tracking-wider">Müşteri Detayları</p>
+                    <h3 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600 text-xl md:text-2xl">Kayıt Düzenle</h3>
+                    <p class="text-xs text-pink-500 font-bold mt-0.5 uppercase tracking-wider">Müşteri Detayları</p>
                 </div>
-                <button onclick="closeEditModal()" class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-red-100 hover:text-red-600 transition flex items-center justify-center border border-slate-200 active:scale-90">
-                    <i class="fas fa-times text-base md:text-lg"></i>
+                <button onclick="closeEditModal()" class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-red-100 hover:text-red-600 transition flex items-center justify-center border border-slate-200 active:scale-90">
+                    <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
             
+            <!-- Modal içerik alanı - pb-24 eklendi ve butonlar buraya taşındı -->
             <div class="flex-1 overflow-y-auto overscroll-contain p-4 md:p-8 bg-[#fffcfd]">
                 <form id="editForm" class="space-y-6">
                     <input type="hidden" id="m_rowIndex"><input type="hidden" id="m_sheetName">
@@ -414,37 +415,37 @@
                     <div class="bg-white p-4 md:p-5 rounded-2xl border border-pink-100 shadow-sm grid grid-cols-2 gap-3 relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-pink-50 to-transparent rounded-bl-full pointer-events-none"></div>
                         <div>
-                            <label class="text-[9px] md:text-[10px] uppercase font-bold text-slate-400 block mb-1">Şube</label>
-                            <input type="text" id="m_branch" class="w-full bg-transparent font-bold text-slate-700 text-xs md:text-sm focus:outline-none" readonly>
+                            <label class="text-xs uppercase font-bold text-slate-400 block mb-1">Şube</label>
+                            <input type="text" id="m_branch" class="w-full bg-transparent font-bold text-slate-700 text-sm md:text-base focus:outline-none" readonly>
                         </div>
                         <div>
-                            <label class="text-[9px] md:text-[10px] uppercase font-bold text-slate-400 block mb-1">Kayıt Tarihi</label>
-                            <input type="text" id="m_date" class="w-full bg-transparent font-bold text-slate-700 text-xs md:text-sm focus:outline-none" readonly>
+                            <label class="text-xs uppercase font-bold text-slate-400 block mb-1">Kayıt Tarihi</label>
+                            <input type="text" id="m_date" class="w-full bg-transparent font-bold text-slate-700 text-sm md:text-base focus:outline-none" readonly>
                         </div>
                     </div>
 
                     <div>
-                        <h4 class="text-xs font-bold text-pink-500 uppercase tracking-wider mb-3 pl-1 flex items-center gap-2">
+                        <h4 class="text-sm font-bold text-pink-500 uppercase tracking-wider mb-3 pl-1 flex items-center gap-2">
                             <i class="fas fa-user-circle text-base"></i> Müşteri Bilgileri
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                             <div class="md:col-span-2">
-                                <label class="text-xs font-bold text-slate-600 mb-1.5 block">Ad Soyad</label>
+                                <label class="text-sm font-bold text-slate-600 mb-1.5 block">Ad Soyad</label>
                                 <input type="text" id="m_name" class="modern-input border-slate-200">
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-slate-600 mb-1.5 block">Müşteri No <span class="text-slate-400 font-normal">(Ops)</span></label>
+                                <label class="text-sm font-bold text-slate-600 mb-1.5 block">Müşteri No <span class="text-slate-400 font-normal">(Ops)</span></label>
                                 <input type="text" id="m_customerNo" class="modern-input border-slate-200">
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-slate-600 mb-1.5 block">Telefon</label>
+                                <label class="text-sm font-bold text-slate-600 mb-1.5 block">Telefon</label>
                                 <div class="relative">
                                     <input type="tel" id="m_contact" class="modern-input border-slate-200 pl-10">
                                     <i class="fas fa-phone text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
                                 </div>
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-slate-600 mb-1.5 block">Kategori</label>
+                                <label class="text-sm font-bold text-slate-600 mb-1.5 block">Kategori</label>
                                 <select id="m_category" class="modern-input border-slate-200">
                                     <option value="">Seçiniz...</option>
                                     <option value="LİMİT ÖĞREN">LİMİT ÖĞREN</option>
@@ -466,7 +467,7 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-slate-600 mb-1.5 block">Ürün Detay</label>
+                                <label class="text-sm font-bold text-slate-600 mb-1.5 block">Ürün Detay</label>
                                 <input type="text" id="m_product" class="modern-input border-slate-200">
                             </div>
                         </div>
@@ -475,12 +476,12 @@
                     <div class="border-t-2 border-dashed border-slate-200 my-2"></div>
 
                     <div>
-                        <h4 class="text-xs font-bold text-pink-500 uppercase tracking-wider mb-3 pl-1 flex items-center gap-2">
+                        <h4 class="text-sm font-bold text-pink-500 uppercase tracking-wider mb-3 pl-1 flex items-center gap-2">
                             <i class="fas fa-headset text-base"></i> Görüşme Sonucu
                         </h4>
                         <div class="space-y-3">
                             <div class="bg-white p-4 rounded-xl border border-pink-100 shadow-sm transition-all" id="step1box">
-                                <label class="text-xs font-bold text-slate-700 mb-2 block">1. Aranma Durumu</label>
+                                <label class="text-sm font-bold text-slate-700 mb-2 block">1. Aranma Durumu</label>
                                 <select id="m_status" class="modern-input font-bold text-slate-700">
                                     <option value="" selected>Seçiniz...</option>
                                     <option value="aranmadı">🔴 Aranmadı</option>
@@ -489,7 +490,7 @@
                             </div>
                             
                             <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm transition-all" id="step2box">
-                                <label class="text-xs font-bold text-slate-700 mb-2 block">2. Müşteri Dönüşü</label>
+                                <label class="text-sm font-bold text-slate-700 mb-2 block">2. Müşteri Dönüşü</label>
                                 <select id="m_result" class="modern-input" disabled>
                                     <option value="" selected>Seçiniz...</option>
                                     <option value="Beklemede">Beklemede</option>
@@ -503,7 +504,7 @@
                             </div>
                             
                             <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm transition-all" id="step3box">
-                                <label class="text-xs font-bold text-slate-700 mb-2 block">3. Personel Notu</label>
+                                <label class="text-sm font-bold text-slate-700 mb-2 block">3. Personel Notu</label>
                                 <textarea id="m_note" class="modern-input resize-none overflow-hidden min-h-[60px]" placeholder="Detay ekle..." oninput="autoResize(this)" disabled></textarea>
                             </div>
                         </div>
@@ -516,7 +517,7 @@
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 relative z-10">
                             <div>
-                                <label class="text-xs font-bold text-emerald-700 mb-1.5 block">Sipariş Gerçekleşti mi?</label>
+                                <label class="text-sm font-bold text-emerald-700 mb-1.5 block">Sipariş Gerçekleşti mi?</label>
                                 <select id="m_isOrder" class="modern-input border-emerald-300 focus:ring-emerald-400 focus:border-emerald-400 font-bold" onchange="toggleAmount()" disabled>
                                     <option value="" selected>Seçiniz...</option>
                                     <option value="Hayır">Hayır</option>
@@ -524,7 +525,7 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-emerald-700 mb-1.5 block">Sepet Tutarı</label>
+                                <label class="text-sm font-bold text-emerald-700 mb-1.5 block">Sepet Tutarı</label>
                                 <div class="relative">
                                     <input type="number" id="m_amount" class="modern-input border-emerald-300 pl-10 focus:ring-emerald-400 focus:border-emerald-400 font-black text-emerald-800 text-lg" placeholder="0" disabled>
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600 font-bold text-lg">₺</span>
@@ -535,10 +536,11 @@
                 </form>
             </div>
 
+            <!-- SABİT FOOTER (Mobilde her zaman görünür, tarayıcı barlarının altında kalmaz) -->
             <div class="p-4 md:p-5 border-t border-pink-100 bg-white flex flex-row justify-end gap-3 shrink-0 shadow-[0_-15px_30px_rgba(0,0,0,0.05)] z-20" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));">
-                <button type="button" onclick="closeEditModal()" class="flex-1 sm:flex-none px-4 py-3 md:py-3.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition active:scale-95">İptal</button>
-                <button type="submit" form="editForm" id="updateBtn" class="flex-1 sm:flex-none px-6 py-3 md:py-3.5 rounded-xl text-sm font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-400 hover:to-purple-500 shadow-lg shadow-pink-500/40 transition active:scale-95 flex justify-center items-center gap-2">
-                    <i class="fas fa-save"></i> Kaydet
+                <button type="button" onclick="closeEditModal()" class="flex-1 sm:flex-none px-4 py-3.5 rounded-xl text-base font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition active:scale-95">İptal</button>
+                <button type="submit" form="editForm" id="updateBtn" class="flex-1 sm:flex-none px-6 py-3.5 rounded-xl text-base font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-400 hover:to-purple-500 shadow-lg shadow-pink-500/40 transition active:scale-95 flex justify-center items-center gap-2">
+                    <i class="fas fa-save text-lg"></i> Kaydet
                 </button>
             </div>
         </div>
@@ -895,7 +897,7 @@
                 .catch(e => {
                     console.warn("Veri Çekme Hatası:", e);
                     if (!isBackground) {
-                        tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold bg-rose-50 rounded-2xl"><i class="fas fa-exclamation-triangle mb-2 text-3xl"></i><br>Veri çekilemedi.<br><span class="text-xs font-normal text-slate-500 mt-2 block">Lütfen internetinizi kontrol edin.</span></td></tr>`;
+                        tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold bg-rose-50 rounded-2xl"><i class="fas fa-exclamation-triangle mb-2 text-3xl"></i><br>Veri çekilemedi.<br><span class="text-sm font-normal text-slate-500 mt-2 block">Lütfen internetinizi kontrol edin.</span></td></tr>`;
                     }
                 });
         }
@@ -1069,8 +1071,8 @@
                 if (isSold) {
                     const amount = parseCurrency(getRevenue(item));
                     const customerNo = String(item.customerNo || "").trim();
-                    if (customerNo === "") missingTags += `<span class="inline-block bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap animate-pulse-fast mt-1"><i class="fas fa-exclamation-circle mr-1"></i>MÜŞTERİ NO EKSİK</span> `;
-                    if (amount <= 0) missingTags += `<span class="inline-block bg-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap animate-pulse-fast mt-1"><i class="fas fa-exclamation-circle mr-1"></i>TUTAR EKSİK</span>`;
+                    if (customerNo === "") missingTags += `<span class="inline-block bg-red-500 text-white text-xs px-2 py-1 rounded shadow-sm whitespace-nowrap animate-pulse-fast mt-1"><i class="fas fa-exclamation-circle mr-1"></i>MÜŞTERİ NO EKSİK</span> `;
+                    if (amount <= 0) missingTags += `<span class="inline-block bg-orange-500 text-white text-xs px-2 py-1 rounded shadow-sm whitespace-nowrap animate-pulse-fast mt-1"><i class="fas fa-exclamation-circle mr-1"></i>TUTAR EKSİK</span>`;
                 }
 
                 tr.innerHTML = `
@@ -1078,42 +1080,42 @@
                         <div class="flex items-center gap-3 md:gap-4 flex-wrap">
                             <div class="avatar-initials shrink-0">${initials}</div>
                             <div>
-                                <div class="font-extrabold text-slate-800 text-sm md:text-base">${safeName || '-'}</div>
-                                ${item.customerNo ? `<div class="text-[10px] md:text-xs text-indigo-500 font-mono font-bold mt-0.5">#${escapeHTML(item.customerNo)}</div>` : ''}
-                                <div class="text-[10px] md:text-xs text-slate-400 font-medium mt-0.5"><i class="far fa-calendar-alt mr-1"></i>${escapeHTML(item.date)}</div>
+                                <div class="font-extrabold text-slate-800 text-base md:text-lg">${safeName || '-'}</div>
+                                ${item.customerNo ? `<div class="text-xs md:text-sm text-indigo-500 font-mono font-bold mt-0.5">#${escapeHTML(item.customerNo)}</div>` : ''}
+                                <div class="text-xs md:text-sm text-slate-400 font-medium mt-0.5"><i class="far fa-calendar-alt mr-1"></i>${escapeHTML(item.date)}</div>
                                 ${missingTags ? `<div class="mt-1">${missingTags}</div>` : ''}
                             </div>
                         </div>
                     </td>
                     <td data-label="İletişim">
-                        <div class="text-xs md:text-sm font-bold text-slate-600 flex items-center justify-end md:justify-start gap-2">
+                        <div class="text-sm md:text-base font-bold text-slate-600 flex items-center justify-end md:justify-start gap-2">
                             ${escapeHTML(item.contact) || '-'} 
-                            <a href="tel:${escapeHTML(item.contact)}" class="md:hidden w-8 h-8 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-full shadow-sm"><i class="fas fa-phone"></i></a>
+                            <a href="tel:${escapeHTML(item.contact)}" class="md:hidden w-10 h-10 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-full shadow-sm"><i class="fas fa-phone text-sm"></i></a>
                         </div>
                     </td>
                     <td data-label="Ürün">
                         <div class="flex flex-col items-end md:items-start">
-                            <div class="text-xs md:text-sm text-slate-700 font-extrabold">${escapeHTML(item.category)}</div>
-                            <div class="text-[10px] md:text-xs text-slate-500 mt-0.5 font-medium">${escapeHTML(item.product) || '-'}</div>
+                            <div class="text-sm md:text-base text-slate-700 font-extrabold">${escapeHTML(item.category)}</div>
+                            <div class="text-xs md:text-sm text-slate-500 mt-0.5 font-medium">${escapeHTML(item.product) || '-'}</div>
                         </div>
                     </td>
                     <td data-label="Durum">
                         <div class="flex flex-col gap-2 items-end md:items-start w-full">
                             ${statusBadge}
-                            ${item.result ? `<span class="text-[9px] md:text-[10px] font-bold text-slate-600 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm">${escapeHTML(item.result)}</span>` : ''}
+                            ${item.result ? `<span class="text-xs md:text-sm font-bold text-slate-600 bg-white px-3 py-1.5 rounded-md border border-slate-200 shadow-sm">${escapeHTML(item.result)}</span>` : ''}
                         </div>
                     </td>
                     <td data-label="Satış">
                         ${String(item.isOrder).toLowerCase() === 'evet' ? 
                             `<div class="flex flex-col items-end md:items-start gap-1">
-                                <span class="bg-emerald-500 text-white px-2 py-1 rounded-md text-[9px] font-bold inline-flex items-center gap-1 shadow-sm"><i class="fas fa-check"></i> SATILDI</span>
-                                <span class="text-emerald-700 font-black text-sm md:text-base tracking-tight">${formatMoney(getRevenue(item))}</span>
+                                <span class="bg-emerald-500 text-white px-2 py-1 rounded-md text-[10px] md:text-xs font-bold inline-flex items-center gap-1 shadow-sm"><i class="fas fa-check"></i> SATILDI</span>
+                                <span class="text-emerald-700 font-black text-base md:text-lg tracking-tight">${formatMoney(getRevenue(item))}</span>
                             </div>` : 
-                            `<span class="text-slate-300 text-sm font-bold">-</span>`
+                            `<span class="text-slate-300 text-base font-bold">-</span>`
                         }
                     </td>
                     <td data-label="İşlem">
-                        <button onclick="openEditModal(${originalIndex})" class="mobile-action-btn md:w-auto bg-white border border-slate-200 text-slate-600 hover:border-pink-300 hover:text-pink-600 hover:shadow-md p-2.5 md:p-3 px-4 md:px-5 rounded-xl md:rounded-2xl transition-all shadow-sm text-xs md:text-sm font-bold flex items-center gap-2">
+                        <button onclick="openEditModal(${originalIndex})" class="mobile-action-btn md:w-auto bg-white border border-slate-200 text-slate-600 hover:border-pink-300 hover:text-pink-600 hover:shadow-md p-3 px-5 rounded-xl md:rounded-2xl transition-all shadow-sm text-sm font-bold flex items-center gap-2">
                             <i class="fas fa-pen-to-square"></i> <span class="md:hidden lg:inline">Düzenle</span>
                         </button>
                     </td>
