@@ -82,14 +82,6 @@
         .modern-input:disabled { background-color: #f9fafb; cursor: not-allowed; opacity: 0.8; color: #9ca3af; border-color: #f3f4f6; box-shadow: none; }
         .input-error { border-color: #e11d48 !important; background-color: #fff1f2 !important; animation: shake 0.3s ease-in-out; }
 
-        .dark-input {
-            width: 100%; padding: 12px 16px; font-size: 0.9rem; border: 1px solid #2a2a3b; 
-            border-radius: 10px; background-color: #0d0d14; transition: all 0.3s;
-            color: #e2e8f0; font-weight: 500; appearance: none;
-        }
-        .dark-input:focus { outline: none; border-color: #0ea5e9; background-color: #14141e; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2); }
-        .dark-input::placeholder { color: #475569; }
-
         .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .custom-table th { color: #831843; font-weight: 700; font-size: 0.75rem; padding: 20px 24px; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(253, 242, 248, 0.8); border-bottom: 2px solid #fce7f3; }
         .custom-table td { padding: 20px 24px; font-size: 0.95rem; vertical-align: middle; background: rgba(255, 255, 255, 0.8); border-bottom: 1px solid #fce7f3; transition: all 0.2s ease; }
@@ -117,8 +109,6 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #f472b6; }
-        .dark-scroll::-webkit-scrollbar-thumb { background: #2a2a3b; }
-        .dark-scroll::-webkit-scrollbar-thumb:hover { background: #0ea5e9; }
     </style>
 </head>
 <body class="bg-rose-50 selection:bg-pink-200 selection:text-pink-900 pb-[env(safe-area-inset-bottom)]">
@@ -348,34 +338,34 @@
         </div>
     </div>
 
-    <!-- YENİ: KAYIT EKLEME MODALI (DARK MODE, TAM EKRAN VE RESPONSIVE) -->
+    <!-- YENİ: KAYIT EKLEME MODALI (LIGHT MODE, TAM EKRAN VE RESPONSIVE) -->
     <div id="addModal" class="fixed inset-0 modal-overlay z-[200] hidden overflow-hidden flex justify-center p-0 md:p-4 bg-black/40 backdrop-blur-sm transition-all duration-300">
-        <div id="addModalContent" class="modal-content-wrapper bg-dark-800 border border-[#3f3f5a] w-full max-w-[1200px] h-full md:h-auto md:max-h-[95vh] shadow-2xl relative flex flex-col transition-all transform duration-300 translate-y-full md:rounded-[28px]">
+        <div id="addModalContent" class="modal-content-wrapper bg-white w-full max-w-[1200px] h-full md:h-auto md:max-h-[95vh] shadow-2xl relative flex flex-col transition-all transform duration-300 translate-y-full md:rounded-[28px]">
             
-            <div class="px-5 md:px-8 py-5 md:py-6 border-b border-[#2d2d44] bg-dark-900 flex justify-between items-center sticky top-0 z-20 md:rounded-t-[28px]">
+            <div class="px-5 md:px-8 py-5 md:py-6 border-b border-pink-100 flex justify-between items-center sticky top-0 z-20 bg-white md:rounded-t-[28px]">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-[#0ea5e9]/20 text-[#0ea5e9] flex items-center justify-center text-lg"><i class="fas fa-user-plus"></i></div>
+                    <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center text-lg shadow-inner"><i class="fas fa-user-plus"></i></div>
                     <div>
-                        <h3 class="font-extrabold text-white text-lg md:text-xl tracking-wide">Yeni Kayıt Oluştur</h3>
+                        <h3 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-blue-700 text-lg md:text-xl tracking-tight">Yeni Kayıt Oluştur</h3>
                         <p class="text-[10px] md:text-xs text-slate-400 font-bold mt-0.5 uppercase tracking-wider">Toplu Müşteri Girişi</p>
                     </div>
                 </div>
-                <button onclick="closeAddModal()" aria-label="Pencereyi Kapat" class="w-10 h-10 rounded-full bg-[#2d2d44] text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 transition flex items-center justify-center border border-[#3f3f5a] active:scale-90">
+                <button onclick="closeAddModal()" aria-label="Pencereyi Kapat" class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 transition flex items-center justify-center border border-slate-200 shadow-sm active:scale-90">
                     <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
             
-            <div class="flex-1 overflow-y-auto dark-scroll p-4 md:p-8 bg-dark-800 pb-24 md:pb-8" id="addRowsContainer">
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#fafafa] pb-24 md:pb-8" id="addRowsContainer">
                 <!-- Satırlar JavaScript ile buraya eklenecek -->
             </div>
 
-            <div class="p-4 md:p-6 border-t border-[#2d2d44] bg-dark-900 md:rounded-b-[28px] flex flex-col sm:flex-row justify-between items-center gap-3 sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.2)]" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));">
-                <button type="button" onclick="addNewRow()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl text-sm font-bold text-[#0ea5e9] bg-[#0ea5e9]/10 hover:bg-[#0ea5e9]/20 border border-[#0ea5e9]/30 transition flex items-center justify-center gap-2 active:scale-95">
+            <div class="p-4 md:p-6 border-t border-pink-100 bg-white md:rounded-b-[28px] flex flex-col sm:flex-row justify-between items-center gap-3 sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));">
+                <button type="button" onclick="addNewRow()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl text-sm font-bold text-sky-600 bg-sky-50 hover:bg-sky-100 border border-sky-200 transition flex items-center justify-center gap-2 active:scale-95">
                     <i class="fas fa-plus"></i> Yeni Kayıt Satırı Ekle
                 </button>
                 <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <button type="button" onclick="closeAddModal()" class="w-full sm:w-auto px-8 py-4 md:py-3.5 rounded-xl text-sm font-bold text-slate-300 bg-[#2d2d44] hover:bg-[#3f3f5a] transition active:scale-95">İptal</button>
-                    <button type="button" id="saveBulkBtn" onclick="saveNewCustomers()" class="w-full sm:w-auto px-10 py-4 md:py-3.5 rounded-xl text-sm font-extrabold bg-[#0ea5e9] text-white hover:bg-[#0284c7] shadow-lg shadow-sky-500/20 transition active:scale-95 flex justify-center items-center gap-2">
+                    <button type="button" onclick="closeAddModal()" class="w-full sm:w-auto px-8 py-4 md:py-3.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 bg-slate-50 transition border border-transparent hover:border-slate-200 active:scale-95">İptal</button>
+                    <button type="button" id="saveBulkBtn" onclick="saveNewCustomers()" class="w-full sm:w-auto px-10 py-4 md:py-3.5 rounded-xl text-sm font-extrabold bg-gradient-to-r from-sky-500 to-blue-600 text-white hover:from-sky-400 hover:to-blue-500 shadow-lg shadow-sky-500/30 transition active:scale-95 flex justify-center items-center gap-2">
                         <i class="fas fa-paper-plane"></i> Hepsini Kaydet
                     </button>
                 </div>
@@ -807,52 +797,53 @@
             const branchOptions = branchList.map(b => `<option value="${b}" ${b === currentBranch ? 'selected' : ''}>${b}</option>`).join('');
 
             const html = `
-                <div class="bg-[#14141e] border border-[#2d2d44] rounded-[16px] p-4 relative mb-4 new-customer-row" id="${rowId}">
-                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                <div class="bg-white border border-slate-200 shadow-sm rounded-2xl md:rounded-3xl p-4 md:p-6 relative mb-4 md:mb-6 new-customer-row overflow-hidden" id="${rowId}">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-sky-50 to-transparent opacity-60 rounded-bl-full pointer-events-none"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 relative z-10">
                         <div class="col-span-1">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">TARİH & SAAT</label>
+                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">TARİH & SAAT</label>
                             <div class="relative">
-                                <input type="text" value="${getFormattedCurrentDate()}" class="dark-input row-date text-slate-300" readonly>
-                                <i class="fas fa-calendar-alt text-slate-500 absolute right-3 top-1/2 -translate-y-1/2"></i>
+                                <input type="text" value="${getFormattedCurrentDate()}" class="modern-input row-date bg-slate-50 text-slate-500" readonly>
+                                <i class="fas fa-calendar-alt text-slate-400 absolute right-4 top-1/2 -translate-y-1/2"></i>
                             </div>
                         </div>
                         <div class="col-span-1">
-                            <label class="text-[10px] text-[#0ea5e9] font-bold uppercase tracking-wider mb-1 block">ŞUBE <span class="text-rose-500">*</span></label>
-                            <select class="dark-input border-[#0ea5e9]/50 row-branch">${branchOptions}</select>
+                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-sky-600 mb-1.5 block">ŞUBE <span class="text-rose-500">*</span></label>
+                            <select class="modern-input border-sky-200 focus:border-sky-400 row-branch">${branchOptions}</select>
                         </div>
                         <div class="col-span-1">
-                            <label class="text-[10px] text-[#0ea5e9] font-bold uppercase tracking-wider mb-1 block">MÜŞTERİ ADI SOYADI <span class="text-rose-500">*</span></label>
-                            <input type="text" placeholder="Örn: Ahmet Yılmaz" class="dark-input border-[#0ea5e9]/50 row-name" required>
+                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-sky-600 mb-1.5 block">MÜŞTERİ ADI SOYADI <span class="text-rose-500">*</span></label>
+                            <input type="text" placeholder="Örn: Ahmet Yılmaz" class="modern-input border-sky-200 focus:border-sky-400 row-name" required>
                         </div>
                         <div class="col-span-1">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">İLETİŞİM NUMARASI</label>
-                            <input type="text" placeholder="05XX..." class="dark-input row-contact">
+                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">İLETİŞİM NUMARASI</label>
+                            <input type="text" placeholder="05XX..." class="modern-input row-contact">
                         </div>
                         <div class="col-span-1">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">GELİŞ MEDYASI</label>
-                            <select class="dark-input row-media">
+                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">GELİŞ MEDYASI</label>
+                            <select class="modern-input row-media">
                                 <option value="">Seçiniz...</option>
                                 ${mediaOptions}
                             </select>
                         </div>
 
-                        <div class="col-span-1 lg:col-span-2">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">İLGİLENDİĞİ KATEGORİ</label>
-                            <select class="dark-input row-category"><option value="">Seçiniz...</option>${categoryOptions}</select>
+                        <div class="col-span-1 md:col-span-2">
+                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">İLGİLENDİĞİ KATEGORİ</label>
+                            <select class="modern-input row-category"><option value="">Seçiniz...</option>${categoryOptions}</select>
                         </div>
-                        <div class="col-span-1 lg:col-span-2">
-                            <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">ÜRÜN ADI / MODELİ</label>
-                            <input type="text" placeholder="Örn: L Koltuk" class="dark-input row-product">
+                        <div class="col-span-1 md:col-span-2">
+                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">ÜRÜN ADI / MODELİ</label>
+                            <input type="text" placeholder="Örn: L Koltuk" class="modern-input row-product">
                         </div>
                         <div class="col-span-1 flex items-end gap-3">
                             <div class="flex-1">
-                                <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1 block">ARAMA DURUMU</label>
-                                <select class="dark-input row-status">
-                                    <option value="aranmadı" selected>aranmadı</option>
-                                    <option value="arandı">arandı</option>
+                                <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">ARAMA DURUMU</label>
+                                <select class="modern-input row-status font-bold text-slate-700">
+                                    <option value="aranmadı" selected>🔴 Aranmadı</option>
+                                    <option value="arandı">🟢 Arandı</option>
                                 </select>
                             </div>
-                            ${!isFirst ? `<button type="button" onclick="document.getElementById('${rowId}').remove()" class="w-[42px] h-[42px] rounded-xl border border-[#3f3f5a] bg-[#1a1a2e] text-rose-500 hover:bg-rose-500 hover:text-white transition flex items-center justify-center shrink-0 mb-[1px]"><i class="fas fa-trash-alt"></i></button>` : `<div class="w-[42px] shrink-0 hidden md:block"></div>`}
+                            ${!isFirst ? `<button type="button" onclick="document.getElementById('${rowId}').remove()" class="w-[52px] h-[52px] rounded-xl border border-rose-200 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition flex items-center justify-center shrink-0"><i class="fas fa-trash-alt"></i></button>` : `<div class="w-[52px] shrink-0 hidden md:block"></div>`}
                         </div>
                     </div>
                 </div>
