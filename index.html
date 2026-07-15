@@ -1160,31 +1160,25 @@
                 const tbody = document.getElementById('crmTableBody');
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-slate-400 font-medium"><i class="fas fa-spinner fa-spin text-2xl mb-2 text-pink-400"></i><br>Veriler Yükleniyor...</td></tr>';
             }
-
-            try {
-                const data = await safeFetch({
-                    action: 'getRecentRecords',
-                    data: { branch: currentBranch, month: selectedMonth },
-                    token: authToken
+            fetch(`${API_URL}?action=getRecentRecords&branch=${encodeURIComponent(currentBranch)}&month=${selectedMonth}&token=${encodeURIComponent(authToken)}&t=${Date.now()}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        if (data.error.includes("Yetkisiz")) logout();
+                        throw new Error(data.error);
+                    }
+                    allRecords = data.records || [];
+                    
+                    updateDashboardMetrics(); 
+                    checkOverdueFollowUps(allRecords);
+                    checkMissingInfo(allRecords); 
+                    renderTable(); 
+                })
+                .catch(e => {
+                    if (!isBackground) {
+                         document.getElementById('crmTableBody').innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold bg-rose-50 rounded-2xl"><i class="fas fa-exclamation-triangle mb-2 text-3xl"></i><br>Veri çekilemedi.<br><span class="text-[10px] text-rose-400 mt-2 block bg-white/50 p-2 rounded-lg border border-rose-100">${escapeHTML(e.message)}</span></td></tr>`;
+                    }
                 });
-
-                if (data.error || data.status === 'error') {
-                    if ((data.message || data.error || "").includes("Yetkisiz")) logout();
-                    throw new Error(data.message || data.error);
-                }
-                
-                allRecords = data.records || [];
-                
-                updateDashboardMetrics(); 
-                checkOverdueFollowUps(allRecords);
-                checkMissingInfo(allRecords); 
-                renderTable(); 
-
-            } catch (e) {
-                if (!isBackground) {
-                     document.getElementById('crmTableBody').innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold bg-rose-50 rounded-2xl"><i class="fas fa-exclamation-triangle mb-2 text-3xl"></i><br>Veri çekilemedi.<br><span class="text-[10px] text-rose-400 mt-2 block bg-white/50 p-2 rounded-lg border border-rose-100">${escapeHTML(e.message)}</span></td></tr>`;
-                }
-            }
         }
 
         function checkMissingInfo(records) {
@@ -1192,14 +1186,20 @@
                 const result = String(item.result || "").trim().toLowerCase();
                 const isSold = result === 'satışa döndü';
                 
+                // Müşteri "Satışa Döndü" olarak işaretlenmiş mi kontrol et
                 if (!isSold) return false;
 
-                const amount = parseCurrency(getRevenue(item));
+                const amountStr = String(item.amount || item.revenue || "").trim();
+                const amount = parseCurrency(amountStr);
                 const customerNo = String(item.customerNo || "").trim();
 
-                const missingAmount = amount <= 0;
+                // Hata 1: Satışa Dönmüş ama Tutar sıfır veya kutucuk boş bırakılmış
+                const missingAmount = amount <= 0 || amountStr === "";
+                
+                // Hata 2: Satışa Dönmüş ama Müşteri Numarası hiç yazılmamış
                 const missingCustomerNo = customerNo === "";
 
+                // İki hatadan biri bile varsa, bu kayıt "Eksik/Hatalı" listesine düşer
                 return missingAmount || missingCustomerNo;
             });
 
