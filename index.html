@@ -22,10 +22,6 @@
                             300: '#f9a8d4', 400: '#f472b6', 500: '#ec4899',
                             600: '#db2777', 700: '#be185d', 800: '#9d174d',
                             900: '#831843',
-                        },
-                        dark: {
-                            800: '#14141e',
-                            900: '#0d0d14'
                         }
                     },
                     animation: {
@@ -527,14 +523,16 @@
         const API_URL = 'https://script.google.com/macros/s/AKfycbwQ7j5NSTaojKhdVKPehsYKqZSCljBBzvywmCf8S7ZXSAYjz3OsXUOMG-9NnMZdRzht/exec'; 
         
         const FALLBACK_BRANCHES = [
-            'İnegöl Şubesi', 'Paşabahçe Şubesi', 'Çekmeköy Şubesi', 'İzmit Şubesi', 'Gölcük Şubesi', 'Körfez Şubesi',
-            'Derince Şubesi', 'Sultanbeyli Şubesi', 'Yenidoğan Şubesi', 'Kavacık Şubesi', 'Çayırova Şubesi', 'Gebze Şubesi'
+            'İnegöl Şubesi', 'Paşabahçe Şubesi', 'Çekmeköy Şubesi',
+            'İzmit Şubesi', 'Gölcük Şubesi', 'Körfez Şubesi',
+            'Derince Şubesi', 'Sultanbeyli Şubesi', 'Yenidoğan Şubesi',
+            'Kavacık Şubesi', 'Çayırova Şubesi', 'Gebze Şubesi', 'Düzce Şubesi'
         ];
 
         const CATEGORIES = [
-            'LİMİT ÖĞREN', 'Mobilya', 'Baza+Yatak+Başlık', 'Bebek ve Çocuk', 'Beyaz Eşya', 'Elektrikli Ev Aletleri', 
-            'Elektrikli-Benzinli Araç', 'Elektronik', 'Ev Dekorasyonu', 'Halı', 'Kişisel Aksesuar', 'Mobilya Aksesuarı', 
-            'Tekstil', 'Züccaciye', 'Ayakkabı', 'GENEL ÜRÜN BİLGİSİ'
+            'LİMİT ÖĞREN', 'Mobilya', 'Baza+Yatak+Başlık', 'Bebek ve Çocuk', 'Beyaz Eşya',
+            'Elektrikli Ev Aletleri', 'Elektrikli-Benzinli Araç', 'Elektronik', 'Ev Dekorasyonu',
+            'Halı', 'Kişisel Aksesuar', 'Mobilya Aksesuarı', 'Tekstil', 'Züccaciye', 'Ayakkabı', 'GENEL ÜRÜN BİLGİSİ'
         ];
 
         const MEDIAS = ['Instagram', 'Whatsapp', 'Facebook', 'Çağrı', 'Web Sitesi Form', 'SMS LİNK'];
@@ -570,6 +568,7 @@
             const strClean = str.toString().trim();
             const [datePart] = strClean.split(' ');
             if(!datePart) return new Date(0);
+            
             if (datePart.includes('.')) {
                 const parts = datePart.split('.');
                 if(parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
@@ -577,6 +576,7 @@
                 const parts = datePart.split('/');
                 if(parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]);
             }
+            
             const fallback = new Date(strClean);
             return isNaN(fallback.getTime()) ? new Date(0) : fallback;
         }
@@ -585,7 +585,8 @@
             if (!str) return "";
             return str.toString().toLocaleLowerCase('tr-TR')
                 .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
-                .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c').replace(/i̇/g, 'i');
+                .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+                .replace(/i̇/g, 'i');
         }
 
         function formatMoney(amount) {
@@ -724,7 +725,7 @@
                         document.getElementById('loginPassword').value = '';
                     }
                 } catch(e) {
-                    errorMsg.innerHTML = `<strong>Hata:</strong> ${escapeHTML(e.message)}`;
+                    errorMsg.innerHTML = `<strong>Hata:</strong> Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edin.<br><span class="text-[10px] text-red-200 mt-1 block opacity-80">Detay: ${escapeHTML(e.message)}</span>`;
                     errorMsg.classList.remove('hidden');
                 } finally {
                     btn.innerHTML = originalBtnText;
@@ -1151,25 +1152,31 @@
                 const tbody = document.getElementById('crmTableBody');
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-slate-400 font-medium"><i class="fas fa-spinner fa-spin text-2xl mb-2 text-pink-400"></i><br>Veriler Yükleniyor...</td></tr>';
             }
-            fetch(`${API_URL}?action=getRecentRecords&branch=${encodeURIComponent(currentBranch)}&month=${selectedMonth}&token=${encodeURIComponent(authToken)}&t=${Date.now()}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.error) {
-                        if (data.error.includes("Yetkisiz")) logout();
-                        throw new Error(data.error);
-                    }
-                    allRecords = data.records || [];
-                    
-                    updateDashboardMetrics(); 
-                    checkOverdueFollowUps(allRecords);
-                    checkMissingInfo(allRecords); 
-                    renderTable(); 
-                })
-                .catch(e => {
-                    if (!isBackground) {
-                         document.getElementById('crmTableBody').innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold bg-rose-50 rounded-2xl"><i class="fas fa-exclamation-triangle mb-2 text-3xl"></i><br>Veri çekilemedi.<br><span class="text-[10px] text-rose-400 mt-2 block bg-white/50 p-2 rounded-lg border border-rose-100">${escapeHTML(e.message)}</span></td></tr>`;
-                    }
+
+            try {
+                const data = await safeFetch({
+                    action: 'getRecentRecords',
+                    data: { branch: currentBranch, month: selectedMonth },
+                    token: authToken
                 });
+
+                if (data.error || data.status === 'error') {
+                    if ((data.message || data.error || "").includes("Yetkisiz")) logout();
+                    throw new Error(data.message || data.error);
+                }
+                
+                allRecords = data.records || [];
+                
+                updateDashboardMetrics(); 
+                checkOverdueFollowUps(allRecords);
+                checkMissingInfo(allRecords); 
+                renderTable(); 
+
+            } catch (e) {
+                if (!isBackground) {
+                     document.getElementById('crmTableBody').innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold bg-rose-50 rounded-2xl"><i class="fas fa-exclamation-triangle mb-2 text-3xl"></i><br>Veri çekilemedi.<br><span class="text-[10px] text-rose-400 mt-2 block bg-white/50 p-2 rounded-lg border border-rose-100">${escapeHTML(e.message)}</span></td></tr>`;
+                }
+            }
         }
 
         function checkMissingInfo(records) {
@@ -1177,20 +1184,14 @@
                 const result = String(item.result || "").trim().toLowerCase();
                 const isSold = result === 'satışa döndü';
                 
-                // Müşteri "Satışa Döndü" olarak işaretlenmiş mi kontrol et
                 if (!isSold) return false;
 
-                const amountStr = String(item.amount || item.revenue || "").trim();
-                const amount = parseCurrency(amountStr);
+                const amount = parseCurrency(getRevenue(item));
                 const customerNo = String(item.customerNo || "").trim();
 
-                // Hata 1: Satışa Dönmüş ama Tutar sıfır veya kutucuk boş bırakılmış
-                const missingAmount = amount <= 0 || amountStr === "";
-                
-                // Hata 2: Satışa Dönmüş ama Müşteri Numarası hiç yazılmamış
+                const missingAmount = amount <= 0;
                 const missingCustomerNo = customerNo === "";
 
-                // İki hatadan biri bile varsa, bu kayıt "Eksik/Hatalı" listesine düşer
                 return missingAmount || missingCustomerNo;
             });
 
@@ -1528,13 +1529,14 @@
                         updateDashboardMetrics(); 
                         renderTable();
                         checkOverdueFollowUps(allRecords);
+                        checkMissingInfo(allRecords); 
                     } else { refreshData(true); }
                 } else {
                     throw new Error(resData.message || "Bilinmeyen hata.");
                 }
             } catch(err) { 
                 if (finalCategory.includes('LİMİT ÖĞREN')) {
-                     showToast("HATA: Lütfen E-Tablodaki (Excel) Kategori listesine 'LİMİT ÖĞREN' ekleyin!", "error");
+                     showToast("HATA: Lütfen E-Tablodaki (Excel) Kategori açılır listesine 'LİMİT ÖĞREN' seçeneğini ekleyin!", "error");
                 } else {
                      showToast("Bağlantı hatası: " + err.message, "error");
                 }
