@@ -266,9 +266,6 @@
                         </h3>
                         <p class="text-sm text-slate-400 font-medium mt-1 ml-14">Güncel aramalar</p>
                     </div>
-                    <button onclick="openAddModal()" class="w-full md:w-auto px-6 py-3 bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-bold rounded-[16px] shadow-lg shadow-sky-500/30 transition-all flex items-center justify-center gap-2 h-[52px] active:scale-95">
-                        <i class="fas fa-plus"></i> <span>Kayıt Ekle</span>
-                    </button>
                 </div>
                 
                 <div class="mobile-filter-grid lg:flex gap-3 w-full xl:w-auto">
@@ -329,41 +326,6 @@
                     <button onclick="changePage(-1)" id="btnPrev" class="px-5 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-bold shadow-sm" disabled><i class="fas fa-chevron-left text-[10px]"></i> Önceki</button>
                     <span id="pageInfo" class="text-sm font-bold bg-white border border-slate-200 px-5 py-3 rounded-xl text-slate-700 min-w-[90px] text-center shadow-sm">1 / 1</span>
                     <button onclick="changePage(1)" id="btnNext" class="px-5 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-bold shadow-sm" disabled>Sonraki <i class="fas fa-chevron-right text-[10px]"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- YENİ: KAYIT EKLEME MODALI (LIGHT MODE, TAM EKRAN VE RESPONSIVE) -->
-    <div id="addModal" class="fixed inset-0 modal-overlay z-[200] hidden overflow-hidden flex justify-center p-0 md:p-4 bg-black/40 backdrop-blur-sm transition-all duration-300">
-        <div id="addModalContent" class="modal-content-wrapper bg-white w-full max-w-[1200px] h-full md:h-auto md:max-h-[95vh] shadow-2xl relative flex flex-col transition-all transform duration-300 translate-y-full md:rounded-[28px]">
-            
-            <div class="px-5 md:px-8 py-5 md:py-6 border-b border-pink-100 flex justify-between items-center sticky top-0 z-20 bg-white md:rounded-t-[28px]">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center text-lg shadow-inner"><i class="fas fa-user-plus"></i></div>
-                    <div>
-                        <h3 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-blue-700 text-lg md:text-xl tracking-tight">Yeni Kayıt Oluştur</h3>
-                        <p class="text-[10px] md:text-xs text-slate-400 font-bold mt-0.5 uppercase tracking-wider">Toplu Müşteri Girişi</p>
-                    </div>
-                </div>
-                <button onclick="closeAddModal()" aria-label="Pencereyi Kapat" class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 transition flex items-center justify-center border border-slate-200 shadow-sm active:scale-90">
-                    <i class="fas fa-times text-lg"></i>
-                </button>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#fafafa] pb-24 md:pb-8" id="addRowsContainer">
-                <!-- Satırlar JavaScript ile buraya eklenecek -->
-            </div>
-
-            <div class="p-4 md:p-6 border-t border-pink-100 bg-white md:rounded-b-[28px] flex flex-col sm:flex-row justify-between items-center gap-3 sticky bottom-0 z-20 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));">
-                <button type="button" onclick="addNewRow()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl text-sm font-bold text-sky-600 bg-sky-50 hover:bg-sky-100 border border-sky-200 transition flex items-center justify-center gap-2 active:scale-95">
-                    <i class="fas fa-plus"></i> Yeni Kayıt Satırı Ekle
-                </button>
-                <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <button type="button" onclick="closeAddModal()" class="w-full sm:w-auto px-8 py-4 md:py-3.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 bg-slate-50 transition border border-transparent hover:border-slate-200 active:scale-95">İptal</button>
-                    <button type="button" id="saveBulkBtn" onclick="saveNewCustomers()" class="w-full sm:w-auto px-10 py-4 md:py-3.5 rounded-xl text-sm font-extrabold bg-gradient-to-r from-sky-500 to-blue-600 text-white hover:from-sky-400 hover:to-blue-500 shadow-lg shadow-sky-500/30 transition active:scale-95 flex justify-center items-center gap-2">
-                        <i class="fas fa-paper-plane"></i> Hepsini Kaydet
-                    </button>
                 </div>
             </div>
         </div>
@@ -686,7 +648,6 @@
             setupSequentialFlow(); 
             
             document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
-            document.getElementById('addModal').addEventListener('click', function(e) { if (e.target === this) closeAddModal(); });
             
             document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -750,173 +711,6 @@
                     loginSuccess(branch);
                 }, 500);
             }, 3500);
-        }
-
-        let rowCounter = 0;
-
-        function getFormattedCurrentDate() {
-            const d = new Date();
-            const pad = (n) => n.toString().padStart(2, '0');
-            return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-        }
-
-        function openAddModal() {
-            const modal = document.getElementById('addModal');
-            const container = document.getElementById('addRowsContainer');
-            
-            container.innerHTML = ''; 
-            rowCounter = 0;
-            addNewRow(); 
-            
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.firstElementChild.classList.remove('translate-y-full');
-            }, 10);
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeAddModal() {
-            const modal = document.getElementById('addModal');
-            modal.firstElementChild.classList.add('translate-y-full');
-            setTimeout(() => {
-                modal.classList.add('hidden'); 
-                document.body.style.overflow = '';
-            }, 300); 
-        }
-
-        function addNewRow() {
-            rowCounter++;
-            const container = document.getElementById('addRowsContainer');
-            const rowId = `newRow_${rowCounter}`;
-            const isFirst = rowCounter === 1;
-
-            const categoryOptions = CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join('');
-            const mediaOptions = MEDIAS.map(m => `<option value="${m}">${m}</option>`).join('');
-            const branchOptions = branchList.map(b => `<option value="${b}" ${b === currentBranch ? 'selected' : ''}>${b}</option>`).join('');
-
-            const html = `
-                <div class="bg-white border border-slate-200 shadow-sm rounded-2xl md:rounded-3xl p-4 md:p-6 relative mb-4 md:mb-6 new-customer-row overflow-hidden" id="${rowId}">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-sky-50 to-transparent opacity-60 rounded-bl-full pointer-events-none"></div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 relative z-10">
-                        <div class="col-span-1">
-                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">TARİH & SAAT</label>
-                            <div class="relative">
-                                <input type="text" value="${getFormattedCurrentDate()}" class="modern-input row-date bg-slate-50 text-slate-500" readonly>
-                                <i class="fas fa-calendar-alt text-slate-400 absolute right-4 top-1/2 -translate-y-1/2"></i>
-                            </div>
-                        </div>
-                        <div class="col-span-1">
-                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-sky-600 mb-1.5 block">ŞUBE <span class="text-rose-500">*</span></label>
-                            <select class="modern-input border-sky-200 focus:border-sky-400 row-branch">${branchOptions}</select>
-                        </div>
-                        <div class="col-span-1">
-                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-sky-600 mb-1.5 block">MÜŞTERİ ADI SOYADI <span class="text-rose-500">*</span></label>
-                            <input type="text" placeholder="Örn: Ahmet Yılmaz" class="modern-input border-sky-200 focus:border-sky-400 row-name" required>
-                        </div>
-                        <div class="col-span-1">
-                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">İLETİŞİM NUMARASI</label>
-                            <input type="text" placeholder="05XX..." class="modern-input row-contact">
-                        </div>
-                        <div class="col-span-1">
-                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">GELİŞ MEDYASI</label>
-                            <select class="modern-input row-media">
-                                <option value="">Seçiniz...</option>
-                                ${mediaOptions}
-                            </select>
-                        </div>
-
-                        <div class="col-span-1 md:col-span-2">
-                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">İLGİLENDİĞİ KATEGORİ</label>
-                            <select class="modern-input row-category"><option value="">Seçiniz...</option>${categoryOptions}</select>
-                        </div>
-                        <div class="col-span-1 md:col-span-2">
-                            <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">ÜRÜN ADI / MODELİ</label>
-                            <input type="text" placeholder="Örn: L Koltuk" class="modern-input row-product">
-                        </div>
-                        <div class="col-span-1 flex items-end gap-3">
-                            <div class="flex-1">
-                                <label class="text-[10px] md:text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5 block">ARAMA DURUMU</label>
-                                <select class="modern-input row-status font-bold text-slate-700">
-                                    <option value="aranmadı" selected>🔴 Aranmadı</option>
-                                    <option value="arandı">🟢 Arandı</option>
-                                </select>
-                            </div>
-                            ${!isFirst ? `<button type="button" onclick="document.getElementById('${rowId}').remove()" class="w-[52px] h-[52px] rounded-xl border border-rose-200 bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition flex items-center justify-center shrink-0"><i class="fas fa-trash-alt"></i></button>` : `<div class="w-[52px] shrink-0 hidden md:block"></div>`}
-                        </div>
-                    </div>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', html);
-            container.scrollTop = container.scrollHeight;
-        }
-
-        async function saveNewCustomers() {
-            const rows = document.querySelectorAll('.new-customer-row');
-            const dataToSave = [];
-            let hasError = false;
-
-            rows.forEach(row => {
-                const nameInput = row.querySelector('.row-name');
-                const name = nameInput.value.trim();
-                const branch = row.querySelector('.row-branch').value;
-
-                if (!name || !branch) {
-                    if(!name) nameInput.classList.add('border-rose-500', 'bg-rose-500/10');
-                    if(!branch) row.querySelector('.row-branch').classList.add('border-rose-500', 'bg-rose-500/10');
-                    hasError = true;
-                } else {
-                    nameInput.classList.remove('border-rose-500', 'bg-rose-500/10');
-                    row.querySelector('.row-branch').classList.remove('border-rose-500', 'bg-rose-500/10');
-                    
-                    let finalCategory = row.querySelector('.row-category').value;
-                    if (finalCategory === "LİMİT ÖĞREN") finalCategory = "'" + finalCategory; 
-
-                    dataToSave.push({
-                        date: row.querySelector('.row-date').value,
-                        branch: branch,
-                        name: name,
-                        customerNo: "", 
-                        media: row.querySelector('.row-media').value,
-                        contact: row.querySelector('.row-contact').value,
-                        category: finalCategory,
-                        product: row.querySelector('.row-product').value,
-                        status: row.querySelector('.row-status').value
-                    });
-                }
-            });
-
-            if (hasError) {
-                showToast("Lütfen Şube ve Müşteri Adı zorunlu alanlarını doldurunuz.", "error");
-                return;
-            }
-
-            if (dataToSave.length === 0) return;
-
-            const btn = document.getElementById('saveBulkBtn');
-            const origHTML = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kaydediliyor...';
-            btn.disabled = true;
-
-            try {
-                const resData = await safeFetch({
-                    action: 'addCustomersBulk', 
-                    data: dataToSave, 
-                    token: sessionStorage.getItem('authToken') 
-                });
-                
-                if(resData.status === 'success') {
-                    showToast(resData.message || `${dataToSave.length} Kayıt Başarıyla Eklendi!`);
-                    closeAddModal();
-                    refreshData(true); 
-                } else {
-                    throw new Error(resData.message || "Bilinmeyen Hata");
-                }
-            } catch (err) {
-                showToast("Hata: " + err.message, "error");
-            } finally {
-                btn.innerHTML = origHTML;
-                btn.disabled = false;
-            }
         }
 
         function setupSequentialFlow() {
