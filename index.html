@@ -639,22 +639,26 @@
         // ===============================================
         async function safeFetch(payload) {
             const fetchUrl = API_URL + (API_URL.includes('?') ? '&' : '?') + 'nocache=' + new Date().getTime();
-            const retryDelays = [1000, 2000, 4000, 8000, 16000]; // Eksponansiyel Geri Çekilme (Exponential Backoff)
+            const retryDelays = [800, 1500];
             let lastError;
 
             for (let i = 0; i <= retryDelays.length; i++) {
                 try {
-                    // Cihazın interneti kökten yoksa boşuna bekletme
                     if (!navigator.onLine) {
                         throw new Error("İnternet bağlantısı yok.");
                     }
+
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 18000);
 
                     const response = await fetch(fetchUrl, {
                         method: 'POST',
                         headers: { "Content-Type": "text/plain;charset=utf-8" },
                         body: JSON.stringify(payload),
-                        redirect: 'follow'
+                        redirect: 'follow',
+                        signal: controller.signal
                     });
+                    clearTimeout(timeoutId);
 
                     if (!response.ok) {
                         throw new Error("HTTP Hatası: " + response.status);
@@ -664,20 +668,21 @@
                     try {
                         return JSON.parse(text);
                     } catch (parseErr) {
-                        // Gelen veri JSON değilse (örn: Google HTML hata sayfası) sunucu yoğun/düşmüş olabilir, tekrar dene
-                        throw new Error("Sunucudan geçersiz bir veri alındı (Muhtemelen aşırı yoğunluk).");
+                        throw new Error("Sunucudan geçersiz yanıt alındı.");
                     }
 
                 } catch (err) {
-                    lastError = err;
+                    if (err.name === 'AbortError') {
+                        lastError = new Error("İşlem zaman aşımına uğradı (Sunucu yanıt vermedi).");
+                    } else {
+                        lastError = err;
+                    }
                     if (i < retryDelays.length) {
-                        // Arka planda sessizce bekleyip tekrar dener
                         await new Promise(resolve => setTimeout(resolve, retryDelays[i]));
                     }
                 }
             }
-            // Tüm denemeler bitti ve hala ulaşılamadıysa:
-            throw new Error(lastError && lastError.message ? lastError.message : "Bağlantı koptu veya sunucu yanıt vermiyor. Lütfen internetinizi kontrol edin.");
+            throw new Error(lastError && lastError.message ? lastError.message : "Sunucuya ulaşılamadı. Lütfen internetinizi kontrol edin.");
         }
 
         // ===============================================
