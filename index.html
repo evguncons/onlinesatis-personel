@@ -189,7 +189,23 @@
             </div>
             
             <div class="flex-1 w-full xl:w-auto mt-2 xl:mt-0">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
+                    <div class="bg-white/80 p-3 rounded-2xl border border-pink-100 shadow-sm flex flex-col justify-between">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center shrink-0"><i class="fas fa-bullseye text-sm"></i></div>
+                                <div class="text-[10px] md:text-xs uppercase font-bold text-pink-500 tracking-wider">Bugün Arama Hedefi</div>
+                            </div>
+                            <div class="text-sm md:text-base font-extrabold text-slate-800" id="metricDailyCalls">0 / 30</div>
+                        </div>
+                        <div class="w-full bg-slate-100 h-2 rounded-full mt-2 overflow-hidden">
+                            <div id="metricDailyProgressBar" class="bg-gradient-to-r from-pink-500 to-rose-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-semibold mt-1 flex justify-between">
+                            <span id="metricDailyPct">%0 tamamlandı</span>
+                            <span id="metricDailyStatus" class="font-bold text-pink-600">Hedefe 30 kaldı</span>
+                        </div>
+                    </div>
                     <div class="bg-white/80 p-3 rounded-2xl border border-purple-100 shadow-sm flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center shrink-0 hidden sm:flex"><i class="fas fa-wallet text-lg"></i></div>
                         <div>
@@ -375,7 +391,10 @@
                                 <input type="text" id="m_name" class="modern-input">
                             </div>
                             <div>
-                                <label for="m_contact" class="text-xs md:text-sm font-bold text-slate-600 mb-1.5 block">Telefon</label>
+                                <div class="flex justify-between items-center mb-1.5">
+                                    <label for="m_contact" class="text-xs md:text-sm font-bold text-slate-600 block">Telefon</label>
+                                    <a id="m_whatsappBtn" href="#" target="_blank" class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 transition"><i class="fab fa-whatsapp text-sm"></i> WhatsApp</a>
+                                </div>
                                 <input type="text" id="m_contact" class="modern-input">
                             </div>
                             <div>
@@ -438,6 +457,15 @@
                             <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-100 shadow-sm transition-all" id="step3box">
                                 <label for="m_note" class="text-xs md:text-sm font-bold text-slate-700 mb-2 md:mb-3 block">3. Personel Notu</label>
                                 <textarea id="m_note" class="modern-input resize-none overflow-hidden min-h-[80px]" placeholder="Detay ekle..." oninput="autoResize(this)" disabled></textarea>
+                                <div class="flex flex-wrap items-center gap-1.5 mt-3 pt-2 border-t border-slate-100">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase w-full mb-0.5"><i class="fas fa-bolt text-amber-500 mr-1"></i> Hızlı Not Şablonları:</span>
+                                    <button type="button" onclick="appendQuickNote('Meşgule Attı')" class="text-xs font-bold px-3 py-1.5 bg-slate-50 hover:bg-pink-50 hover:text-pink-600 text-slate-600 rounded-xl border border-slate-200 hover:border-pink-200 transition active:scale-95">+ Meşgule Attı</button>
+                                    <button type="button" onclick="appendQuickNote('Cevap Vermedi')" class="text-xs font-bold px-3 py-1.5 bg-slate-50 hover:bg-pink-50 hover:text-pink-600 text-slate-600 rounded-xl border border-slate-200 hover:border-pink-200 transition active:scale-95">+ Cevap Vermedi</button>
+                                    <button type="button" onclick="appendQuickNote('Fiyat Yüksek Buldu')" class="text-xs font-bold px-3 py-1.5 bg-slate-50 hover:bg-pink-50 hover:text-pink-600 text-slate-600 rounded-xl border border-slate-200 hover:border-pink-200 transition active:scale-95">+ Fiyat Yüksek Buldu</button>
+                                    <button type="button" onclick="appendQuickNote('Eşiyle Danışacak')" class="text-xs font-bold px-3 py-1.5 bg-slate-50 hover:bg-pink-50 hover:text-pink-600 text-slate-600 rounded-xl border border-slate-200 hover:border-pink-200 transition active:scale-95">+ Eşiyle Danışacak</button>
+                                    <button type="button" onclick="appendQuickNote('Limit Yetersiz')" class="text-xs font-bold px-3 py-1.5 bg-slate-50 hover:bg-pink-50 hover:text-pink-600 text-slate-600 rounded-xl border border-slate-200 hover:border-pink-200 transition active:scale-95">+ Limit Yetersiz</button>
+                                    <button type="button" onclick="appendQuickNote('Maaş Günü Arayın')" class="text-xs font-bold px-3 py-1.5 bg-slate-50 hover:bg-pink-50 hover:text-pink-600 text-slate-600 rounded-xl border border-slate-200 hover:border-pink-200 transition active:scale-95">+ Maaş Günü Arayın</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -546,6 +574,36 @@
                 .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
                 .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
                 .replace(/i̇/g, 'i');
+        }
+
+        function getWhatsAppUrl(contact, name, product, category) {
+            if (!contact) return '#';
+            let digits = String(contact).replace(/\D/g, '');
+            if (digits.startsWith('90') && digits.length === 12) {
+                // already has 90
+            } else if (digits.startsWith('0') && digits.length === 11) {
+                digits = '90' + digits.substring(1);
+            } else if (digits.length === 10) {
+                digits = '90' + digits;
+            }
+            const cleanName = name ? name.trim() : 'Müşterimiz';
+            const prod = (product && product.trim() !== '') ? product.trim() : ((category && category.trim() !== '') ? category.trim() : 'ürünlerimiz');
+            const msg = `Merhaba ${cleanName}, Hedef AVM'den arıyorum. İlgilendiğiniz ${prod} hakkında kampanyalı fiyat ve elden senetli taksit imkanlarımızla ilgili bilgi vermek için ulaşıyorum. Size nasıl yardımcı olabilirim?`;
+            return `https://wa.me/${digits}?text=${encodeURIComponent(msg)}`;
+        }
+
+        function appendQuickNote(text) {
+            const noteEl = document.getElementById('m_note');
+            if (!noteEl || noteEl.disabled) return;
+            const cur = noteEl.value.trim();
+            if (cur === "") {
+                noteEl.value = text;
+            } else {
+                if (!cur.includes(text)) {
+                    noteEl.value = cur + ", " + text;
+                }
+            }
+            autoResize(noteEl);
         }
 
         function formatMoney(amount) {
@@ -973,6 +1031,13 @@
             let monthRevenue = 0;
             let calledCount = 0;
             let salesCount = 0;
+            let todayCalledCount = 0;
+
+            const now = new Date();
+            const todayD = String(now.getDate()).padStart(2, '0');
+            const todayM = String(now.getMonth() + 1).padStart(2, '0');
+            const todayY = now.getFullYear();
+            const todayPrefix = `${todayD}.${todayM}.${todayY}`;
 
             allRecords.forEach(item => {
                 let amount = parseCurrency(item.amount !== undefined && item.amount !== '' ? item.amount : item.revenue);
@@ -983,6 +1048,9 @@
                 if (statusStr === 'arandı') {
                     calledCount++;
                     if (isSold) salesCount++;
+                    if (item.date && String(item.date).includes(todayPrefix)) {
+                        todayCalledCount++;
+                    }
                 }
 
                 if (isSold && amount > 0) {
@@ -999,6 +1067,25 @@
             const conversionRate = calledCount > 0 ? ((salesCount / calledCount) * 100).toFixed(1) : 0;
             if(metricConv) metricConv.textContent = `%${conversionRate}`;
             if(metricConvDetail) metricConvDetail.textContent = `${salesCount} / ${calledCount} Müşteri`;
+
+            // Günlük Hedef Metrikleri (Gamification)
+            const dailyTarget = 30;
+            const pct = Math.min(100, Math.round((todayCalledCount / dailyTarget) * 100));
+            const metricDailyCalls = document.getElementById('metricDailyCalls');
+            const metricDailyProgressBar = document.getElementById('metricDailyProgressBar');
+            const metricDailyPct = document.getElementById('metricDailyPct');
+            const metricDailyStatus = document.getElementById('metricDailyStatus');
+
+            if (metricDailyCalls) metricDailyCalls.textContent = `${todayCalledCount} / ${dailyTarget}`;
+            if (metricDailyProgressBar) metricDailyProgressBar.style.width = `${pct}%`;
+            if (metricDailyPct) metricDailyPct.textContent = `%${pct} tamamlandı`;
+            if (metricDailyStatus) {
+                if (todayCalledCount >= dailyTarget) {
+                    metricDailyStatus.innerHTML = '<span class="text-emerald-500 font-bold">🎉 Hedefe Ulaşıldı!</span>';
+                } else {
+                    metricDailyStatus.textContent = `Hedefe ${dailyTarget - todayCalledCount} kaldı`;
+                }
+            }
         }
 
         async function refreshData(isBackground = false, showLoading = false) {
@@ -1105,7 +1192,8 @@
             
             const rawTerm = document.getElementById('searchInput').value.trim();
             const termNorm = normalizeSearchText(rawTerm);
-            const termNoSpace = rawTerm.replace(/\s+/g, '');
+            const termDigits = rawTerm.replace(/\D/g, '');
+            const termDigitsNoZero = termDigits.replace(/^0+/, '');
             
             const statusFilter = document.getElementById('filterStatus').value.toLocaleLowerCase('tr-TR');
             
@@ -1126,11 +1214,37 @@
                 if ((activeFilterMode === 'overdue' || activeFilterMode === 'missingInfo') && rawTerm === '') return true; 
 
                 const nameNorm = normalizeSearchText(item.name);
-                const contactNoSpace = (item.contact || "").toString().replace(/\s+/g, '');
+                const productNorm = normalizeSearchText(item.product);
+                const categoryNorm = normalizeSearchText(item.category);
+                const customerNoNorm = normalizeSearchText(item.customerNo);
+                const noteNorm = normalizeSearchText(item.note);
+
+                const rawContact = String(item.contact || "");
+                const contactDigits = rawContact.replace(/\D/g, '');
+                const contactDigitsNoZero = contactDigits.replace(/^0+/, '');
+
+                let matchesSearch = rawTerm === "";
+                if (!matchesSearch) {
+                    const textMatch = nameNorm.includes(termNorm) || 
+                                      customerNoNorm.includes(termNorm) || 
+                                      productNorm.includes(termNorm) || 
+                                      categoryNorm.includes(termNorm) ||
+                                      noteNorm.includes(termNorm);
+
+                    let phoneMatch = false;
+                    if (termDigits.length >= 2) {
+                        phoneMatch = contactDigits.includes(termDigits) ||
+                                     (termDigitsNoZero !== "" && contactDigitsNoZero.includes(termDigitsNoZero)) ||
+                                     (contactDigitsNoZero !== "" && termDigitsNoZero.includes(contactDigitsNoZero));
+                    } else if (rawTerm.length > 0) {
+                        phoneMatch = normalizeSearchText(rawContact).includes(termNorm);
+                    }
+
+                    matchesSearch = textMatch || phoneMatch;
+                }
+                
                 const rawStatus = (item.status || "").toString().trim().toLocaleLowerCase('tr-TR');
                 const rawResult = (item.result || "").toString().trim().toLocaleLowerCase('tr-TR');
-
-                const matchesSearch = rawTerm === "" || nameNorm.includes(termNorm) || (termNoSpace !== "" && contactNoSpace.includes(termNoSpace));
                 
                 let matchesStatus = true;
                 if (statusFilter === "aranmadı" || statusFilter === "arandı") matchesStatus = rawStatus === statusFilter;
@@ -1199,9 +1313,12 @@
                         </div>
                     </td>
                     <td data-label="İletişim">
-                        <div class="text-sm font-semibold text-slate-600 flex items-center justify-end md:justify-start gap-2">
-                            ${escapeHTML(item.contact) || '-'} 
-                            <a href="tel:${escapeHTML(item.contact)}" class="md:hidden w-8 h-8 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-full"><i class="fas fa-phone"></i></a>
+                        <div class="text-sm font-semibold text-slate-600 flex items-center justify-end md:justify-start gap-2 flex-wrap">
+                            <span>${escapeHTML(item.contact) || '-'}</span> 
+                            ${item.contact ? `
+                                <a href="${getWhatsAppUrl(item.contact, item.name, item.product, item.category)}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-full transition shadow-sm border border-emerald-200" title="WhatsApp Mesajı Gönder"><i class="fab fa-whatsapp text-base"></i></a>
+                                <a href="tel:${escapeHTML(item.contact).replace(/[^\d+]/g, '')}" class="md:hidden w-8 h-8 flex items-center justify-center bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100" title="Ara"><i class="fas fa-phone"></i></a>
+                            ` : ''}
                         </div>
                     </td>
                     <td data-label="Ürün">
@@ -1263,6 +1380,11 @@
                 const el = document.getElementById(id);
                 if(el) el.value = item[id.replace('m_','')] || '';
             });
+
+            const waBtn = document.getElementById('m_whatsappBtn');
+            if (waBtn) {
+                waBtn.href = getWhatsAppUrl(item.contact, item.name, item.product, item.category);
+            }
             
             const st = (item.status || "").trim().toLocaleLowerCase('tr-TR');
             const stEl = document.getElementById('m_status');
@@ -1339,11 +1461,6 @@
                 els.order.classList.add('input-error'); showToast("Satış Durumunu seçiniz.", "error"); return;
             }
 
-            const btn = document.getElementById('updateBtn');
-            const origHtml = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kaydediliyor...'; 
-            btn.disabled = true;
-
             let resultToSend = vals.result;
             let finalIsOrder = vals.order;
             let finalAmount = vals.amount;
@@ -1375,38 +1492,41 @@
                 customerNo: vals.customerNo
             };
 
-            try {
-                const resData = await safeFetch({
-                    action: 'updateCustomer', 
-                    data: formData, 
-                    token: sessionStorage.getItem('authToken') 
-                });
-                
-                if(resData.status === 'success') {
-                    showToast("Müşteri başarıyla güncellendi!");
-                    closeEditModal();
-                    
-                    const targetIndex = allRecords.findIndex(r => String(r.rowIndex) === String(rowIndexStr));
-                    if (targetIndex !== -1) {
-                        allRecords[targetIndex] = { ...allRecords[targetIndex], ...formData };
-                        allRecords = deduplicateRecords(allRecords);
-                        updateDashboardMetrics(); 
-                        renderTable();
-                        checkOverdueFollowUps(allRecords);
-                        checkMissingInfo(allRecords); 
-                    } else { refreshData(true); }
-                } else {
-                    throw new Error(resData.message || "Bilinmeyen hata.");
-                }
-            } catch(err) { 
-                if (finalCategory.includes('LİMİT ÖĞREN')) {
-                     showToast("HATA: Lütfen E-Tablodaki (Excel) Kategori açılır listesine 'LİMİT ÖĞREN' seçeneğini ekleyin!", "error");
-                } else {
-                     showToast("Bağlantı hatası: " + err.message, "error");
-                }
-            } finally {
-                btn.innerHTML = origHtml; btn.disabled = false; 
+            // 🚀 ANINDA MODAL KAPATMA & ANINDA ARAYÜZ GÜNCELLEMESİ (Optimistic UI - Sıfır Bekleme)
+            closeEditModal();
+            showToast("✓ Kaydedildi, senkronize ediliyor...", "success");
+
+            const targetIndex = allRecords.findIndex(r => String(r.rowIndex) === String(rowIndexStr));
+            let backupRecord = null;
+            if (targetIndex !== -1) {
+                backupRecord = { ...allRecords[targetIndex] };
+                allRecords[targetIndex] = { ...allRecords[targetIndex], ...formData };
+                allRecords = deduplicateRecords(allRecords);
+                updateDashboardMetrics(); 
+                renderTable();
+                checkOverdueFollowUps(allRecords);
+                checkMissingInfo(allRecords); 
             }
+
+            // Arka planda Google Sheets'e kaydet (Kullanıcı beklemez)
+            safeFetch({
+                action: 'updateCustomer', 
+                data: formData, 
+                token: sessionStorage.getItem('authToken') 
+            }).then(resData => {
+                if (resData && resData.status === 'success') {
+                    showToast("✓ Google E-Tabloya başarıyla işlendi!");
+                } else {
+                    throw new Error((resData && resData.message) || "Sunucu hatası.");
+                }
+            }).catch(err => {
+                showToast("⚠️ Kayıt E-Tabloya işlenemedi: " + err.message, "error");
+                if (backupRecord && targetIndex !== -1) {
+                    allRecords[targetIndex] = backupRecord;
+                    updateDashboardMetrics();
+                    renderTable();
+                }
+            });
         });
 
         function exportToExcel() {
