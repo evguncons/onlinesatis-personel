@@ -506,6 +506,46 @@
         </div>
     </div>
 
+    <!-- MÜKERRER SATIŞ UYARI MODALI -->
+    <div id="duplicateWarningModal" class="fixed inset-0 z-[90] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-amber-200 overflow-hidden transform transition-all p-6 sm:p-7 animate-in fade-in zoom-in-95 duration-200">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 text-2xl shadow-inner border border-amber-200">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-slate-800 text-lg sm:text-xl">Mükerrer Satış Uyarısı</h3>
+                    <p class="text-xs text-amber-600 font-bold uppercase tracking-wider mt-0.5">Dikkat: Kayıt Zaten Mevcut</p>
+                </div>
+            </div>
+
+            <div class="bg-amber-50/90 rounded-2xl p-4 border border-amber-200/80 mb-6">
+                <p class="text-sm font-bold text-slate-800 leading-relaxed" id="duplicateWarningText">
+                    Bu müşterinin bu ay için satış kaydı zaten işlendi!
+                </p>
+                <div class="mt-3 pt-3 border-t border-amber-200/70 text-xs font-semibold text-slate-600 space-y-1" id="duplicateWarningDetails">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500">Mevcut Satış Tutarı:</span>
+                        <span id="duplicateWarningAmount" class="text-base font-extrabold text-emerald-600">0 ₺</span>
+                    </div>
+                    <div class="flex justify-between items-center" id="duplicateWarningDateRow">
+                        <span class="text-slate-500">Kayıt Tarihi:</span>
+                        <span id="duplicateWarningDate" class="font-bold text-slate-700">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <button type="button" onclick="closeDuplicateWarning(false)" class="w-full py-3.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold rounded-2xl transition text-sm active:scale-95 border border-slate-200 text-center">
+                    Tamam
+                </button>
+                <button type="button" onclick="closeDuplicateWarning(true)" class="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold rounded-2xl shadow-lg shadow-amber-500/25 transition text-sm active:scale-95 text-center">
+                    Devam Et
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbwQ7j5NSTaojKhdVKPehsYKqZSCljBBzvywmCf8S7ZXSAYjz3OsXUOMG-9NnMZdRzht/exec'; 
         
@@ -648,25 +688,43 @@
                 const isAranmadi = statusLower === "aranmadı" || statusLower === "";
 
                 if (!map.has(key)) {
-                    map.set(key, item);
+                    map.set(key, { ...item, existingSales: Array.isArray(item.existingSales) ? [...item.existingSales] : [] });
                 } else {
                     const existing = map.get(key);
                     const existingStatusLower = String(existing.status || "").trim().toLowerCase();
                     const existingIsAranmadi = existingStatusLower === "aranmadı" || existingStatusLower === "";
 
+                    const mergedSales = [...(existing.existingSales || [])];
+                    if (Array.isArray(item.existingSales)) {
+                        for (const s of item.existingSales) {
+                            if (!mergedSales.some(m => String(m.rowIndex) === String(s.rowIndex))) {
+                                mergedSales.push(s);
+                            }
+                        }
+                    }
+
                     // ÖNCELİK KURALI:
                     // Müşterinin eski kaydı satışa dönmüş/aranmış olsa bile yeni yönlendirme 'aranmadı' ise, personelin es geçmemesi için 'aranmadı' olanı göster
+                    let chosenItem;
                     if (isAranmadi && !existingIsAranmadi) {
-                        map.set(key, item);
+                        chosenItem = { ...item };
                     } else if (isAranmadi && existingIsAranmadi) {
                         if (Number(item.rowIndex || 0) >= Number(existing.rowIndex || 0)) {
-                            map.set(key, item);
+                            chosenItem = { ...item };
+                        } else {
+                            chosenItem = existing;
                         }
                     } else if (!isAranmadi && !existingIsAranmadi) {
                         if (Number(item.rowIndex || 0) >= Number(existing.rowIndex || 0)) {
-                            map.set(key, item);
+                            chosenItem = { ...item };
+                        } else {
+                            chosenItem = existing;
                         }
+                    } else {
+                        chosenItem = existing;
                     }
+                    chosenItem.existingSales = mergedSales;
+                    map.set(key, chosenItem);
                 }
             }
 
@@ -685,6 +743,127 @@
         let currentPage = 1;
         const rowsPerPage = 10;
         let activeFilterMode = 'default';
+
+        // Mükerrer Satış Kontrol Durumu
+        let isDuplicateConfirmed = false;
+        let pendingSubmitAfterConfirm = false;
+        window.customerSalesMap = {};
+
+        function findDuplicateSale(targetAmount) {
+            const numericTarget = parseCurrency(targetAmount);
+            if (!numericTarget || numericTarget <= 0) return null;
+
+            const currentRowIndex = String(document.getElementById('m_rowIndex').value || '').trim();
+            const name = document.getElementById('m_name').value;
+            const contact = document.getElementById('m_contact').value;
+            const customerNo = document.getElementById('m_customerNo').value;
+
+            const currentItem = {
+                rowIndex: currentRowIndex,
+                name: name,
+                contact: contact,
+                customerNo: customerNo
+            };
+            const custKey = getCustomerKey(currentItem);
+            const compContact = getCompareNum(contact);
+
+            // 1. Düzenlenen kaydın existingSales geçmişini kontrol et (Aynı aydaki diğer satışları)
+            let currentRec = allRecords.find(r => String(r.rowIndex).trim() === currentRowIndex);
+            if (currentRec && Array.isArray(currentRec.existingSales)) {
+                for (const s of currentRec.existingSales) {
+                    if (String(s.rowIndex).trim() !== currentRowIndex && Math.abs(parseCurrency(s.amount) - numericTarget) < 0.01) {
+                        return s;
+                    }
+                }
+            }
+
+            // 2. window.customerSalesMap varsa kontrol et
+            if (window.customerSalesMap) {
+                let salesList = (custKey && window.customerSalesMap[custKey]) ? window.customerSalesMap[custKey] : [];
+                if (salesList.length === 0 && compContact && compContact.length >= 7) {
+                    salesList = window.customerSalesMap['tel:' + compContact] || [];
+                }
+                for (const s of salesList) {
+                    if (String(s.rowIndex).trim() !== currentRowIndex && Math.abs(parseCurrency(s.amount) - numericTarget) < 0.01) {
+                        return s;
+                    }
+                }
+            }
+
+            // 3. allRecords içinde aynı müşteriye ait diğer satış kayıtlarını kontrol et
+            for (const r of allRecords) {
+                if (String(r.rowIndex).trim() === currentRowIndex) continue;
+                const rKey = getCustomerKey(r);
+                const rComp = getCompareNum(r.contact);
+                const isSameCustomer = (custKey && rKey === custKey) || (compContact && compContact.length >= 7 && rComp === compContact);
+                if (isSameCustomer) {
+                    const isSold = String(r.isOrder || "").toLowerCase() === 'evet' || String(r.result || "").toLowerCase() === 'satışa döndü';
+                    const rAmount = parseCurrency(getRevenue(r));
+                    if (isSold && Math.abs(rAmount - numericTarget) < 0.01) {
+                        return {
+                            rowIndex: r.rowIndex,
+                            amount: rAmount,
+                            date: r.date || '-'
+                        };
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        function showDuplicateWarning(dupSale, isSubmit = false) {
+            pendingSubmitAfterConfirm = isSubmit;
+            const modal = document.getElementById('duplicateWarningModal');
+            const amtEl = document.getElementById('duplicateWarningAmount');
+            const dateEl = document.getElementById('duplicateWarningDate');
+            const dateRow = document.getElementById('duplicateWarningDateRow');
+
+            if (amtEl) amtEl.textContent = formatMoney(dupSale.amount || 0);
+            if (dateEl) {
+                if (dupSale.date && dupSale.date !== '-') {
+                    dateEl.textContent = dupSale.date;
+                    if (dateRow) dateRow.style.display = 'flex';
+                } else {
+                    if (dateRow) dateRow.style.display = 'none';
+                }
+            }
+
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeDuplicateWarning(proceed) {
+            const modal = document.getElementById('duplicateWarningModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
+
+            if (proceed) {
+                // "Devam Et" tıklandı: Kullanıcı bilerek aynı tutarı girmek istiyor
+                isDuplicateConfirmed = true;
+                if (pendingSubmitAfterConfirm) {
+                    pendingSubmitAfterConfirm = false;
+                    const editForm = document.getElementById('editForm');
+                    if (editForm) {
+                        editForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                    }
+                }
+            } else {
+                // "Tamam" tıklandı: Mükerrer giriş engellenir, tutar temizlenir
+                pendingSubmitAfterConfirm = false;
+                isDuplicateConfirmed = false;
+                const amountInput = document.getElementById('m_amount');
+                if (amountInput) {
+                    amountInput.value = '';
+                    amountInput.focus();
+                }
+                showToast("Mükerrer satış girişi iptal edildi. Tutar temizlendi.", "error");
+            }
+        }
 
         let searchTimeout;
         function handleSearch() {
@@ -775,6 +954,23 @@
             fetchBranches();
             setupSequentialFlow(); 
             
+            // Mükerrer Satış Kontrolü Dinleyicileri
+            const amtEl = document.getElementById('m_amount');
+            if (amtEl) {
+                amtEl.addEventListener('input', () => {
+                    isDuplicateConfirmed = false;
+                });
+                amtEl.addEventListener('change', () => {
+                    const isOrder = document.getElementById('m_isOrder').value;
+                    if (isOrder === 'Evet' && !isDuplicateConfirmed && amtEl.value) {
+                        const dup = findDuplicateSale(amtEl.value);
+                        if (dup) {
+                            showDuplicateWarning(dup, false);
+                        }
+                    }
+                });
+            }
+
             document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
             
             document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -1113,6 +1309,7 @@
                     throw new Error(data.message || data.error);
                 }
                 
+                window.customerSalesMap = data.customerSales || {};
                 allRecords = deduplicateRecords(data.records || []);
                 
                 updateDashboardMetrics(); 
@@ -1373,6 +1570,8 @@
 
         function openEditModal(index) {
             document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+            isDuplicateConfirmed = false;
+            pendingSubmitAfterConfirm = false;
             const item = allRecords[index];
             if(!item) return;
 
@@ -1408,6 +1607,8 @@
         }
 
         function closeEditModal() { 
+            isDuplicateConfirmed = false;
+            pendingSubmitAfterConfirm = false;
             const modal = document.getElementById('editModal');
             modal.firstElementChild.classList.add('translate-y-full');
             setTimeout(() => {
@@ -1472,6 +1673,15 @@
                 numericAmount = parseCurrency(finalAmount);
                 if (isNaN(numericAmount) || numericAmount === null) {
                     numericAmount = 0;
+                }
+            }
+
+            // Mükerrer satış kontrolü: Aynı müşteriye bu ay aynı tutarda satış işlenmiş mi?
+            if (finalIsOrder === 'Evet' && numericAmount > 0 && !isDuplicateConfirmed) {
+                const dup = findDuplicateSale(numericAmount);
+                if (dup) {
+                    showDuplicateWarning(dup, true);
+                    return;
                 }
             }
             
