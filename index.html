@@ -159,6 +159,7 @@
                 <p id="loginError" class="mt-6 p-4 bg-red-500/20 border border-red-500/50 rounded-2xl text-red-100 text-center text-sm font-medium hidden backdrop-blur-sm"></p>
             </div>
 
+            <button id="leaderboardLoadBtn" type="button" onclick="loadLeaderboard()" class="text-white/80 text-sm py-2">Şube sıralamasını göster</button>
             <div id="loginLeaderboard" class="bg-black/30 backdrop-blur-md border border-white/10 p-6 rounded-[32px] hidden w-full shadow-2xl">
                 <h3 class="text-pink-200 text-xs font-bold uppercase tracking-widest mb-4 text-center border-b border-white/10 pb-3 flex items-center justify-center gap-2"><i class="fas fa-trophy text-yellow-400 text-base"></i> Ayın Ciro Şampiyonları</h3>
                 <div class="space-y-2" id="leaderboardList"></div>
@@ -900,10 +901,32 @@
             }
         }
 
+        function nativeRequest(payload) {
+            return new Promise((resolve, reject) => {
+                let settled = false;
+                const finish = (fn, value) => {
+                    if (settled) return;
+                    settled = true; clearTimeout(timer); fn(value);
+                };
+                const timer = setTimeout(() => finish(reject, Object.assign(new Error('Sunucu yanıtı bekleniyor.'), {retryable: true})), 60000);
+                try {
+                    google.script.run
+                        .withSuccessHandler(result => {
+                            if (!result || typeof result !== 'object') finish(reject, new Error('Geçersiz sunucu yanıtı.'));
+                            else if (result.retryable) finish(reject, Object.assign(new Error(result.message || 'Sunucu meşgul.'), {retryable: true}));
+                            else finish(resolve, result);
+                        })
+                        .withFailureHandler(() => finish(reject, Object.assign(new Error('Sunucu bağlantısı yenileniyor.'), {retryable: true})))
+                        .panelRequest(payload);
+                } catch (error) { finish(reject, error); }
+            });
+        }
+
         async function fetchOnce(payload) {
             if (!navigator.onLine) throw Object.assign(new Error("İnternet bağlantısı yok."), { retryable: true });
+            if (typeof google !== 'undefined' && google.script && google.script.run) return nativeRequest(payload);
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), payload.action === 'getLeaderboard' ? 60000 : 30000);
+            const timeoutId = setTimeout(() => controller.abort(), ['login', 'getRecentRecords', 'getLeaderboard'].includes(payload.action) ? 60000 : 30000);
             try {
                 // Her isteğin URL'si farklı olmalı: önbellekteki GET/yönlendirme
                 // yanıtı POST işleminin yerine kullanılmamalı. Kimlik bilgileri gövdede kalır.
@@ -1007,11 +1030,11 @@
                 errorMsg.classList.add('hidden');
 
                 try {
-                    const result = await safeFetch({ action: 'login', data: { branch, password } });
+                    const result = await safeFetch({ action: 'login', data: { branch, password, includeRecords: true, month: document.getElementById('monthFilter').value } });
                     
                     if(result.status === 'success') {
                         sessionStorage.setItem('authToken', result.token);
-                        loginSuccess(branch);
+                        loginSuccess(branch, result.initialData, result.month);
                     } else {
                         errorMsg.textContent = result.message || "Giriş başarısız. Lütfen şifrenizi kontrol ediniz.";
                         errorMsg.classList.remove('hidden');
@@ -1175,7 +1198,13 @@
                 option.value = branch; option.textContent = branch;
                 select.appendChild(option);
             });
-            // Sıralama giriş için zorunlu değildir; şube seçimi ağ isteğini beklemez.
+        }
+
+        async function loadLeaderboard() {
+            const button = document.getElementById('leaderboardLoadBtn');
+            if (button.disabled) return;
+            button.disabled = true;
+            button.textContent = 'Sıralama hazırlanıyor...';
             try {
                 const data = await safeFetch({ action: 'getLeaderboard' });
                 if (data.status === 'error' || !Array.isArray(data.leaderboard)) throw new Error(data.message || 'Sıralama alınamadı.');
@@ -1184,6 +1213,9 @@
             } catch (error) {
                 console.warn('Liderlik tablosu yüklenemedi:', error.message);
                 document.getElementById('loginLeaderboard').classList.add('hidden');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Şube sıralamasını göster';
             }
         }
 
@@ -1192,6 +1224,7 @@
             const listEl = document.getElementById('leaderboardList');
             if (!container || !listEl) return;
             if (!list || list.length === 0) { container.classList.add('hidden'); return; }
+            container.classList.remove('hidden');
 
             const top3 = [...list].sort((a, b) => parseCurrency(getRevenue(b)) - parseCurrency(getRevenue(a))).slice(0, 3);
             
@@ -1212,13 +1245,19 @@
             } else { container.classList.add('hidden'); }
         }
 
-        function loginSuccess(branch) {
+        function loginSuccess(branch, initialData, initialMonth) {
             currentBranch = branch;
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('headerTitle').textContent = branch.toUpperCase();
             
-            refreshData(false, true); 
+            if (initialData && !initialData.error && Array.isArray(initialData.records) && initialMonth === document.getElementById('monthFilter').value) {
+                allRecords = deduplicateRecords(initialData.records);
+                window.customerSalesMap = initialData.customerSales || {};
+                loadedRecordsKey = branch + ':' + initialMonth;
+                updateDashboardMetrics(); checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords); renderTable();
+                document.getElementById('lastTime').textContent = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+            } else { refreshData(false, true); } 
             
             setInterval(() => {
                 const modal = document.getElementById('editModal');
