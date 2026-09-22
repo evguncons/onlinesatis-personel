@@ -881,54 +881,42 @@
         }
 
         // ===============================================
-        // MÜKEMMEL FETCH YARDIMCISI (AUTO-RETRY KALKANI)
+        // POST istekleri ve Apps Script yönlendirme önbelleği kontrolü
         // ===============================================
         async function safeFetch(payload) {
-            const fetchUrl = API_URL + (API_URL.includes('?') ? '&' : '?') + 'nocache=' + new Date().getTime();
-            const retryDelays = [800, 1500];
-            let lastError;
-
-            for (let i = 0; i <= retryDelays.length; i++) {
-                try {
-                    if (!navigator.onLine) {
-                        throw new Error("İnternet bağlantısı yok.");
-                    }
-
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 18000);
-
-                    const response = await fetch(fetchUrl, {
-                        method: 'POST',
-                        headers: { "Content-Type": "text/plain;charset=utf-8" },
-                        body: JSON.stringify(payload),
-                        redirect: 'follow',
-                        signal: controller.signal
-                    });
-                    clearTimeout(timeoutId);
-
-                    if (!response.ok) {
-                        throw new Error("HTTP Hatası: " + response.status);
-                    }
-
-                    const text = await response.text();
-                    try {
-                        return JSON.parse(text);
-                    } catch (parseErr) {
-                        throw new Error("Sunucudan geçersiz yanıt alındı.");
-                    }
-
-                } catch (err) {
-                    if (err.name === 'AbortError') {
-                        lastError = new Error("İşlem zaman aşımına uğradı (Sunucu yanıt vermedi).");
-                    } else {
-                        lastError = err;
-                    }
-                    if (i < retryDelays.length) {
-                        await new Promise(resolve => setTimeout(resolve, retryDelays[i]));
-                    }
+            if (!navigator.onLine) throw new Error("İnternet bağlantısı yok.");
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), payload.action === 'getLeaderboard' ? 60000 : 30000);
+            try {
+                // Her isteğin URL'si farklı olmalı: önbellekteki GET/yönlendirme
+                // yanıtı POST işleminin yerine kullanılmamalı. Kimlik bilgileri gövdede kalır.
+                const requestId = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+                const requestUrl = API_URL + (API_URL.includes('?') ? '&' : '?') + '_request=' + requestId;
+                const response = await fetch(requestUrl, {
+                    method: 'POST',
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify(payload),
+                    redirect: 'follow', cache: 'no-store', credentials: 'omit', signal: controller.signal
+                });
+                if (!response.ok) throw new Error("Sunucu hatası (HTTP " + response.status + ").");
+                const text = await response.text();
+                let result;
+                try { result = JSON.parse(text); }
+                catch (_) { throw new Error("Sunucudan geçersiz yanıt alındı. Apps Script dağıtımını kontrol edin."); }
+                if (!result || typeof result !== 'object' || Array.isArray(result)) throw new Error("Sunucu yanıtı geçersiz.");
+                if (result.code === 'METHOD_NOT_ALLOWED' || /Sadece POST desteklenir/i.test(result.message || '')) {
+                    throw new Error('Veri isteği POST yerine GET olarak karşılandı. Güncel HTML dosyasını ve Apps Script web uygulamasının yeni sürümünü birlikte yayınlayıp sayfayı yenileyin.');
                 }
-            }
-            throw new Error(lastError && lastError.message ? lastError.message : "Sunucuya ulaşılamadı. Lütfen internetinizi kontrol edin.");
+                return result;
+            } catch (err) {
+                if (err.name === 'AbortError') {
+                    const writing = ['updateCustomer', 'deleteCustomer', 'addCustomersBulk'].includes(payload.action);
+                    throw new Error(writing
+                        ? "Yanıt zaman aşımına uğradı. İşlem kaydedilmiş olabilir; yeniden kaydetmeden önce listeyi yenileyin."
+                        : "Sunucu zamanında yanıt vermedi. Tekrar deneyin.");
+                }
+                throw err;
+            } finally { clearTimeout(timeoutId); }
         }
 
         // ===============================================
@@ -1003,13 +991,7 @@
                     
                     if(result.status === 'success') {
                         sessionStorage.setItem('authToken', result.token);
-                        const sortedLeaderboard = [...leaderboardData].sort((a, b) => parseCurrency(getRevenue(b)) - parseCurrency(getRevenue(a)));
-
-                        if (sortedLeaderboard.length > 0 && sortedLeaderboard[0].branch === branch) {
-                            showChampionCelebration(branch);
-                        } else {
-                            loginSuccess(branch);
-                        }
+                        loginSuccess(branch);
                     } else {
                         errorMsg.textContent = result.message || "Giriş başarısız. Lütfen şifrenizi kontrol ediniz.";
                         errorMsg.classList.remove('hidden');
@@ -1163,39 +1145,22 @@
 
         async function fetchBranches() {
             const select = document.getElementById('loginBranch');
+            branchList = [...FALLBACK_BRANCHES];
+            select.innerHTML = '<option value="">Lütfen Bir Şube Seçin...</option>';
+            branchList.forEach(branch => {
+                const option = document.createElement('option');
+                option.value = branch; option.textContent = branch;
+                select.appendChild(option);
+            });
+            // Sıralama giriş için zorunlu değildir; şube seçimi ağ isteğini beklemez.
             try {
-                document.getElementById('loginLeaderboard')?.classList.remove('hidden');
-                
                 const data = await safeFetch({ action: 'getLeaderboard' });
-                
-                branchList = data.leaderboard && data.leaderboard.length > 0 ? data.leaderboard.map(b => b.branch) : [];
-                leaderboardData = data.leaderboard || []; 
-
-                if (branchList.length === 0) {
-                     branchList = FALLBACK_BRANCHES;
-                }
-
-                select.innerHTML = '<option value="">Lütfen Bir Şube Seçin...</option>';
-                branchList.forEach(b => {
-                    const opt = document.createElement('option');
-                    opt.value = b; opt.textContent = b;
-                    select.appendChild(opt);
-                });
-
+                if (data.status === 'error' || !Array.isArray(data.leaderboard)) throw new Error(data.message || 'Sıralama alınamadı.');
+                leaderboardData = data.leaderboard.filter(item => !item.error);
                 renderLoginLeaderboard(leaderboardData);
-
-            } catch(e) { 
-                console.warn("Şube Yükleme Hatası (Yedek Liste Yükleniyor):", e);
-                branchList = FALLBACK_BRANCHES;
-                
-                select.innerHTML = '<option value="">Lütfen Bir Şube Seçin...</option>';
-                branchList.forEach(b => {
-                    const opt = document.createElement('option');
-                    opt.value = b; opt.textContent = b;
-                    select.appendChild(opt);
-                });
-                
-                document.getElementById('loginLeaderboard').classList.add('hidden'); 
+            } catch (error) {
+                console.warn('Liderlik tablosu yüklenemedi:', error.message);
+                document.getElementById('loginLeaderboard').classList.add('hidden');
             }
         }
 
@@ -1235,7 +1200,7 @@
             setInterval(() => {
                 const modal = document.getElementById('editModal');
                 const addModal = document.getElementById('addModal');
-                if (modal && modal.classList.contains('hidden') && addModal && addModal.classList.contains('hidden') && document.visibilityState === 'visible') {
+                if (modal && modal.classList.contains('hidden') && (!addModal || addModal.classList.contains('hidden')) && document.visibilityState === 'visible') {
                     refreshData(true); 
                 }
             }, 60000); 
@@ -1243,7 +1208,7 @@
             document.addEventListener('visibilitychange', () => {
                 const modal = document.getElementById('editModal');
                 const addModal = document.getElementById('addModal');
-                if (document.visibilityState === 'visible' && modal && modal.classList.contains('hidden') && addModal && addModal.classList.contains('hidden')) {
+                if (document.visibilityState === 'visible' && modal && modal.classList.contains('hidden') && (!addModal || addModal.classList.contains('hidden'))) {
                     refreshData(true); 
                 }
             });
@@ -1312,44 +1277,57 @@
             }
         }
 
+        let activeRecordsRequest = null;
+        let recordsRequestVersion = 0;
+        let loadedRecordsKey = null;
+        let pendingSaves = 0;
+
         async function refreshData(isBackground = false, showLoading = false) {
-            if(!currentBranch) return;
+            if (!currentBranch || pendingSaves > 0) return;
+            const selectedMonth = document.getElementById('monthFilter').value;
+            const branch = currentBranch;
+            const key = branch + ':' + selectedMonth;
+            if (activeRecordsRequest && activeRecordsRequest.key === key) return activeRecordsRequest.promise;
+            const version = ++recordsRequestVersion;
+            const tbody = document.getElementById('crmTableBody');
             const timeSpan = document.getElementById('lastTime');
-            if(timeSpan) timeSpan.textContent = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
-
-            const selectedMonth = document.getElementById('monthFilter').value; 
-            const authToken = sessionStorage.getItem('authToken');
-            
-            if (showLoading && !isBackground) {
-                const tbody = document.getElementById('crmTableBody');
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-slate-400 font-medium"><i class="fas fa-spinner fa-spin text-2xl mb-2 text-pink-400"></i><br>Veriler Yükleniyor...</td></tr>';
+            const hasData = loadedRecordsKey === key;
+            if (!hasData) {
+                allRecords = []; window.customerSalesMap = {};
+                loadedRecordsKey = null;
+                updateDashboardMetrics(); checkOverdueFollowUps([]); checkMissingInfo([]);
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-slate-400"><i class="fas fa-spinner fa-spin"></i> Veriler yükleniyor...</td></tr>';
             }
-
-            try {
-                const data = await safeFetch({
-                    action: 'getRecentRecords',
-                    data: { branch: currentBranch, month: selectedMonth },
-                    token: authToken
-                });
-
-                if (data.error || data.status === 'error') {
-                    if ((data.message || data.error || "").includes("Yetkisiz")) logout();
-                    throw new Error(data.message || data.error);
+            if (timeSpan) timeSpan.textContent = 'Güncelleniyor...';
+            const request = { key, promise: null };
+            activeRecordsRequest = request;
+            request.promise = (async () => {
+                try {
+                    const data = await safeFetch({ action: 'getRecentRecords', data: { branch, month: selectedMonth }, token: sessionStorage.getItem('authToken') });
+                    if (version !== recordsRequestVersion || pendingSaves > 0) return;
+                    if (data.error || data.status === 'error') {
+                        if ((data.message || data.error || '').includes('Yetkisiz')) logout();
+                        throw new Error(data.message || data.error);
+                    }
+                    if (!Array.isArray(data.records)) throw new Error('Müşteri listesi yanıtı geçersiz.');
+                    window.customerSalesMap = data.customerSales || {};
+                    allRecords = deduplicateRecords(data.records);
+                    loadedRecordsKey = key;
+                    updateDashboardMetrics(); checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords); renderTable();
+                    if (timeSpan) timeSpan.textContent = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                } catch (error) {
+                    if (version !== recordsRequestVersion) return;
+                    if (timeSpan) timeSpan.textContent = 'Güncelleme başarısız';
+                    if (hasData) {
+                        if (!isBackground) showToast(error.message, 'error');
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-rose-600">Veriler yüklenemedi.<br>' + escapeHTML(error.message) + '<br><button type="button" onclick="refreshData(false, true)" class="mt-4 px-5 py-3 rounded-xl bg-rose-100 font-bold">Tekrar dene</button></td></tr>';
+                    }
+                } finally {
+                    if (activeRecordsRequest === request) activeRecordsRequest = null;
                 }
-                
-                window.customerSalesMap = data.customerSales || {};
-                allRecords = deduplicateRecords(data.records || []);
-                
-                updateDashboardMetrics(); 
-                checkOverdueFollowUps(allRecords);
-                checkMissingInfo(allRecords); 
-                renderTable(); 
-
-            } catch (e) {
-                if (!isBackground) {
-                     document.getElementById('crmTableBody').innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold bg-rose-50 rounded-2xl"><i class="fas fa-exclamation-triangle mb-2 text-3xl"></i><br>Veri çekilemedi.<br><span class="text-[10px] text-rose-400 mt-2 block bg-white/50 p-2 rounded-lg border border-rose-100">${escapeHTML(e.message)}</span></td></tr>`;
-                }
-            }
+            })();
+            return request.promise;
         }
 
         function checkMissingInfo(records) {
@@ -1599,6 +1577,7 @@
         function changePage(dir) { currentPage += dir; renderTable(); }
 
         function openEditModal(index) {
+            if (pendingSaves > 0) { showToast("Kayıt tamamlanıyor. Lütfen bekleyin.", "error"); return; }
             document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
             isDuplicateConfirmed = false;
             pendingSubmitAfterConfirm = false;
@@ -1738,8 +1717,13 @@
             };
 
             // 🚀 ANINDA MODAL KAPATMA & ANINDA ARAYÜZ GÜNCELLEMESİ (Optimistic UI - Sıfır Bekleme)
+            if (pendingSaves > 0) { showToast("Önceki kayıt tamamlanıyor. Lütfen bekleyin.", "error"); return; }
+            pendingSaves++;
+            recordsRequestVersion++;
+            activeRecordsRequest = null;
+            document.getElementById("monthFilter").disabled = true;
             closeEditModal();
-            showToast("✓ Kaydedildi, senkronize ediliyor...", "success");
+            showToast("Kaydediliyor...", "success");
 
             const targetIndex = allRecords.findIndex(r => String(r.rowIndex) === String(rowIndexStr));
             let backupRecord = null;
@@ -1767,10 +1751,16 @@
             }).catch(err => {
                 showToast("⚠️ Kayıt E-Tabloya işlenemedi: " + err.message, "error");
                 if (backupRecord && targetIndex !== -1) {
-                    allRecords[targetIndex] = backupRecord;
+                    const rollbackIndex = allRecords.findIndex(r => String(r.rowIndex) === String(rowIndexStr) && r.sheetName === formData.sheetName);
+                    if (rollbackIndex !== -1) allRecords[rollbackIndex] = backupRecord;
                     updateDashboardMetrics();
                     renderTable();
+                    checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords);
                 }
+            }).finally(() => {
+                pendingSaves--;
+                document.getElementById("monthFilter").disabled = false;
+                refreshData(true);
             });
         });
 
