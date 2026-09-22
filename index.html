@@ -883,8 +883,23 @@
         // ===============================================
         // POST istekleri ve Apps Script yönlendirme önbelleği kontrolü
         // ===============================================
+        function retryPause(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
         async function safeFetch(payload) {
-            if (!navigator.onLine) throw new Error("İnternet bağlantısı yok.");
+            const retryableAction = ['getRecentRecords', 'getLeaderboard', 'updateCustomer'].includes(payload.action);
+            if (payload.action === 'updateCustomer' && !payload.operationId) {
+                payload = { ...payload, operationId: Date.now().toString(36) + '-' + Math.random().toString(36).slice(2) };
+            }
+            for (let attempt = 0; ; attempt++) {
+                try { return await fetchOnce(payload); }
+                catch (error) {
+                    if (!retryableAction || !error.retryable || attempt >= 3) throw error;
+                    await retryPause([1500, 4000, 9000][attempt] + Math.random() * 500);
+                }
+            }
+        }
+
+        async function fetchOnce(payload) {
+            if (!navigator.onLine) throw Object.assign(new Error("İnternet bağlantısı yok."), { retryable: true });
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), payload.action === 'getLeaderboard' ? 60000 : 30000);
             try {
@@ -898,7 +913,7 @@
                     body: JSON.stringify(payload),
                     redirect: 'follow', cache: 'no-store', credentials: 'omit', signal: controller.signal
                 });
-                if (!response.ok) throw new Error("Sunucu hatası (HTTP " + response.status + ").");
+                if (!response.ok) throw Object.assign(new Error("Sunucu hatası (HTTP " + response.status + ")."), { retryable: [404, 408, 429, 500, 502, 503, 504].includes(response.status) });
                 const text = await response.text();
                 let result;
                 try { result = JSON.parse(text); }
@@ -907,14 +922,16 @@
                 if (result.code === 'METHOD_NOT_ALLOWED' || /Sadece POST desteklenir/i.test(result.message || '')) {
                     throw new Error('Veri isteği POST yerine GET olarak karşılandı. Güncel HTML dosyasını ve Apps Script web uygulamasının yeni sürümünü birlikte yayınlayıp sayfayı yenileyin.');
                 }
+                if (result.retryable) throw Object.assign(new Error(result.message || 'Sunucu meşgul.'), { retryable: true });
                 return result;
             } catch (err) {
                 if (err.name === 'AbortError') {
                     const writing = ['updateCustomer', 'deleteCustomer', 'addCustomersBulk'].includes(payload.action);
-                    throw new Error(writing
+                    throw Object.assign(new Error(writing
                         ? "Yanıt zaman aşımına uğradı. İşlem kaydedilmiş olabilir; yeniden kaydetmeden önce listeyi yenileyin."
-                        : "Sunucu zamanında yanıt vermedi. Tekrar deneyin.");
+                        : "Sunucu zamanında yanıt vermedi. Tekrar deneyin."), { retryable: true });
                 }
+                if (err instanceof TypeError) err.retryable = true;
                 throw err;
             } finally { clearTimeout(timeoutId); }
         }
@@ -1280,6 +1297,8 @@
         let activeRecordsRequest = null;
         let recordsRequestVersion = 0;
         let loadedRecordsKey = null;
+        let recordsRetryTimer;
+        let recordsRetryCount = 0;
         const customerSaves = new Map();
         let saveRefreshTimer;
         const recordSaveKey = item => JSON.stringify([item.branch, item.sheetName, String(item.rowIndex)]);
@@ -1311,7 +1330,7 @@
             }).catch(error => {
                 if (customerSaves.get(key) === state) {
                     state.error = error.message;
-                    showToast((formData.name || 'Müşteri') + ': Kayıt doğrulanamadı. ' + error.message + ' Değişiklikler ekranda korundu.', 'error');
+                    console.warn('Kayıt senkronizasyonu:', error.message);
                 }
             }).finally(() => {
                 renderTable();
@@ -1327,6 +1346,7 @@
             const branch = currentBranch;
             const key = branch + ':' + selectedMonth;
             if (activeRecordsRequest && activeRecordsRequest.key === key) return activeRecordsRequest.promise;
+            clearTimeout(recordsRetryTimer);
             const version = ++recordsRequestVersion;
             const tbody = document.getElementById('crmTableBody');
             const timeSpan = document.getElementById('lastTime');
@@ -1352,16 +1372,20 @@
                     window.customerSalesMap = data.customerSales || {};
                     allRecords = deduplicateRecords(mergePendingSaves(data.records));
                     loadedRecordsKey = key;
+                    recordsRetryCount = 0;
                     updateDashboardMetrics(); checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords); renderTable();
                     if (timeSpan) timeSpan.textContent = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
                 } catch (error) {
                     if (version !== recordsRequestVersion) return;
-                    if (timeSpan) timeSpan.textContent = 'Güncelleme başarısız';
-                    if (hasData) {
-                        if (!isBackground) showToast(error.message, 'error');
-                    } else {
-                        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-rose-600">Veriler yüklenemedi.<br>' + escapeHTML(error.message) + '<br><button type="button" onclick="refreshData(false, true)" class="mt-4 px-5 py-3 rounded-xl bg-rose-100 font-bold">Tekrar dene</button></td></tr>';
+                    console.warn('Liste senkronizasyonu:', error.message);
+                    if (timeSpan) timeSpan.textContent = 'Bağlantı bekleniyor';
+                    if (!hasData) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-slate-400">Veriler hazırlanıyor. Bağlantı arka planda yenileniyor...</td></tr>';
                     }
+                    const delay = Math.min(60000, 5000 * Math.pow(2, Math.min(recordsRetryCount++, 4)));
+                    recordsRetryTimer = setTimeout(() => {
+                        if (currentBranch === branch && document.getElementById('monthFilter').value === selectedMonth) refreshData(true);
+                    }, delay);
                 } finally {
                     if (activeRecordsRequest === request) activeRecordsRequest = null;
                 }
@@ -1545,7 +1569,7 @@
                 const saveState = customerSaves.get(recordSaveKey(item));
                 const saveBadge = saveState
                     ? (saveState.error
-                        ? '<div class="text-xs text-rose-600 mt-1" title="' + escapeHTML(saveState.error) + '">Kayıt doğrulanamadı — düzenleyip tekrar kaydedebilirsiniz.</div>'
+                        ? '<div class="text-xs text-rose-600 mt-1" title="' + 'Eşitleme bekleniyor' + '">Değişiklikler henüz eşitlenmedi.</div>'
                         : '<div class="text-xs text-indigo-500 mt-1">Arka planda kaydediliyor...</div>')
                     : '';
                 const initials = safeName.replace(/[^a-zA-ZğüşıöçĞÜŞİÖÇ\s]/g, '').trim().split(/\s+/).map(n => n ? n[0] : '').join('').substring(0, 2).toUpperCase() || "M";
