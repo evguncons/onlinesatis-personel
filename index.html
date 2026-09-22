@@ -643,19 +643,12 @@
         }
 
         function requiresStaffNote(result) {
-            return ['bilgi verildi, olumsuz', 'bilgi verildi', 'olumsuz'].includes(String(result || '').trim().toLocaleLowerCase('tr-TR'));
+            return String(result || '').trim() !== '';
         }
 
         function hasCallbackNote(note) {
-            return /meşgule attı|cevap vermedi/.test(String(note || '').toLocaleLowerCase('tr-TR').replace(/\s+/g, ' '));
-        }
-
-        function applyCallbackNote() {
-            if (hasCallbackNote(document.getElementById('m_note').value)) {
-                document.getElementById('m_result').value = 'Tekrar Aranacak';
-                if (window.updateModalFlow) window.updateModalFlow();
-                toggleAmount();
-            }
+            const normalized = String(note || '').toLocaleLowerCase('tr-TR').replace(/ı/g, 'i').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
+            return /(^|[^a-z])(acmiyor|acmadi|mesgule atti|cevap vermedi|yanit vermedi|ulasilamadi)(?=$|[^a-z])/.test(normalized);
         }
 
         function appendQuickNote(text) {
@@ -670,7 +663,7 @@
                 }
             }
             autoResize(noteEl);
-            applyCallbackNote();
+            if (hasCallbackNote(noteEl.value)) showToast('Bu not kaydedildiğinde aranma durumu otomatik aranmadı olacak.');
         }
 
         function formatMoney(amount) {
@@ -1121,7 +1114,7 @@
                     setEnabled(resultEl, 'step2box', true);
                 } else {
                     setEnabled(resultEl, 'step2box', false);
-                    setEnabled(noteEl, 'step3box', false);
+                    setEnabled(noteEl, 'step3box', true);
                     setEnabled(orderEl, 'step4box', false);
                     document.getElementById('m_amount').disabled = true;
                     return;
@@ -1146,7 +1139,7 @@
 
             statusEl.addEventListener('change', updateFlow);
             resultEl.addEventListener('change', updateFlow);
-            noteEl.addEventListener('input', () => { autoResize(noteEl); applyCallbackNote(); });
+            noteEl.addEventListener('input', () => autoResize(noteEl));
             window.updateModalFlow = updateFlow;
         }
 
@@ -1779,7 +1772,6 @@
 
         document.getElementById('editForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            applyCallbackNote();
             document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
 
             const els = {
@@ -1799,8 +1791,15 @@
             if (requiresStaffNote(vals.result) && !noteEl.value.trim()) {
                 noteEl.classList.add('input-error');
                 noteEl.focus();
-                showToast('Bilgi verildi, olumsuz sonucunda personel notu zorunludur.', 'error');
+                showToast('Her görüşme sonucu için görüşme notu zorunludur.', 'error');
                 return;
+            }
+
+            if (hasCallbackNote(noteEl.value)) {
+                vals.status = 'aranmadı';
+                vals.result = '';
+                vals.order = 'Hayır';
+                vals.amount = '';
             }
 
             if(!vals.status) {
