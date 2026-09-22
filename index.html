@@ -885,7 +885,7 @@
         // ===============================================
         function retryPause(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
         async function safeFetch(payload) {
-            const retryableAction = ['getRecentRecords', 'getLeaderboard', 'updateCustomer'].includes(payload.action);
+            const retryableAction = ['login', 'getRecentRecords', 'getLeaderboard', 'updateCustomer'].includes(payload.action);
             if (payload.action === 'updateCustomer' && !payload.operationId) {
                 payload = { ...payload, operationId: Date.now().toString(36) + '-' + Math.random().toString(36).slice(2) };
             }
@@ -913,7 +913,7 @@
                     body: JSON.stringify(payload),
                     redirect: 'follow', cache: 'no-store', credentials: 'omit', signal: controller.signal
                 });
-                if (!response.ok) throw Object.assign(new Error("Sunucu hatası (HTTP " + response.status + ")."), { retryable: [404, 408, 429, 500, 502, 503, 504].includes(response.status) });
+                if (!response.ok) throw Object.assign(new Error("Sunucu hatası (HTTP " + response.status + ")."), { httpStatus: response.status, retryable: [404, 408, 429, 500, 502, 503, 504].includes(response.status) });
                 const text = await response.text();
                 let result;
                 try { result = JSON.parse(text); }
@@ -1002,6 +1002,7 @@
                 const originalBtnText = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Doğrulanıyor...';
                 btn.disabled = true;
+                errorMsg.classList.add('hidden');
 
                 try {
                     const result = await safeFetch({ action: 'login', data: { branch, password } });
@@ -1015,7 +1016,10 @@
                         document.getElementById('loginPassword').value = '';
                     }
                 } catch(e) {
-                    errorMsg.innerHTML = `<strong>Hata:</strong> Sunucuya ulaşılamadı. İnternet bağlantınızı kontrol edin.<br><span class="text-[10px] text-red-200 mt-1 block opacity-80">Detay: ${escapeHTML(e.message)}</span>`;
+                    console.warn('Giriş bağlantısı:', e.message);
+                    errorMsg.textContent = e.httpStatus === 404
+                        ? 'Giriş bağlantısı şu anda yanıt vermiyor. Otomatik denemeler tamamlandı; lütfen biraz sonra yeniden giriş yapın.'
+                        : 'Giriş bağlantısı kurulamadı. Lütfen tekrar giriş yapın.';
                     errorMsg.classList.remove('hidden');
                 } finally {
                     btn.innerHTML = originalBtnText;
