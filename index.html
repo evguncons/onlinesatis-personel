@@ -1280,10 +1280,49 @@
         let activeRecordsRequest = null;
         let recordsRequestVersion = 0;
         let loadedRecordsKey = null;
-        let pendingSaves = 0;
+        const customerSaves = new Map();
+        let saveRefreshTimer;
+        const recordSaveKey = item => JSON.stringify([item.branch, item.sheetName, String(item.rowIndex)]);
+
+        function mergePendingSaves(records) {
+            return records.map(record => {
+                const state = customerSaves.get(recordSaveKey(record));
+                return state ? { ...record, ...state.data } : record;
+            });
+        }
+
+        function saveCustomerInBackground(formData) {
+            const key = recordSaveKey(formData);
+            const previous = customerSaves.get(key);
+            const state = { data: { ...formData }, promise: null, error: null };
+            customerSaves.set(key, state);
+            renderTable();
+            const token = sessionStorage.getItem('authToken');
+            // Aynı müşteriye ait yazmalar sıralıdır; diğer müşteriler beklemez.
+            state.promise = (previous ? previous.promise : Promise.resolve()).then(async () => {
+                const result = await safeFetch({ action: 'updateCustomer', data: state.data, token });
+                if (result.status !== 'success') throw new Error(result.message || 'Kayıt başarısız.');
+                if (customerSaves.get(key) === state) {
+                    customerSaves.delete(key);
+                    recordsRequestVersion++;
+                    activeRecordsRequest = null;
+                    showToast('✓ ' + (formData.name || 'Müşteri') + ': E-tabloya kaydedildi.');
+                }
+            }).catch(error => {
+                if (customerSaves.get(key) === state) {
+                    state.error = error.message;
+                    showToast((formData.name || 'Müşteri') + ': Kayıt doğrulanamadı. ' + error.message + ' Değişiklikler ekranda korundu.', 'error');
+                }
+            }).finally(() => {
+                renderTable();
+                clearTimeout(saveRefreshTimer);
+                saveRefreshTimer = setTimeout(() => refreshData(true), 1200);
+            });
+            return state.promise;
+        }
 
         async function refreshData(isBackground = false, showLoading = false) {
-            if (!currentBranch || pendingSaves > 0) return;
+            if (!currentBranch) return;
             const selectedMonth = document.getElementById('monthFilter').value;
             const branch = currentBranch;
             const key = branch + ':' + selectedMonth;
@@ -1304,14 +1343,14 @@
             request.promise = (async () => {
                 try {
                     const data = await safeFetch({ action: 'getRecentRecords', data: { branch, month: selectedMonth }, token: sessionStorage.getItem('authToken') });
-                    if (version !== recordsRequestVersion || pendingSaves > 0) return;
+                    if (version !== recordsRequestVersion) return;
                     if (data.error || data.status === 'error') {
                         if ((data.message || data.error || '').includes('Yetkisiz')) logout();
                         throw new Error(data.message || data.error);
                     }
                     if (!Array.isArray(data.records)) throw new Error('Müşteri listesi yanıtı geçersiz.');
                     window.customerSalesMap = data.customerSales || {};
-                    allRecords = deduplicateRecords(data.records);
+                    allRecords = deduplicateRecords(mergePendingSaves(data.records));
                     loadedRecordsKey = key;
                     updateDashboardMetrics(); checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords); renderTable();
                     if (timeSpan) timeSpan.textContent = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
@@ -1503,6 +1542,12 @@
                 tr.className = String(item.isOrder).toLowerCase() === 'evet' ? 'bg-emerald-50/40 hover:bg-emerald-50 transition duration-200' : 'hover:bg-slate-50 transition duration-200';
                 
                 const safeName = escapeHTML(item.name || "Müşteri");
+                const saveState = customerSaves.get(recordSaveKey(item));
+                const saveBadge = saveState
+                    ? (saveState.error
+                        ? '<div class="text-xs text-rose-600 mt-1" title="' + escapeHTML(saveState.error) + '">Kayıt doğrulanamadı — düzenleyip tekrar kaydedebilirsiniz.</div>'
+                        : '<div class="text-xs text-indigo-500 mt-1">Arka planda kaydediliyor...</div>')
+                    : '';
                 const initials = safeName.replace(/[^a-zA-ZğüşıöçĞÜŞİÖÇ\s]/g, '').trim().split(/\s+/).map(n => n ? n[0] : '').join('').substring(0, 2).toUpperCase() || "M";
                 const originalIndex = allRecords.findIndex(r => r === item); 
 
@@ -1512,6 +1557,7 @@
                             <div class="avatar-initials shrink-0">${initials}</div>
                             <div>
                                 <div class="font-bold text-slate-800 text-base">${safeName}</div>
+                                ${saveBadge}
                                 ${item.customerNo ? `<div class="text-[10px] text-indigo-400 font-mono font-bold mt-0.5">#${escapeHTML(item.customerNo)}</div>` : ''}
                                 <div class="text-xs text-slate-400 font-medium mt-0.5">${escapeHTML(item.date)}</div>
                             </div>
@@ -1577,7 +1623,6 @@
         function changePage(dir) { currentPage += dir; renderTable(); }
 
         function openEditModal(index) {
-            if (pendingSaves > 0) { showToast("Kayıt tamamlanıyor. Lütfen bekleyin.", "error"); return; }
             document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
             isDuplicateConfirmed = false;
             pendingSubmitAfterConfirm = false;
@@ -1716,52 +1761,17 @@
                 customerNo: vals.customerNo
             };
 
-            // 🚀 ANINDA MODAL KAPATMA & ANINDA ARAYÜZ GÜNCELLEMESİ (Optimistic UI - Sıfır Bekleme)
-            if (pendingSaves > 0) { showToast("Önceki kayıt tamamlanıyor. Lütfen bekleyin.", "error"); return; }
-            pendingSaves++;
-            recordsRequestVersion++;
-            activeRecordsRequest = null;
-            document.getElementById("monthFilter").disabled = true;
             closeEditModal();
-            showToast("Kaydediliyor...", "success");
-
-            const targetIndex = allRecords.findIndex(r => String(r.rowIndex) === String(rowIndexStr));
-            let backupRecord = null;
+            const key = recordSaveKey(formData);
+            const targetIndex = allRecords.findIndex(record => recordSaveKey(record) === key);
             if (targetIndex !== -1) {
-                backupRecord = { ...allRecords[targetIndex] };
                 allRecords[targetIndex] = { ...allRecords[targetIndex], ...formData };
-                allRecords = deduplicateRecords(allRecords);
-                updateDashboardMetrics(); 
-                renderTable();
-                checkOverdueFollowUps(allRecords);
-                checkMissingInfo(allRecords); 
+                updateDashboardMetrics(); renderTable();
+                checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords);
             }
+            showToast('Değişiklikler ekrana uygulandı; arka planda kaydediliyor.');
+            saveCustomerInBackground(formData);
 
-            // Arka planda Google Sheets'e kaydet (Kullanıcı beklemez)
-            safeFetch({
-                action: 'updateCustomer', 
-                data: formData, 
-                token: sessionStorage.getItem('authToken') 
-            }).then(resData => {
-                if (resData && resData.status === 'success') {
-                    showToast("✓ Google E-Tabloya başarıyla işlendi!");
-                } else {
-                    throw new Error((resData && resData.message) || "Sunucu hatası.");
-                }
-            }).catch(err => {
-                showToast("⚠️ Kayıt E-Tabloya işlenemedi: " + err.message, "error");
-                if (backupRecord && targetIndex !== -1) {
-                    const rollbackIndex = allRecords.findIndex(r => String(r.rowIndex) === String(rowIndexStr) && r.sheetName === formData.sheetName);
-                    if (rollbackIndex !== -1) allRecords[rollbackIndex] = backupRecord;
-                    updateDashboardMetrics();
-                    renderTable();
-                    checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords);
-                }
-            }).finally(() => {
-                pendingSaves--;
-                document.getElementById("monthFilter").disabled = false;
-                refreshData(true);
-            });
         });
 
         function exportToExcel() {
