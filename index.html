@@ -173,7 +173,7 @@
             </div>
 
             <div id="loginLeaderboard" class="bg-black/30 backdrop-blur-md border border-white/10 p-6 rounded-[32px] w-full shadow-2xl">
-                <h3 class="text-pink-200 text-xs font-bold uppercase tracking-widest mb-4 text-center border-b border-white/10 pb-3 flex items-center justify-center gap-2"><i class="fas fa-trophy text-yellow-400 text-base"></i> Ayın Ciro Şampiyonları</h3>
+                <h3 class="text-pink-200 text-xs font-bold uppercase tracking-widest mb-4 text-center border-b border-white/10 pb-3 flex items-center justify-center gap-2"><i class="fas fa-trophy text-yellow-400 text-base"></i> Ayın Şube Sıralaması (İlk 3)</h3>
                 <div class="space-y-2" id="leaderboardList"></div>
             </div>
         </div>
@@ -1229,19 +1229,6 @@
 
             // Podyumu önbellekten 0 gecikmeyle anında göster
             loadCachedLeaderboard();
-
-            // Arka planda sunucudan sessizce güncelle (kullanıcıyı asla bekletmez)
-            setTimeout(() => {
-                if (!currentBranch) {
-                    safeFetch({ action: 'getLeaderboard' }).then(data => {
-                        if (data && Array.isArray(data.leaderboard) && data.leaderboard.length > 0) {
-                            leaderboardData = data.leaderboard;
-                            try { localStorage.setItem('cached_leaderboard', JSON.stringify(leaderboardData)); } catch(e){}
-                            renderLoginLeaderboard(leaderboardData);
-                        }
-                    }).catch(() => {});
-                }
-            }, 1000);
         }
 
         function renderLoginLeaderboard(list) {
@@ -1262,18 +1249,17 @@
                     let icon = index === 0 ? '👑' : (index === 1 ? '🥈' : '🥉');
                     let colorClass = index === 0 ? 'text-yellow-300 font-extrabold text-base' : 'text-white font-bold text-sm';
                     let bgClass = index === 0 ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-yellow-500/30' : 'bg-white/5 border-white/10';
-                    const rev = item.revenue !== undefined ? item.revenue : getRevenue(item);
+                    let rankBadge = index === 0 
+                        ? 'bg-yellow-400 text-yellow-950 font-black' 
+                        : (index === 1 ? 'bg-slate-200 text-slate-900 font-extrabold' : 'bg-amber-600 text-white font-extrabold');
                     return `
                         <div class="flex justify-between items-center p-3.5 rounded-2xl border transition-all ${bgClass} shadow-sm backdrop-blur-sm animate-in fade-in slide-in-from-bottom-2 duration-500" style="animation-delay: ${index * 100}ms">
                             <div class="flex items-center gap-3">
                                 <span class="text-2xl filter drop-shadow-md">${icon}</span>
-                                <div>
-                                    <div class="${colorClass} tracking-wide">${escapeHTML(item.branch)}</div>
-                                    <div class="text-[11px] text-pink-200/80 font-bold">${index + 1}. Şube</div>
-                                </div>
+                                <div class="${colorClass} tracking-wide">${escapeHTML(item.branch)}</div>
                             </div>
                             <div class="text-right">
-                                <span class="text-xs md:text-sm font-extrabold text-white bg-white/15 px-3 py-1.5 rounded-xl border border-white/20 shadow-sm">${formatMoney(rev)}</span>
+                                <span class="text-xs px-3 py-1.5 rounded-xl shadow-sm ${rankBadge}">${index + 1}. SIRA</span>
                             </div>
                         </div>
                     `;
