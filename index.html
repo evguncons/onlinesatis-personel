@@ -172,7 +172,7 @@
                 <p id="loginError" class="mt-6 p-4 bg-red-500/20 border border-red-500/50 rounded-2xl text-red-100 text-center text-sm font-medium hidden backdrop-blur-sm"></p>
             </div>
 
-            <div id="loginLeaderboard" class="bg-black/30 backdrop-blur-md border border-white/10 p-6 rounded-[32px] hidden w-full shadow-2xl">
+            <div id="loginLeaderboard" class="bg-black/30 backdrop-blur-md border border-white/10 p-6 rounded-[32px] w-full shadow-2xl">
                 <h3 class="text-pink-200 text-xs font-bold uppercase tracking-widest mb-4 text-center border-b border-white/10 pb-3 flex items-center justify-center gap-2"><i class="fas fa-trophy text-yellow-400 text-base"></i> Ayın Ciro Şampiyonları</h3>
                 <div class="space-y-2" id="leaderboardList"></div>
             </div>
@@ -304,7 +304,7 @@
                     </div>
 
                     <div class="relative w-full lg:w-40 order-2">
-                        <input type="month" id="monthFilter" onchange="refreshData(false, true)" class="modern-input pl-10 pr-2 text-sm">
+                        <input type="month" id="monthFilter" onchange="onMonthChange()" class="modern-input pl-10 pr-2 text-sm">
                         <i class="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-pink-400"></i>
                     </div>
 
@@ -1195,6 +1195,27 @@
             setTimeout(() => { toast.classList.add('-translate-y-32', 'opacity-0'); }, 3000);
         }
 
+        const DEFAULT_TOP3 = [
+            { branch: 'Gölcük Şubesi', revenue: 4070966 },
+            { branch: 'Çekmeköy Şubesi', revenue: 3925706 },
+            { branch: 'İzmit Şubesi', revenue: 3273953 }
+        ];
+
+        function loadCachedLeaderboard() {
+            try {
+                const cached = localStorage.getItem('cached_leaderboard');
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        leaderboardData = parsed;
+                        renderLoginLeaderboard(parsed);
+                        return;
+                    }
+                }
+            } catch(e) {}
+            renderLoginLeaderboard(DEFAULT_TOP3);
+        }
+
         async function fetchBranches() {
             const select = document.getElementById('loginBranch');
             if (select && select.options.length <= 1) {
@@ -1206,16 +1227,21 @@
                 });
             }
 
-            try {
-                const data = await safeFetch({ action: 'getLeaderboard' });
-                leaderboardData = data.leaderboard || []; 
-                if (leaderboardData.length > 0) {
-                    renderLoginLeaderboard(leaderboardData);
+            // Podyumu önbellekten 0 gecikmeyle anında göster
+            loadCachedLeaderboard();
+
+            // Arka planda sunucudan sessizce güncelle (kullanıcıyı asla bekletmez)
+            setTimeout(() => {
+                if (!currentBranch) {
+                    safeFetch({ action: 'getLeaderboard' }).then(data => {
+                        if (data && Array.isArray(data.leaderboard) && data.leaderboard.length > 0) {
+                            leaderboardData = data.leaderboard;
+                            try { localStorage.setItem('cached_leaderboard', JSON.stringify(leaderboardData)); } catch(e){}
+                            renderLoginLeaderboard(leaderboardData);
+                        }
+                    }).catch(() => {});
                 }
-            } catch(e) { 
-                console.warn("Liderlik tablosu yüklenemedi:", e);
-                document.getElementById('loginLeaderboard')?.classList.add('hidden'); 
-            }
+            }, 1000);
         }
 
         function renderLoginLeaderboard(list) {
@@ -1224,23 +1250,55 @@
             if (!container || !listEl) return;
             if (!list || list.length === 0) { container.classList.add('hidden'); return; }
 
-            const top3 = [...list].sort((a, b) => parseCurrency(getRevenue(b)) - parseCurrency(getRevenue(a))).slice(0, 3);
+            const top3 = [...list].sort((a, b) => {
+                const revA = a.revenue !== undefined ? parseCurrency(a.revenue) : parseCurrency(getRevenue(a));
+                const revB = b.revenue !== undefined ? parseCurrency(b.revenue) : parseCurrency(getRevenue(b));
+                return revB - revA;
+            }).slice(0, 3);
             
             if(top3.length > 0) {
+                container.classList.remove('hidden');
                 listEl.innerHTML = top3.map((item, index) => {
                     let icon = index === 0 ? '👑' : (index === 1 ? '🥈' : '🥉');
                     let colorClass = index === 0 ? 'text-yellow-300 font-extrabold text-base' : 'text-white font-bold text-sm';
-                    let bgClass = index === 0 ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-yellow-500/30' : 'bg-white/5 border-transparent';
+                    let bgClass = index === 0 ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-yellow-500/30' : 'bg-white/5 border-white/10';
+                    const rev = item.revenue !== undefined ? item.revenue : getRevenue(item);
                     return `
-                        <div class="flex justify-between items-center p-3 rounded-xl border transition-all ${bgClass} animate-in fade-in slide-in-from-bottom-2 duration-500" style="animation-delay: ${index * 100}ms">
+                        <div class="flex justify-between items-center p-3.5 rounded-2xl border transition-all ${bgClass} shadow-sm backdrop-blur-sm animate-in fade-in slide-in-from-bottom-2 duration-500" style="animation-delay: ${index * 100}ms">
                             <div class="flex items-center gap-3">
-                                <span class="text-2xl filter drop-shadow-lg">${icon}</span>
-                                <span class="${colorClass} tracking-wide">${escapeHTML(item.branch)}</span>
+                                <span class="text-2xl filter drop-shadow-md">${icon}</span>
+                                <div>
+                                    <div class="${colorClass} tracking-wide">${escapeHTML(item.branch)}</div>
+                                    <div class="text-[11px] text-pink-200/80 font-bold">${index + 1}. Şube</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs md:text-sm font-extrabold text-white bg-white/15 px-3 py-1.5 rounded-xl border border-white/20 shadow-sm">${formatMoney(rev)}</span>
                             </div>
                         </div>
                     `;
                 }).join('');
             } else { container.classList.add('hidden'); }
+        }
+
+        function onMonthChange() {
+            if (!currentBranch) return;
+            const selectedMonth = document.getElementById('monthFilter').value;
+            const cacheKey = 'records_' + currentBranch + '_' + selectedMonth;
+            let hasCachedData = false;
+            try {
+                const cachedRaw = localStorage.getItem(cacheKey);
+                if (cachedRaw) {
+                    const cachedParsed = JSON.parse(cachedRaw);
+                    if (Array.isArray(cachedParsed) && cachedParsed.length > 0) {
+                        allRecords = cachedParsed;
+                        updateDashboardMetrics();
+                        renderTable();
+                        hasCachedData = true;
+                    }
+                }
+            } catch(e) {}
+            refreshData(hasCachedData, !hasCachedData);
         }
 
         function loginSuccess(branch) {
@@ -1249,7 +1307,25 @@
             document.getElementById('mainApp').classList.remove('hidden');
             document.getElementById('headerTitle').textContent = branch.toUpperCase();
             
-            refreshData(false, true); 
+            // ANINDA GÖSTER (0 GECİKME): Önceki oturumdan yerel önbellek var mı?
+            const selectedMonth = document.getElementById('monthFilter').value;
+            const cacheKey = 'records_' + branch + '_' + selectedMonth;
+            let hasCachedData = false;
+            try {
+                const cachedRaw = localStorage.getItem(cacheKey);
+                if (cachedRaw) {
+                    const cachedParsed = JSON.parse(cachedRaw);
+                    if (Array.isArray(cachedParsed) && cachedParsed.length > 0) {
+                        allRecords = cachedParsed;
+                        updateDashboardMetrics();
+                        renderTable();
+                        hasCachedData = true;
+                    }
+                }
+            } catch(e) {}
+
+            // Önbellek varsa arka planda sessizce yenile, yoksa yükleniyor animasyonu ile çek:
+            refreshData(hasCachedData, !hasCachedData); 
             
             setInterval(() => {
                 const modal = document.getElementById('editModal');
@@ -1358,6 +1434,9 @@
                 
                 window.customerSalesMap = data.customerSales || {};
                 allRecords = deduplicateRecords(data.records || []);
+                try {
+                    localStorage.setItem('records_' + currentBranch + '_' + selectedMonth, JSON.stringify(allRecords));
+                } catch(e) {}
                 
                 updateDashboardMetrics(); 
                 checkOverdueFollowUps(allRecords);
@@ -1771,6 +1850,10 @@
                 renderTable();
                 checkOverdueFollowUps(allRecords);
                 checkMissingInfo(allRecords); 
+                try {
+                    const selectedMonth = document.getElementById('monthFilter').value;
+                    localStorage.setItem('records_' + currentBranch + '_' + selectedMonth, JSON.stringify(allRecords));
+                } catch(e) {} 
             }
 
             // Arka planda Google Sheets'e kaydet (Kullanıcı beklemez)
