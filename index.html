@@ -1300,6 +1300,8 @@
         let recordsRetryTimer;
         let recordsRetryCount = 0;
         const customerSaves = new Map();
+        const saveClientId = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+        let saveSequence = 0;
         let saveRefreshTimer;
         const recordSaveKey = item => JSON.stringify([item.branch, item.sheetName, String(item.rowIndex)]);
 
@@ -1312,14 +1314,15 @@
 
         function saveCustomerInBackground(formData) {
             const key = recordSaveKey(formData);
-            const previous = customerSaves.get(key);
             const state = { data: { ...formData }, promise: null, error: null };
             customerSaves.set(key, state);
             renderTable();
             const token = sessionStorage.getItem('authToken');
-            // Aynı müşteriye ait yazmalar sıralıdır; diğer müşteriler beklemez.
-            state.promise = (previous ? previous.promise : Promise.resolve()).then(async () => {
-                const result = await safeFetch({ action: 'updateCustomer', data: state.data, token });
+            // Yeni seçim eski isteğin yanıtını veya yeniden denemelerini beklemez.
+            const sequence = ++saveSequence;
+            state.promise = Promise.resolve().then(async () => {
+                const result = await safeFetch({ action: 'updateCustomer', data: state.data, token,
+                    clientId: saveClientId, sequence, operationId: saveClientId + '-' + sequence });
                 if (result.status !== 'success') throw new Error(result.message || 'Kayıt başarısız.');
                 if (customerSaves.get(key) === state) {
                     customerSaves.delete(key);
