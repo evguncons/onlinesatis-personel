@@ -141,7 +141,20 @@
                     <div>
                         <div class="relative group">
                             <select id="loginBranch" class="w-full pl-5 pr-12 py-4 bg-white/95 backdrop-blur-sm rounded-2xl text-slate-800 font-bold text-base md:text-lg shadow-lg border-2 border-transparent focus:border-pink-400 focus:ring-0 appearance-none cursor-pointer transition-all h-[56px] md:h-[60px]" required>
-                                <option value="">Şube Yükleniyor...</option>
+                                <option value="">Lütfen Bir Şube Seçin...</option>
+                                <option value="İnegöl Şubesi">İnegöl Şubesi</option>
+                                <option value="Paşabahçe Şubesi">Paşabahçe Şubesi</option>
+                                <option value="Çekmeköy Şubesi">Çekmeköy Şubesi</option>
+                                <option value="İzmit Şubesi">İzmit Şubesi</option>
+                                <option value="Gölcük Şubesi">Gölcük Şubesi</option>
+                                <option value="Körfez Şubesi">Körfez Şubesi</option>
+                                <option value="Derince Şubesi">Derince Şubesi</option>
+                                <option value="Sultanbeyli Şubesi">Sultanbeyli Şubesi</option>
+                                <option value="Yenidoğan Şubesi">Yenidoğan Şubesi</option>
+                                <option value="Kavacık Şubesi">Kavacık Şubesi</option>
+                                <option value="Çayırova Şubesi">Çayırova Şubesi</option>
+                                <option value="Gebze Şubesi">Gebze Şubesi</option>
+                                <option value="Düzce Şubesi">Düzce Şubesi</option>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center px-5 pointer-events-none text-pink-600"><i class="fas fa-chevron-down text-lg"></i></div>
                         </div>
@@ -1165,39 +1178,24 @@
 
         async function fetchBranches() {
             const select = document.getElementById('loginBranch');
+            if (select && select.options.length <= 1) {
+                select.innerHTML = '<option value="">Lütfen Bir Şube Seçin...</option>';
+                FALLBACK_BRANCHES.forEach(b => {
+                    const opt = document.createElement('option');
+                    opt.value = b; opt.textContent = b;
+                    select.appendChild(opt);
+                });
+            }
+
             try {
-                document.getElementById('loginLeaderboard')?.classList.remove('hidden');
-                
                 const data = await safeFetch({ action: 'getLeaderboard' });
-                
-                branchList = data.leaderboard && data.leaderboard.length > 0 ? data.leaderboard.map(b => b.branch) : [];
                 leaderboardData = data.leaderboard || []; 
-
-                if (branchList.length === 0) {
-                     branchList = FALLBACK_BRANCHES;
+                if (leaderboardData.length > 0) {
+                    renderLoginLeaderboard(leaderboardData);
                 }
-
-                select.innerHTML = '<option value="">Lütfen Bir Şube Seçin...</option>';
-                branchList.forEach(b => {
-                    const opt = document.createElement('option');
-                    opt.value = b; opt.textContent = b;
-                    select.appendChild(opt);
-                });
-
-                renderLoginLeaderboard(leaderboardData);
-
             } catch(e) { 
-                console.warn("Şube Yükleme Hatası (Yedek Liste Yükleniyor):", e);
-                branchList = FALLBACK_BRANCHES;
-                
-                select.innerHTML = '<option value="">Lütfen Bir Şube Seçin...</option>';
-                branchList.forEach(b => {
-                    const opt = document.createElement('option');
-                    opt.value = b; opt.textContent = b;
-                    select.appendChild(opt);
-                });
-                
-                document.getElementById('loginLeaderboard').classList.add('hidden'); 
+                console.warn("Liderlik tablosu yüklenemedi:", e);
+                document.getElementById('loginLeaderboard')?.classList.add('hidden'); 
             }
         }
 
