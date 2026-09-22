@@ -458,7 +458,7 @@
                             </div>
                             
                             <div class="bg-white p-4 md:p-5 rounded-2xl border border-slate-100 shadow-sm transition-all" id="step3box">
-                                <label for="m_note" class="text-xs md:text-sm font-bold text-slate-700 mb-2 md:mb-3 block">3. Personel Notu</label>
+                                <label for="m_note" class="text-xs md:text-sm font-bold text-slate-700 mb-2 md:mb-3 block">3. Personel Notu <span id="noteRequiredBadge" class="text-rose-500 hidden">(Zorunlu)</span></label>
                                 <textarea id="m_note" class="modern-input resize-none overflow-hidden min-h-[80px]" placeholder="Detay ekle..." oninput="autoResize(this)" disabled></textarea>
                                 <div class="flex flex-wrap items-center gap-1.5 mt-3 pt-2 border-t border-slate-100">
                                     <span class="text-[10px] font-bold text-slate-400 uppercase w-full mb-0.5"><i class="fas fa-bolt text-amber-500 mr-1"></i> Hızlı Not Şablonları:</span>
@@ -642,6 +642,22 @@
             return `https://wa.me/${digits}?text=${encodeURIComponent(msg)}`;
         }
 
+        function requiresStaffNote(result) {
+            return ['bilgi verildi, olumsuz', 'bilgi verildi', 'olumsuz'].includes(String(result || '').trim().toLocaleLowerCase('tr-TR'));
+        }
+
+        function hasCallbackNote(note) {
+            return /meşgule attı|cevap vermedi/.test(String(note || '').toLocaleLowerCase('tr-TR').replace(/\s+/g, ' '));
+        }
+
+        function applyCallbackNote() {
+            if (hasCallbackNote(document.getElementById('m_note').value)) {
+                document.getElementById('m_result').value = 'Tekrar Aranacak';
+                if (window.updateModalFlow) window.updateModalFlow();
+                toggleAmount();
+            }
+        }
+
         function appendQuickNote(text) {
             const noteEl = document.getElementById('m_note');
             if (!noteEl || noteEl.disabled) return;
@@ -654,6 +670,7 @@
                 }
             }
             autoResize(noteEl);
+            applyCallbackNote();
         }
 
         function formatMoney(amount) {
@@ -1097,6 +1114,8 @@
             const updateFlow = () => {
                 const st = statusEl.value;
                 const res = resultEl.value;
+                noteEl.required = st === 'arandı' && requiresStaffNote(res);
+                document.getElementById('noteRequiredBadge').classList.toggle('hidden', !noteEl.required);
                 
                 if (st === 'arandı') {
                     setEnabled(resultEl, 'step2box', true);
@@ -1127,7 +1146,7 @@
 
             statusEl.addEventListener('change', updateFlow);
             resultEl.addEventListener('change', updateFlow);
-            noteEl.addEventListener('input', () => autoResize(noteEl));
+            noteEl.addEventListener('input', () => { autoResize(noteEl); applyCallbackNote(); });
             window.updateModalFlow = updateFlow;
         }
 
@@ -1760,6 +1779,7 @@
 
         document.getElementById('editForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            applyCallbackNote();
             document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
 
             const els = {
@@ -1775,6 +1795,13 @@
                 order: els.order.value, amount: els.amount.value,
                 customerNo: els.customerNo.value.trim()
             };
+            const noteEl = document.getElementById('m_note');
+            if (requiresStaffNote(vals.result) && !noteEl.value.trim()) {
+                noteEl.classList.add('input-error');
+                noteEl.focus();
+                showToast('Bilgi verildi, olumsuz sonucunda personel notu zorunludur.', 'error');
+                return;
+            }
 
             if(!vals.status) {
                 els.status.classList.add('input-error'); showToast("Aranma Durumunu seçiniz.", "error"); return;
