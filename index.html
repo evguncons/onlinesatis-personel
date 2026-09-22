@@ -895,7 +895,7 @@
                     }
 
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 18000);
+                    const timeoutId = setTimeout(() => controller.abort(), 35000);
 
                     const response = await fetch(fetchUrl, {
                         method: 'POST',
@@ -1347,8 +1347,9 @@
 
             } catch (e) {
                 if (!isBackground) {
-                     document.getElementById('crmTableBody').innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold bg-rose-50 rounded-2xl"><i class="fas fa-exclamation-triangle mb-2 text-3xl"></i><br>Veri çekilemedi.<br><span class="text-[10px] text-rose-400 mt-2 block bg-white/50 p-2 rounded-lg border border-rose-100">${escapeHTML(e.message)}</span></td></tr>`;
+                     document.getElementById('crmTableBody').innerHTML = `<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold bg-rose-50 rounded-2xl"><i class="fas fa-exclamation-triangle mb-2 text-3xl"></i><br>Veri çekilemedi.<br><span class="text-[11px] text-rose-500 mt-2 block bg-white/70 p-2 rounded-lg border border-rose-200 max-w-md mx-auto">${escapeHTML(e.message)}</span><button onclick="refreshData(false, true)" class="mt-4 px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold rounded-xl shadow transition active:scale-95 inline-flex items-center gap-1.5 cursor-pointer"><i class="fas fa-redo"></i> Tekrar Dene</button></td></tr>`;
                 }
+                showToast("⚠️ Veri yüklenemedi: " + e.message, "error");
             }
         }
 
