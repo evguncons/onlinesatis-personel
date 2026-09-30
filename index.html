@@ -1444,12 +1444,12 @@
             }).finally(() => {
                 renderTable();
                 clearTimeout(saveRefreshTimer);
-                saveRefreshTimer = setTimeout(() => refreshData(true), 1200);
+                saveRefreshTimer = setTimeout(() => refreshData(true, false, true), 1200);
             });
             return state.promise;
         }
 
-        async function refreshData(isBackground = false, showLoading = false) {
+        async function refreshData(isBackground = false, showLoading = false, fresh = false) {
             if (!currentBranch) return;
             const selectedMonth = document.getElementById('monthFilter').value;
             const branch = currentBranch;
@@ -1474,7 +1474,7 @@
             activeRecordsRequest = request;
             request.promise = (async () => {
                 try {
-                    const data = await safeFetch({ action: 'getRecentRecords', data: { branch, month: selectedMonth }, token: sessionStorage.getItem('authToken') });
+                    const data = await safeFetch({ action: 'getRecentRecords', data: { branch, month: selectedMonth, fresh: fresh || (!isBackground && loadedRecordsKey === key) }, token: sessionStorage.getItem('authToken') });
                     if (version !== recordsRequestVersion) return;
                     if (data.error || data.status === 'error') {
                         if ((data.message || data.error || '').includes('Yetkisiz')) logout();
@@ -1974,7 +1974,7 @@
                 showToast('Satış şubenize yeni satır olarak eklendi.');
                 document.getElementById('monthFilter').value = result.month;
                 recordsRequestVersion++; activeRecordsRequest = null;
-                refreshData(false,true);
+                refreshData(false,true,true);
             } catch(error) {
                 message.textContent = pendingSale ? 'Yanıt doğrulanamadı. Tekrar kaydettiğinizde aynı işlem kontrol edilir; ikinci satır eklenmez.' : error.message;
             } finally {
