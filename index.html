@@ -167,6 +167,28 @@
         </div>
     </div>
 
+
+    <div id="addModal" class="hidden fixed inset-0 z-[80] bg-slate-900/60 p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="addSaleTitle">
+      <div class="max-w-2xl mx-auto bg-white rounded-3xl p-6 my-8">
+        <div class="flex justify-between items-center"><h2 id="addSaleTitle" class="text-xl font-bold">Satış Ekle</h2><button type="button" onclick="closeAddSale()" aria-label="Kapat">✕</button></div>
+        <p class="text-sm text-slate-500 mt-2 mb-4">Tüm alanlar zorunludur. Satış, şubenize yeni satır olarak eklenir.</p>
+        <form id="addSaleForm"><fieldset id="saleFields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label>Şube<input id="sale_branch" class="modern-input" readonly required></label>
+        <label>Satış Tarihi<input id="sale_date" type="datetime-local" class="modern-input" required></label>
+        <label>Ad Soyad<input id="sale_name" class="modern-input" required></label>
+        <label>Telefon<input id="sale_contact" type="tel" class="modern-input" required></label>
+        <label>Müşteri No<input id="sale_customerNo" class="modern-input" required></label>
+        <label>Satış Tutarı (₺)<input id="sale_amount" type="number" min="0.01" step="0.01" class="modern-input" required></label>
+        <label>Kategori<select id="sale_category" class="modern-input" required></select></label>
+        <label>Kaynak<select id="sale_media" class="modern-input" required></select></label>
+        <label class="md:col-span-2">Ürün<input id="sale_product" class="modern-input" required></label>
+        <label class="md:col-span-2">Görüşme Notu<textarea id="sale_note" class="modern-input" required></textarea></label>
+        </fieldset><p class="text-sm text-emerald-600 my-4">Arandı · Satışa Döndü · Satış Onayı: Evet</p>
+        <p id="saleMessage" role="status" aria-live="polite" class="text-sm mb-3"></p>
+        <button id="saleSubmit" type="submit" class="bg-pink-600 text-white font-bold rounded-xl px-6 py-3">Satışı Kaydet</button></form>
+      </div>
+    </div>
+
     <!-- MAIN APP -->
     <div id="mainApp" class="hidden w-full max-w-[1400px] mx-auto p-3 sm:p-6 md:p-8 lg:p-10 pb-32">
         <header class="flex flex-col xl:flex-row justify-between items-start gap-4 md:gap-6 mb-6 md:mb-10 w-full">
@@ -313,6 +335,7 @@
                         <i class="fas fa-undo group-hover:rotate-180 transition-transform duration-500"></i> <span class="md:hidden lg:inline">Sıfırla</span>
                     </button>
 
+                    <button type="button" onclick="openAddSale()" class="px-4 py-3 bg-pink-600 text-white rounded-2xl font-bold whitespace-nowrap">+ Satış Ekle</button>
                     <button onclick="exportToExcel()" class="w-full lg:w-auto px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-[16px] text-emerald-600 hover:text-white hover:bg-emerald-500 transition shadow-sm flex items-center justify-center gap-2 group whitespace-nowrap font-bold text-sm h-[52px] order-5" title="Excel İndir">
                         <i class="fas fa-file-excel group-hover:scale-110 transition-transform duration-300"></i> <span class="md:hidden lg:inline">Excel</span>
                     </button>
@@ -898,7 +921,7 @@
         async function safeFetch(payload) {
             // Liste okumalarının yeniden denemesi refreshData tarafından yönetilir.
             // İki katmanlı tekrar 30 saniyelik isteği dakikalarca uzatıyordu.
-            const retryableAction = ['login', 'getLeaderboard', 'updateCustomer'].includes(payload.action);
+            const retryableAction = ['login', 'getLeaderboard', 'updateCustomer', 'addSale'].includes(payload.action);
             if (payload.action === 'updateCustomer' && !payload.operationId) {
                 payload = { ...payload, operationId: Date.now().toString(36) + '-' + Math.random().toString(36).slice(2) };
             }
@@ -1434,7 +1457,7 @@
             if (activeRecordsRequest && activeRecordsRequest.key === key) return activeRecordsRequest.promise;
             if (recordsRetryKey !== key || !isBackground) recordsRetryCount = 0;
             recordsRetryKey = key;
-            if (isBackground && recordsRetryCount >= 3) return;
+
             clearTimeout(recordsRetryTimer);
             const version = ++recordsRequestVersion;
             const tbody = document.getElementById('crmTableBody');
@@ -1472,15 +1495,10 @@
                         tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-slate-400">Veriler hazırlanıyor. Bağlantı arka planda yenileniyor...</td></tr>';
                     }
                     recordsRetryCount++;
-                    if (recordsRetryCount < 3) {
-                        const delay = 3000 * recordsRetryCount;
-                        recordsRetryTimer = setTimeout(() => {
-                            if (currentBranch === branch && document.getElementById('monthFilter').value === selectedMonth) refreshData(true);
-                        }, delay);
-                    } else {
-                        if (timeSpan) timeSpan.textContent = 'Bağlantı bekleniyor';
-                        if (!hasData) tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-slate-500">Liste henüz alınamadı. Bağlantı yeniden kurulunca devam edebilirsiniz.<br><button type="button" onclick="refreshData(false, true)" class="mt-4 px-5 py-3 rounded-xl bg-slate-100 font-bold">Yeniden bağlan</button></td></tr>';
-                    }
+                    const delay = Math.min(60000, 3000 * Math.pow(2, Math.min(recordsRetryCount - 1,5)));
+                    recordsRetryTimer = setTimeout(() => {
+                        if (currentBranch === branch && document.getElementById('monthFilter').value === selectedMonth) refreshData(true);
+                    }, delay);
                 } finally {
                     if (activeRecordsRequest === request) activeRecordsRequest = null;
                 }
@@ -1905,6 +1923,64 @@
             showToast('Değişiklikler ekrana uygulandı; arka planda kaydediliyor.');
             saveCustomerInBackground(formData);
 
+        });
+
+        let pendingSale = null;
+        let saleSaving = false;
+        function openAddSale() {
+            if (!currentBranch) return;
+            if (!pendingSale) {
+                document.getElementById('addSaleForm').reset();
+                document.getElementById('sale_branch').value = currentBranch;
+                const date = new Date();
+                document.getElementById('sale_date').value = new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16);
+                [['category',CATEGORIES],['media',MEDIAS]].forEach(([key,values]) => {
+                    document.getElementById('sale_'+key).innerHTML = '<option value="">Seçiniz...</option>' + values.map(value => '<option>'+escapeHTML(value)+'</option>').join('');
+                });
+                document.getElementById('saleFields').disabled = false;
+                document.getElementById('saleMessage').textContent = '';
+            }
+            document.getElementById('addModal').classList.remove('hidden');
+        }
+        function closeAddSale() { document.getElementById('addModal').classList.add('hidden'); }
+        document.getElementById('addSaleForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            if (saleSaving) return;
+            const message = document.getElementById('saleMessage');
+            if (!pendingSale) {
+                const data = {branch:currentBranch};
+                for (const key of ['date','name','contact','customerNo','amount','category','media','product','note']) {
+                    data[key] = document.getElementById('sale_'+key).value.trim();
+                    if (!data[key]) { message.textContent = 'Tüm alanları doldurun.'; return; }
+                }
+                if (!(Number(data.amount)>0) || !Number.isFinite(Number(data.amount))) { message.textContent = 'Geçerli satış tutarı girin.'; return; }
+                if (data.contact.replace(/\D/g,'').length<10) { message.textContent = 'Geçerli telefon girin.'; return; }
+                if (hasCallbackNote(data.note)) { message.textContent = 'Ulaşılamama notuyla satış eklenemez.'; return; }
+                pendingSale = {action:'addSale',data,token:sessionStorage.getItem('authToken'),operationId:'sale-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)};
+            }
+            saleSaving = true;
+            document.getElementById('saleFields').disabled = true;
+            document.getElementById('saleSubmit').disabled = true;
+            message.textContent = 'Satış kaydediliyor...';
+            try {
+                const result = await safeFetch(pendingSale);
+                if (result.status !== 'success') {
+                    pendingSale = null;
+                    document.getElementById('saleFields').disabled = false;
+                    throw new Error(result.message || 'Satış kaydedilemedi.');
+                }
+                pendingSale = null;
+                closeAddSale();
+                showToast('Satış şubenize yeni satır olarak eklendi.');
+                document.getElementById('monthFilter').value = result.month;
+                recordsRequestVersion++; activeRecordsRequest = null;
+                refreshData(false,true);
+            } catch(error) {
+                message.textContent = pendingSale ? 'Yanıt doğrulanamadı. Tekrar kaydettiğinizde aynı işlem kontrol edilir; ikinci satır eklenmez.' : error.message;
+            } finally {
+                saleSaving = false;
+                document.getElementById('saleSubmit').disabled = false;
+            }
         });
 
         function exportToExcel() {
