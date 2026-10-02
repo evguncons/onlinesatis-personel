@@ -1013,7 +1013,7 @@
                 badge.className = "flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2.5 py-1 md:px-3 rounded-full font-bold text-[10px] md:text-xs border border-emerald-100 shadow-sm transition-colors duration-300";
                 badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online';
             }
-            if(currentBranch) { recordsRetryCount = 0; refreshData(true); }
+            if(currentBranch) { recordsRetryCount = 0; resumeCustomerSync(); refreshData(true); }
         });
 
 
@@ -1418,35 +1418,86 @@
             });
         }
 
-        function saveCustomerInBackground(formData) {
-            const key = recordSaveKey(formData);
-            const state = { data: { ...formData }, promise: null, error: null };
-            customerSaves.set(key, state);
-            renderTable();
-            const token = sessionStorage.getItem('authToken');
-            // Yeni seçim eski isteğin yanıtını veya yeniden denemelerini beklemez.
-            const sequence = ++saveSequence;
+        function scheduleCustomerSync(key, state) {
+            if (customerSaves.get(key) !== state || state.blocked) return;
+            clearTimeout(state.retryTimer);
+            const delay = Math.min(60000, 5000 * Math.pow(2, Math.min(state.attempts, 4)));
+            state.retryTimer = setTimeout(() => sendCustomerSave(key, state), delay);
+        }
+
+        function sendCustomerSave(key, state) {
+            if (customerSaves.get(key) !== state) return Promise.resolve();
+            if (state.inFlight) return state.promise;
+            clearTimeout(state.retryTimer);
+            if (!navigator.onLine) {
+                scheduleCustomerSync(key, state);
+                return Promise.resolve();
+            }
+            state.inFlight = true;
             state.promise = Promise.resolve().then(async () => {
-                const result = await safeFetch({ action: 'updateCustomer', data: state.data, token,
-                    clientId: saveClientId, sequence, operationId: saveClientId + '-' + sequence });
-                if (result.status !== 'success') throw new Error(result.message || 'Kayıt başarısız.');
+                const result = await safeFetch(state.payload);
+                if (result.status !== 'success') {
+                    const error = new Error(result.message || 'Kayıt başarısız.');
+                    error.permanent = !result.retryable && /zorunlu|geçersiz|yetkisiz|bulunamadı|eksik/i.test(error.message);
+                    throw error;
+                }
                 if (customerSaves.get(key) === state) {
+                    clearTimeout(state.retryTimer);
                     customerSaves.delete(key);
                     recordsRequestVersion++;
                     activeRecordsRequest = null;
-                    showToast('✓ ' + (formData.name || 'Müşteri') + ': E-tabloya kaydedildi.');
                 }
             }).catch(error => {
                 if (customerSaves.get(key) === state) {
                     state.error = error.message;
-                    console.warn('Kayıt senkronizasyonu:', error.message);
+                    state.blocked = !!error.permanent;
+                    state.attempts++;
+                    console.warn('Arka plan kayıt denemesi:', error.message);
+                    scheduleCustomerSync(key, state);
                 }
             }).finally(() => {
-                renderTable();
+                state.inFlight = false;
+                // Yenileme sunucuya yazılmış ancak yanıtı kaybolmuş kaydı da doğrular.
                 clearTimeout(saveRefreshTimer);
                 saveRefreshTimer = setTimeout(() => refreshData(true, false, true), 1200);
             });
             return state.promise;
+        }
+
+        function resumeCustomerSync() {
+            customerSaves.forEach((state, key) => {
+                if (!state.blocked) sendCustomerSave(key, state);
+            });
+        }
+
+        function reconcileCustomerSaves(records) {
+            records.forEach(record => {
+                const key = recordSaveKey(record);
+                const state = customerSaves.get(key);
+                if (!state) return;
+                const normalize = value => String(value == null ? '' : value).trim().replace(/^'/,'');
+                const matches = Object.keys(state.data).every(field => {
+                    if (field === 'amount') return parseCurrency(record[field]) === parseCurrency(state.data[field]);
+                    return normalize(record[field]) === normalize(state.data[field]);
+                });
+                if (matches) {
+                    clearTimeout(state.retryTimer);
+                    customerSaves.delete(key);
+                }
+            });
+        }
+
+        function saveCustomerInBackground(formData) {
+            const key = recordSaveKey(formData);
+            const previous = customerSaves.get(key);
+            if (previous) clearTimeout(previous.retryTimer);
+            const sequence = ++saveSequence;
+            const data = { ...formData };
+            const state = { data, promise: null, error: null, attempts: 0, inFlight: false, blocked: false, retryTimer: null,
+                payload: {action:'updateCustomer',data,token:sessionStorage.getItem('authToken'),
+                    clientId:saveClientId,sequence,operationId:saveClientId+'-'+sequence} };
+            customerSaves.set(key, state);
+            return sendCustomerSave(key, state);
         }
 
         async function refreshData(isBackground = false, showLoading = false, fresh = false) {
@@ -1481,6 +1532,7 @@
                         throw new Error(data.message || data.error);
                     }
                     if (!Array.isArray(data.records)) throw new Error('Müşteri listesi yanıtı geçersiz.');
+                    reconcileCustomerSaves(data.records);
                     window.customerSalesMap = data.customerSales || {};
                     allRecords = deduplicateRecords(mergePendingSaves(data.records));
                     loadedRecordsKey = key;
@@ -1679,12 +1731,6 @@
                 tr.className = String(item.isOrder).toLowerCase() === 'evet' ? 'bg-emerald-50/40 hover:bg-emerald-50 transition duration-200' : 'hover:bg-slate-50 transition duration-200';
                 
                 const safeName = escapeHTML(item.name || "Müşteri");
-                const saveState = customerSaves.get(recordSaveKey(item));
-                const saveBadge = saveState
-                    ? (saveState.error
-                        ? '<div class="text-xs text-rose-600 mt-1" title="' + 'Eşitleme bekleniyor' + '">Değişiklikler henüz eşitlenmedi.</div>'
-                        : '<div class="text-xs text-indigo-500 mt-1">Arka planda kaydediliyor...</div>')
-                    : '';
                 const initials = safeName.replace(/[^a-zA-ZğüşıöçĞÜŞİÖÇ\s]/g, '').trim().split(/\s+/).map(n => n ? n[0] : '').join('').substring(0, 2).toUpperCase() || "M";
                 const originalIndex = allRecords.findIndex(r => r === item); 
 
@@ -1694,7 +1740,6 @@
                             <div class="avatar-initials shrink-0">${initials}</div>
                             <div>
                                 <div class="font-bold text-slate-800 text-base">${safeName}</div>
-                                ${saveBadge}
                                 ${item.customerNo ? `<div class="text-[10px] text-indigo-400 font-mono font-bold mt-0.5">#${escapeHTML(item.customerNo)}</div>` : ''}
                                 <div class="text-xs text-slate-400 font-medium mt-0.5">${escapeHTML(item.date)}</div>
                             </div>
