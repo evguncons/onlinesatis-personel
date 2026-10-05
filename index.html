@@ -659,8 +659,8 @@
             } else if (digits.length === 10) {
                 digits = '90' + digits;
             }
-            const cleanName = name ? name.trim() : 'Müşterimiz';
-            const prod = (product && product.trim() !== '') ? product.trim() : ((category && category.trim() !== '') ? category.trim() : 'ürünlerimiz');
+            const cleanName = String(name == null ? '' : name).trim() || 'Müşterimiz';
+            const prod = String(product == null ? '' : product).trim() || String(category == null ? '' : category).trim() || 'ürünlerimiz';
             const msg = `Merhaba ${cleanName}, Hedef AVM'den arıyorum. İlgilendiğiniz ${prod} hakkında kampanyalı fiyat ve elden senetli taksit imkanlarımızla ilgili bilgi vermek için ulaşıyorum. Size nasıl yardımcı olabilirim?`;
             return `https://wa.me/${digits}?text=${encodeURIComponent(msg)}`;
         }
@@ -1312,7 +1312,7 @@
             document.getElementById('headerTitle').textContent = branch.toUpperCase();
             
             if (initialData && !initialData.error && Array.isArray(initialData.records) && initialMonth === document.getElementById('monthFilter').value) {
-                allRecords = deduplicateRecords(initialData.records);
+                allRecords = deduplicateRecords(normalizeCustomerRecords(initialData.records));
                 window.customerSalesMap = initialData.customerSales || {};
                 loadedRecordsKey = branch + ':' + initialMonth;
                 updateDashboardMetrics(); checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords); renderTable();
@@ -1405,11 +1405,23 @@
         let recordsRetryTimer;
         let recordsRetryCount = 0;
         let recordsRetryKey = null;
+        let recordsRenderFailureKey = null;
         const customerSaves = new Map();
         const saveClientId = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
         let saveSequence = 0;
         let saveRefreshTimer;
         const recordSaveKey = item => JSON.stringify([item.branch, item.sheetName, String(item.rowIndex)]);
+
+        function normalizeCustomerRecords(records) {
+            return records.filter(record => record && typeof record === 'object' && !Array.isArray(record)).map(record => {
+                const normalized = { ...record };
+                ['branch','sheetName','date','name','status','contact','customerNo','media','category','product','result','note','isOrder'].forEach(field => {
+                    normalized[field] = String(record[field] == null ? '' : record[field]);
+                });
+                normalized.existingSales = Array.isArray(record.existingSales) ? record.existingSales.filter(sale => sale && typeof sale === 'object') : [];
+                return normalized;
+            });
+        }
 
         function mergePendingSaves(records) {
             return records.map(record => {
@@ -1505,6 +1517,8 @@
             const selectedMonth = document.getElementById('monthFilter').value;
             const branch = currentBranch;
             const key = branch + ':' + selectedMonth;
+            if (isBackground && recordsRenderFailureKey === key) return;
+            if (!isBackground) recordsRenderFailureKey = null;
             if (activeRecordsRequest && activeRecordsRequest.key === key) return activeRecordsRequest.promise;
             if (recordsRetryKey !== key || !isBackground) recordsRetryCount = 0;
             recordsRetryKey = key;
@@ -1524,6 +1538,7 @@
             const request = { key, promise: null };
             activeRecordsRequest = request;
             request.promise = (async () => {
+                let phase = 'request';
                 try {
                     const data = await safeFetch({ action: 'getRecentRecords', data: { branch, month: selectedMonth, fresh: fresh || (!isBackground && loadedRecordsKey === key) }, token: sessionStorage.getItem('authToken') });
                     if (version !== recordsRequestVersion) return;
@@ -1532,16 +1547,25 @@
                         throw new Error(data.message || data.error);
                     }
                     if (!Array.isArray(data.records)) throw new Error('Müşteri listesi yanıtı geçersiz.');
-                    reconcileCustomerSaves(data.records);
+                    phase = 'render';
+                    const records = normalizeCustomerRecords(data.records);
+                    reconcileCustomerSaves(records);
                     window.customerSalesMap = data.customerSales || {};
-                    allRecords = deduplicateRecords(mergePendingSaves(data.records));
+                    allRecords = deduplicateRecords(mergePendingSaves(records));
+                    updateDashboardMetrics(); checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords); renderTable();
                     loadedRecordsKey = key;
                     recordsRetryCount = 0;
-                    updateDashboardMetrics(); checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords); renderTable();
+                    recordsRenderFailureKey = null;
                     if (timeSpan) timeSpan.textContent = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
                 } catch (error) {
                     if (version !== recordsRequestVersion) return;
                     console.warn('Liste senkronizasyonu:', error.message);
+                    if (phase === 'render') {
+                        recordsRenderFailureKey = key;
+                        if (timeSpan) timeSpan.textContent = 'Görünüm hazırlanamadı';
+                        if (!hasData) tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-slate-500">Liste alındı, ancak görüntülenemedi. Sayfayı yenileyin.</td></tr>';
+                        return;
+                    }
                     if (timeSpan) timeSpan.textContent = 'Bağlantı bekleniyor';
                     if (!hasData) {
                         tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 text-slate-400">Veriler hazırlanıyor. Bağlantı arka planda yenileniyor...</td></tr>';
@@ -1601,7 +1625,7 @@
             overdueRecords = records.filter(item => {
                 const itemDate = parseDateTR(item.date);
                 if (itemDate.getTime() === 0) return false; 
-                const res = (item.result || "").toLowerCase();
+                const res = String(item.result == null ? '' : item.result).toLowerCase();
                 return (res.includes("gelecek") || res.includes("tekrar") || res.includes("ara")) && (now - itemDate > limit);
             });
 
@@ -1720,7 +1744,7 @@
             pageData.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 let statusBadge = '', statusColor = '#e2e8f0'; 
-                const displayStatus = (item.status || "").trim().toLocaleLowerCase('tr-TR');
+                const displayStatus = String(item.status == null ? '' : item.status).trim().toLocaleLowerCase('tr-TR');
 
                 if (displayStatus === 'arandı') {
                     statusBadge = '<span class="status-badge bg-yellow-100 text-yellow-800 border border-yellow-200"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> ARANDI</span>'; statusColor = '#eab308';
@@ -1821,7 +1845,7 @@
                 waBtn.href = getWhatsAppUrl(item.contact, item.name, item.product, item.category);
             }
             
-            const st = (item.status || "").trim().toLocaleLowerCase('tr-TR');
+            const st = String(item.status == null ? '' : item.status).trim().toLocaleLowerCase('tr-TR');
             const stEl = document.getElementById('m_status');
             stEl.value = '';
             for(let opt of stEl.options) { if(opt.value.toLocaleLowerCase('tr-TR') === st) stEl.value = opt.value; }
