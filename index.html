@@ -86,6 +86,69 @@
         .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.025em; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .avatar-initials { width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; color: white; background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); box-shadow: 0 4px 10px -2px rgba(236, 72, 153, 0.4); border: 2px solid #fff; }
 
+        .customer-history { background:#fff; border:1px solid #f3dce8; border-radius:22px; padding:clamp(18px,3vw,26px); box-shadow:0 3px 12px rgba(131,24,67,.035); }
+        .history-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+        .history-title { display:flex; align-items:center; gap:11px; }
+        .history-title-icon { width:38px; height:38px; display:grid; place-items:center; border-radius:12px; background:#fdf2f8; color:#be185d; }
+        .history-title h4 { font-size:16px; font-weight:800; color:#1e293b; margin:0; }
+        .history-title p { font-size:11px; color:#64748b; margin:3px 0 0; }
+        .history-counts { display:flex; gap:6px; flex-wrap:wrap; }
+        .history-chip { display:inline-flex; align-items:center; gap:6px; border-radius:8px; padding:6px 9px; font-size:11px; line-height:1.4; font-weight:700; color:#475569; background:#f1f5f9; }
+        .history-chip--sale { color:#047857; background:#ecfdf5; }
+        .history-sales-summary { margin-top:18px; padding:15px 17px; border:1px solid #a7e5d1; border-radius:14px; background:#f0fdf7; display:flex; justify-content:space-between; align-items:center; gap:14px; }
+        .history-sales-summary h5 { margin:0; color:#065f46; font-size:13px; font-weight:800; display:flex; align-items:center; gap:7px; }
+        .history-sales-summary p { margin:5px 0 0; font-size:11px; color:#3f6e60; line-height:1.6; }
+        .history-total { flex-shrink:0; text-align:right; }
+        .history-total strong { display:block; font-size:21px; font-weight:800; letter-spacing:-.6px; color:#047857; font-variant-numeric:tabular-nums; }
+        .history-total .history-total-label { display:block; font-size:10px; color:#3f6e60; margin-top:2px; }
+        .history-amount-missing { color:#92400e; background:#fff7e5; border:1px solid #f3d397; border-radius:7px; display:inline-flex; align-items:center; gap:5px; padding:5px 8px; font-size:11px; font-weight:700; line-height:1.4; }
+        .history-list { list-style:none; padding:0 0 0 18px; margin:20px 0 0; position:relative; }
+        .history-list::before { content:''; position:absolute; top:12px; bottom:22px; left:4px; width:2px; background:#f1dce6; }
+        .history-entry { --history-accent:#94a3b8; position:relative; margin-bottom:14px; min-width:0; }
+        .history-entry:last-child { margin-bottom:0; }
+        .history-entry::before { content:''; position:absolute; left:-19px; top:20px; width:12px; height:12px; border-radius:50%; background:var(--history-accent); border:3px solid #fff; box-shadow:0 0 0 1px var(--history-accent); }
+        .history-entry--current { --history-accent:#db2777; }
+        .history-entry--sale { --history-accent:#059669; }
+        .history-card { padding:16px; border:1px solid #e2e8f0; border-radius:14px; background:#fff; }
+        .history-entry--current .history-card { border-color:#f2b8d2; background:#fffafd; box-shadow:inset 3px 0 0 #db2777; }
+        .history-entry--sale:not(.history-entry--current) .history-card { border-color:#b9e6d8; box-shadow:inset 3px 0 0 #059669; }
+        .history-card-top { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+        .history-date { display:inline-flex; align-items:center; gap:7px; font-size:11px; color:#475569; font-weight:600; }
+        .history-date i { color:#94a3b8; }
+        .history-time { color:#64748b; margin-left:3px; font-weight:400; }
+        .history-current { color:#be185d; background:#fce7f3; font-size:10px; font-weight:800; border-radius:7px; padding:5px 8px; display:inline-flex; align-items:center; gap:5px; }
+        .history-previous { color:#64748b; font-size:10px; }
+        .history-product { margin:0; font-size:14px; line-height:1.65; font-weight:800; color:#1e293b; overflow-wrap:anywhere; }
+        .history-customer-number { margin-top:4px; font-size:11px; color:#64748b; overflow-wrap:anywhere; }
+        .history-outcome { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-top:11px; }
+        .history-badge { display:inline-flex; align-items:center; gap:5px; padding:5px 8px; border-radius:7px; font-size:10px; font-weight:700; line-height:1.5; }
+        .history-badge--called { background:#eef2ff; color:#4338ca; }
+        .history-badge--uncalled { background:#fff1f2; color:#be123c; }
+        .history-badge--sale { background:#dff7ed; color:#047857; }
+        .history-badge--negative { background:#fff1f2; color:#9f1239; }
+        .history-badge--followup { background:#fff7e5; color:#92400e; }
+        .history-badge--neutral { background:#f1f5f9; color:#475569; }
+        .history-sale-amount { color:#047857; font-size:15px; font-weight:800; margin-left:auto; font-variant-numeric:tabular-nums; }
+        .history-note { margin-top:13px; padding:11px 12px; border-radius:10px; background:#f8fafc; border:1px solid #edf0f4; }
+        .history-entry--current .history-note { background:#fff; border-color:#f7e5ee; }
+        .history-note-label { display:flex; align-items:center; gap:6px; color:#64748b; font-size:10px; font-weight:700; margin-bottom:5px; }
+        .history-note p { color:#334155; margin:0; font-size:13px; line-height:1.8; white-space:pre-wrap; overflow-wrap:anywhere; }
+        .history-note-empty { margin:11px 0 0; color:#94a3b8; font-size:11px; }
+        .history-edit-hint { margin:18px 0 0; padding-top:13px; border-top:1px dashed #edd5e1; color:#64748b; font-size:11px; line-height:1.7; display:flex; align-items:flex-start; gap:7px; }
+        .history-edit-hint i { color:#be185d; margin-top:4px; }
+        @media (max-width:480px) {
+            .customer-history { padding:16px; border-radius:18px; }
+            .history-title h4 { font-size:15px; }
+            .history-sales-summary { align-items:flex-start; flex-direction:column; gap:10px; padding:13px; }
+            .history-total { text-align:left; }
+            .history-total strong { font-size:20px; }
+            .history-card { padding:13px; }
+            .history-card-top { gap:7px; }
+            .history-current { font-size:9px; }
+            .history-product { font-size:13px; }
+            .history-sale-amount { flex-basis:100%; margin-left:0; margin-top:3px; }
+        }
+
         @media (max-width: 1024px) {
             .glass-card { border: none; box-shadow: none; background: transparent; border-radius: 0; padding-bottom: 2rem;}
             .custom-table thead { display: none; }
@@ -389,7 +452,7 @@
                 <form id="editForm" class="space-y-6 md:space-y-8">
                     <input type="hidden" id="m_rowIndex"><input type="hidden" id="m_sheetName">
 
-                    <section id="customerHistory" aria-label="Müşteri geçmişi" class="hidden bg-white p-4 md:p-6 rounded-2xl border border-indigo-100 shadow-sm"></section>
+                    <section id="customerHistory" aria-label="Müşteri geçmişi" class="hidden customer-history"></section>
 
                     <div class="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl border border-pink-100 shadow-sm grid grid-cols-2 gap-4 md:gap-6 relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-pink-100 to-transparent opacity-50 rounded-bl-full pointer-events-none"></div>
@@ -765,29 +828,55 @@
             const container = document.getElementById('customerHistory');
             if (!container) return;
             const summary = getCustomerHistorySummary(item);
+            const missingAmounts = summary.sales.filter(sale => !(sale.amount > 0)).length;
             container.classList.remove('hidden');
             container.innerHTML = `
-                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                    <h4 class="font-bold text-slate-800"><i class="fas fa-clock-rotate-left text-indigo-400 mr-2" aria-hidden="true"></i>Müşteri Geçmişi</h4>
-                    <span class="text-xs font-semibold text-indigo-600">${summary.referralCount} yönlendirme · ${summary.saleCount} satış</span>
+                <div class="history-heading">
+                    <div class="history-title">
+                        <span class="history-title-icon" aria-hidden="true"><i class="fas fa-clock-rotate-left"></i></span>
+                        <div><h4>Müşteri Geçmişi</h4><p>Bu şube · Seçili ay</p></div>
+                    </div>
+                    <div class="history-counts" aria-label="Geçmiş özeti">
+                        <span class="history-chip"><i class="fas fa-share-nodes" aria-hidden="true"></i>${summary.referralCount} yönlendirme</span>
+                        <span class="history-chip history-chip--sale"><i class="fas fa-bag-shopping" aria-hidden="true"></i>${summary.saleCount} satış</span>
+                    </div>
                 </div>
-                <p class="text-xs text-slate-500 mb-3">Bu şubede, seçili ayın kayıtları. Formda yalnızca “Düzenlenen yönlendirme” güncellenir.</p>
-                ${summary.previousSaleCount ? `<p class="rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-sm font-semibold p-3 mb-3">Bu müşteriye daha önce ${summary.previousSaleCount} satış yapıldı. Seçili ay toplamı: ${formatMoney(summary.totalRevenue)}</p>` : ''}
-                <ol class="space-y-3 max-h-72 overflow-y-auto pr-1" tabindex="0" aria-label="Seçili aydaki yönlendirmeler">
+                ${summary.saleCount ? `<div class="history-sales-summary">
+                    <div><h5><i class="fas fa-circle-check" aria-hidden="true"></i>${summary.previousSaleCount ? 'Bu müşteriye daha önce satış yapıldı' : 'Satış kaydı var'}</h5>
+                    <p>${summary.previousSaleCount ? summary.previousSaleCount + ' önceki satış kaydı bulunuyor.' : 'Düzenlenen yönlendirmede satış bulunuyor.'}</p></div>
+                    <div class="history-total">${summary.totalRevenue > 0 ? `<strong>${formatMoney(summary.totalRevenue)}</strong><span class="history-total-label">${missingAmounts ? 'Tutarı girilen satışların toplamı' : 'Bu ayki satış toplamı'}</span>` : ''}
+                        ${missingAmounts ? `<span class="history-amount-missing"><i class="fas fa-circle-exclamation" aria-hidden="true"></i>${missingAmounts === 1 ? 'Satış tutarı girilmemiş' : missingAmounts + ' satışın tutarı girilmemiş'}</span>` : ''}</div>
+                </div>` : ''}
+                <ol class="history-list" aria-label="Seçili aydaki yönlendirmeler">
                     ${summary.history.map(entry => {
                         const isCurrent = referralRowKey(entry) === referralRowKey(item);
-                        return `<li class="rounded-xl border ${isCurrent ? 'border-indigo-200 bg-indigo-50/50' : 'border-slate-200 bg-slate-50/50'} p-3">
-                            <div class="flex flex-wrap justify-between gap-2 text-xs mb-2">
-                                <span class="font-semibold text-slate-600">${escapeHTML(entry.date) || 'Tarih belirtilmemiş'}</span>
-                                ${isCurrent ? '<span class="font-bold text-indigo-600">Düzenlenen yönlendirme</span>' : '<span class="text-slate-400">Önceki kayıt</span>'}
-                            </div>
-                            <div class="text-sm font-semibold text-slate-700">${escapeHTML(entry.product || entry.category) || 'Ürün belirtilmemiş'}</div>
-                            ${entry.customerNo ? `<div class="text-xs text-slate-500 mt-1">Müşteri no: ${escapeHTML(entry.customerNo)}</div>` : ''}
-                            <div class="text-xs text-slate-600 mt-1">${escapeHTML(entry.status || 'aranmadı')}${entry.result ? ' · ' + escapeHTML(entry.result) : ''}${isSaleRecord(entry) ? ` · <strong class="text-emerald-700">${formatMoney(entry.amount)}</strong>` : ''}</div>
-                            <p class="text-sm text-slate-600 whitespace-pre-wrap break-words mt-2">${escapeHTML(entry.note) || 'Görüşme notu yok.'}</p>
+                        const sold = isSaleRecord(entry);
+                        const called = entry.status.trim().toLocaleLowerCase('tr-TR') === 'arandı';
+                        const result = entry.result.trim().toLocaleLowerCase('tr-TR');
+                        const outcome = sold ? {tone:'sale',icon:'bag-shopping'} : result.includes('olumsuz') ? {tone:'negative',icon:'circle-minus'} :
+                            /tekrar|gelecek|mağaza/.test(result) ? {tone:'followup',icon:'clock'} : {tone:'neutral',icon:'comment-dots'};
+                        const dateParts = entry.date.trim().split(/\s+/);
+                        const dateText = dateParts.shift() || 'Tarih belirtilmemiş';
+                        const timeText = dateParts.join(' ');
+                        return `<li class="history-entry${isCurrent ? ' history-entry--current' : ''}${sold ? ' history-entry--sale' : ''}">
+                            <article class="history-card" aria-label="${isCurrent ? 'Düzenlenen yönlendirme' : 'Önceki kayıt'}">
+                                <div class="history-card-top">
+                                    <span class="history-date"><i class="far fa-calendar" aria-hidden="true"></i><span>${escapeHTML(dateText)}${timeText ? `<span class="history-time">${escapeHTML(timeText)}</span>` : ''}</span></span>
+                                    ${isCurrent ? '<span class="history-current"><i class="fas fa-pen" aria-hidden="true"></i>Düzenlenen yönlendirme</span>' : '<span class="history-previous">Önceki kayıt</span>'}
+                                </div>
+                                <h5 class="history-product">${escapeHTML(entry.product || entry.category) || 'Ürün belirtilmemiş'}</h5>
+                                ${entry.customerNo ? `<p class="history-customer-number">Müşteri no: <strong>${escapeHTML(entry.customerNo)}</strong></p>` : ''}
+                                <div class="history-outcome">
+                                    <span class="history-badge history-badge--${called ? 'called' : 'uncalled'}"><i class="fas fa-${called ? 'phone' : 'phone-slash'}" aria-hidden="true"></i>${called ? 'Arandı' : 'Aranmadı'}</span>
+                                    ${entry.result || sold ? `<span class="history-badge history-badge--${outcome.tone}"><i class="fas fa-${outcome.icon}" aria-hidden="true"></i>${escapeHTML(entry.result || 'Satışa Döndü')}</span>` : ''}
+                                    ${sold ? entry.amount > 0 ? `<strong class="history-sale-amount">${formatMoney(entry.amount)}</strong>` : '<span class="history-amount-missing"><i class="fas fa-circle-exclamation" aria-hidden="true"></i>Tutar girilmemiş</span>' : ''}
+                                </div>
+                                ${entry.note.trim() ? `<div class="history-note"><span class="history-note-label"><i class="far fa-comment-dots" aria-hidden="true"></i>Görüşme notu</span><p>${escapeHTML(entry.note)}</p></div>` : '<p class="history-note-empty">Henüz görüşme notu yok.</p>'}
+                            </article>
                         </li>`;
                     }).join('')}
-                </ol>`;
+                </ol>
+                <p class="history-edit-hint"><i class="fas fa-arrow-down" aria-hidden="true"></i><span>Kaydı düzenlemek için aşağı kaydırın. Yalnızca pembe işaretli yönlendirme güncellenir.</span></p>`;
         }
 
         function deduplicateRecords(records) {
