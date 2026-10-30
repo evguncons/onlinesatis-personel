@@ -896,7 +896,17 @@
 
         function hasCallbackNote(note) {
             const normalized = String(note || '').toLocaleLowerCase('tr-TR').replace(/ı/g, 'i').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
-            return /(^|[^a-z])(acmiyor|acmadi|mesgule atti|cevap vermedi|yanit vermedi|ulasilamadi)(?=$|[^a-z])/.test(normalized);
+            return /(^|[^a-z])(acmiyor|acmiyo|acmadi|mesgule atti|mesgule atiyor|mesgul|cevap vermedi|cevap vermiyor|cevap vermiyo|yanit vermedi|yanit vermiyor|ulasilamadi)(?=$|[^a-z])/.test(normalized);
+        }
+
+        function applyCallbackNoteToForm() {
+            const status = document.getElementById('m_status');
+            const note = document.getElementById('m_note');
+            if (status.value !== 'arandı' || !hasCallbackNote(note.value)) return;
+            document.getElementById('m_result').value = 'Tekrar Aranacak';
+            document.getElementById('m_isOrder').value = 'Hayır';
+            document.getElementById('m_amount').value = '';
+            if (window.updateModalFlow) window.updateModalFlow();
         }
 
         function appendQuickNote(text) {
@@ -911,7 +921,8 @@
                 }
             }
             autoResize(noteEl);
-            if (hasCallbackNote(noteEl.value)) showToast('Bu not kaydedildiğinde aranma durumu otomatik aranmadı olacak.');
+            applyCallbackNoteToForm();
+            if (hasCallbackNote(noteEl.value) && document.getElementById('m_status').value === 'arandı') showToast('Görüşme sonucu Tekrar Aranacak olarak kaydedilecek.');
         }
 
         function formatMoney(amount) {
@@ -954,7 +965,7 @@
             const add = record => {
                 if (!record || typeof record !== 'object' || Array.isArray(record)) return;
                 const entry = { rowIndex: record.rowIndex, sheetName: String(record.sheetName || item.sheetName || '') };
-                ['branch','date','name','status','contact','customerNo','media','category','product','result','note','isOrder'].forEach(field => {
+                ['branch','date','lastUpdatedAt','name','status','contact','customerNo','media','category','product','result','note','isOrder'].forEach(field => {
                     entry[field] = String(record[field] == null ? '' : record[field]);
                 });
                 entry.amount = parseCurrency(record.amount !== undefined && record.amount !== '' ? record.amount : record.revenue);
@@ -1023,6 +1034,7 @@
                                     <span class="history-date"><i class="far fa-calendar" aria-hidden="true"></i><span>${escapeHTML(dateText)}${timeText ? `<span class="history-time">${escapeHTML(timeText)}</span>` : ''}</span></span>
                                     ${isCurrent ? '<span class="history-current"><i class="fas fa-pen" aria-hidden="true"></i>Düzenlenen yönlendirme</span>' : '<span class="history-previous">Önceki kayıt</span>'}
                                 </div>
+                                ${entry.lastUpdatedAt ? `<p class="history-customer-number">Son güncelleme: ${escapeHTML(entry.lastUpdatedAt)}</p>` : ''}
                                 <h5 class="history-product">${escapeHTML(entry.product || entry.category) || 'Ürün belirtilmemiş'}</h5>
                                 ${entry.customerNo ? `<p class="history-customer-number">Müşteri no: <strong>${escapeHTML(entry.customerNo)}</strong></p>` : ''}
                                 <div class="history-outcome">
@@ -1487,7 +1499,7 @@
 
             statusEl.addEventListener('change', updateFlow);
             resultEl.addEventListener('change', updateFlow);
-            noteEl.addEventListener('input', () => autoResize(noteEl));
+            noteEl.addEventListener('input', () => { autoResize(noteEl); applyCallbackNoteToForm(); });
             window.updateModalFlow = updateFlow;
         }
 
@@ -1672,7 +1684,7 @@
                 // Dönüşüm tekil müşteri, ciro ise o müşterinin tüm ayrı satış satırları üzerinden hesaplanır.
                 if (called.length || summary.saleCount) calledCount++;
                 if (summary.saleCount) salesCount++;
-                if (called.some(entry => entry.date.includes(todayPrefix))) todayCalledCount++;
+                if (called.some(entry => (entry.lastUpdatedAt || entry.date).includes(todayPrefix))) todayCalledCount++;
                 monthRevenue += summary.totalRevenue;
             });
 
@@ -1722,7 +1734,7 @@
         function normalizeCustomerRecords(records) {
             return records.filter(record => record && typeof record === 'object' && !Array.isArray(record)).map(record => {
                 const normalized = { ...record };
-                ['branch','sheetName','date','name','status','contact','customerNo','media','category','product','result','note','isOrder'].forEach(field => {
+                ['branch','sheetName','date','lastUpdatedAt','name','status','contact','customerNo','media','category','product','result','note','isOrder'].forEach(field => {
                     normalized[field] = String(record[field] == null ? '' : record[field]);
                 });
                 normalized.existingSales = Array.isArray(record.existingSales) ? record.existingSales.filter(sale => sale && typeof sale === 'object') : [];
@@ -1966,15 +1978,17 @@
             const now = new Date();
             const limit = 5 * 24 * 60 * 60 * 1000; 
             overdueRecords = records.filter(item => {
-                const itemDate = parseDateTR(item.date);
+                const updatedParts = String(item.lastUpdatedAt || '').match(/^(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})(?::(\d{2}))?$/);
+                const itemDate = updatedParts ? new Date(`${updatedParts[3]}-${updatedParts[2]}-${updatedParts[1]}T${updatedParts[4]}:${updatedParts[5]}:${updatedParts[6] || '00'}+03:00`) : parseDateTR(item.date);
                 if (itemDate.getTime() === 0) return false; 
                 const res = String(item.result == null ? '' : item.result).toLowerCase();
-                return (res.includes("gelecek") || res.includes("tekrar") || res.includes("ara")) && (now - itemDate > limit);
+                const followUpLimit = hasCallbackNote(item.note) && res.includes('tekrar') ? 48*60*60*1000 : limit;
+                return (res.includes("gelecek") || res.includes("tekrar") || res.includes("ara")) && (now - itemDate > followUpLimit);
             });
 
             const notifBox = document.getElementById('overdueNotification');
             if (overdueRecords.length > 0) {
-                document.getElementById('overdueMessage').innerHTML = `<strong>${overdueRecords.length}</strong> müşterinin takibi 5 günü geçti. Lütfen kontrol ediniz.`;
+                document.getElementById('overdueMessage').innerHTML = `<strong>${overdueRecords.length}</strong> müşterinin takip süresi doldu. Lütfen tekrar arayınız.`;
                 notifBox.classList.remove('hidden');
             } else { notifBox.classList.add('hidden'); }
         }
@@ -2111,6 +2125,7 @@
                                 <div class="customer-name font-bold text-slate-800 text-base">${safeName}</div>
                                 ${item.customerNo ? `<div class="customer-meta text-[10px] text-indigo-400 font-mono font-bold mt-0.5">#${escapeHTML(item.customerNo)}</div>` : ''}
                                 <div class="customer-meta text-xs text-slate-400 font-medium mt-0.5">${escapeHTML(item.date)}</div>
+                                ${item.lastUpdatedAt ? `<div class="customer-meta text-xs text-slate-500 mt-0.5">Son işlem: ${escapeHTML(item.lastUpdatedAt)}</div>` : ''}
                                 ${historySummary.referralCount > 1 ? `<button type="button" onclick="openEditModal(${originalIndex})" class="customer-history-link text-xs text-indigo-600 font-semibold underline underline-offset-2 mt-2 text-left">${historySummary.referralCount} yönlendirme · Geçmişi gör</button>` : ''}
                             </div>
                         </div>
@@ -2263,9 +2278,8 @@
                 return;
             }
 
-            if (hasCallbackNote(noteEl.value)) {
-                vals.status = 'aranmadı';
-                vals.result = '';
+            if (vals.status === 'arandı' && hasCallbackNote(noteEl.value)) {
+                vals.result = 'Tekrar Aranacak';
                 vals.order = 'Hayır';
                 vals.amount = '';
             }
