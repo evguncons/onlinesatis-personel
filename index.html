@@ -170,7 +170,7 @@
 
     <div id="addModal" class="hidden fixed inset-0 z-[80] bg-slate-900/60 p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="addSaleTitle">
       <div class="max-w-2xl mx-auto bg-white rounded-3xl p-6 my-8">
-        <div class="flex justify-between items-center"><h2 id="addSaleTitle" class="text-xl font-bold">Satış Ekle</h2><button type="button" onclick="closeAddSale()" aria-label="Kapat">✕</button></div>
+        <div class="flex justify-between items-center"><h2 id="addSaleTitle" class="text-xl font-bold">Müşteri Ekle</h2><button type="button" onclick="closeAddSale()" aria-label="Kapat">✕</button></div>
         <p class="text-sm text-slate-500 mt-2 mb-4">Tüm alanlar zorunludur. Satış, şubenize yeni satır olarak eklenir.</p>
         <form id="addSaleForm"><fieldset id="saleFields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <label>Şube<input id="sale_branch" class="modern-input" readonly required></label>
@@ -335,7 +335,7 @@
                         <i class="fas fa-undo group-hover:rotate-180 transition-transform duration-500"></i> <span class="md:hidden lg:inline">Sıfırla</span>
                     </button>
 
-                    <button type="button" onclick="openAddSale()" class="px-4 py-3 bg-pink-600 text-white rounded-2xl font-bold whitespace-nowrap">+ Satış Ekle</button>
+                    <button type="button" onclick="openAddSale()" class="px-4 py-3 bg-pink-600 text-white rounded-2xl font-bold whitespace-nowrap">+ Müşteri Ekle</button>
                     <button onclick="exportToExcel()" class="w-full lg:w-auto px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-[16px] text-emerald-600 hover:text-white hover:bg-emerald-500 transition shadow-sm flex items-center justify-center gap-2 group whitespace-nowrap font-bold text-sm h-[52px] order-5" title="Excel İndir">
                         <i class="fas fa-file-excel group-hover:scale-110 transition-transform duration-300"></i> <span class="md:hidden lg:inline">Excel</span>
                     </button>
@@ -514,9 +514,9 @@
                                 </select>
                             </div>
                             <div>
-                                <label for="m_amount" class="text-[10px] md:text-xs font-bold text-emerald-700/70 mb-1.5 block uppercase tracking-wide">Toplam Tutar</label>
+                                <label for="m_amount" class="text-[10px] md:text-xs font-bold text-emerald-700/70 mb-1.5 block uppercase tracking-wide">Toplam Tutar <span id="amountRequiredBadge" class="text-rose-500 hidden">* Zorunlu</span></label>
                                 <div class="relative">
-                                    <input type="number" id="m_amount" class="modern-input border-emerald-300 pl-10 focus:ring-emerald-400 focus:border-emerald-400 font-black text-emerald-800 text-lg" placeholder="0" disabled>
+                                    <input type="number" id="m_amount" min="0.01" step="0.01" class="modern-input border-emerald-300 pl-10 focus:ring-emerald-400 focus:border-emerald-400 font-black text-emerald-800 text-lg" placeholder="0" disabled>
                                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500 font-bold text-lg">₺</span>
                                 </div>
                             </div>
@@ -535,7 +535,7 @@
     </div>
 
     <!-- MÜKERRER SATIŞ UYARI MODALI -->
-    <div id="duplicateWarningModal" class="fixed inset-0 z-[90] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300">
+    <div id="duplicateWarningModal" role="dialog" aria-modal="true" aria-label="Mükerrer satış kontrolü" class="fixed inset-0 z-[90] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300">
         <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-amber-200 overflow-hidden transform transition-all p-6 sm:p-7 animate-in fade-in zoom-in-95 duration-200">
             <div class="flex items-center gap-4 mb-4">
                 <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 text-2xl shadow-inner border border-amber-200">
@@ -543,14 +543,15 @@
                 </div>
                 <div>
                     <h3 class="font-extrabold text-slate-800 text-lg sm:text-xl">Mükerrer Satış Uyarısı</h3>
-                    <p class="text-xs text-amber-600 font-bold uppercase tracking-wider mt-0.5">Dikkat: Kayıt Zaten Mevcut</p>
+                    <p class="text-xs text-amber-600 font-bold uppercase tracking-wider mt-0.5">Aynı ay · Aynı müşteri · Aynı tutar</p>
                 </div>
             </div>
 
             <div class="bg-amber-50/90 rounded-2xl p-4 border border-amber-200/80 mb-6">
                 <p class="text-sm font-bold text-slate-800 leading-relaxed" id="duplicateWarningText">
-                    Bu müşterinin bu ay için satış kaydı zaten işlendi!
+                    Bu müşterinin aynı ayda aynı tutarda satışı var. Bu yeni bir satış mı, yoksa aynı satış tekrar mı işleniyor?
                 </p>
+                <p id="duplicateWarningCustomer" class="text-xs text-slate-600 font-semibold mt-2 break-words"></p>
                 <div class="mt-3 pt-3 border-t border-amber-200/70 text-xs font-semibold text-slate-600 space-y-1" id="duplicateWarningDetails">
                     <div class="flex justify-between items-center">
                         <span class="text-slate-500">Mevcut Satış Tutarı:</span>
@@ -563,19 +564,19 @@
                 </div>
                 <div class="mt-3 pt-2.5 border-t border-amber-200/70 text-[11px] text-slate-600 leading-relaxed bg-white/60 p-2.5 rounded-xl">
                     📌 <strong>Ne Yapmalısınız?</strong><br>
-                    • <strong>Yeni satış yoksa:</strong> <span class="font-bold text-slate-700">"Tamam"</span>a basın. Tutar silinecektir. Ardından Satış Onayı'nı <span class="font-bold text-rose-600">"Hayır"</span> seçip görüşme notunuzu kaydedebilirsiniz.<br>
-                    • <strong>Gerçekten 2. kez satış yapıldıysa:</strong> <span class="font-bold text-amber-600">"Devam Et"</span>e basarak aynı tutardaki ikinci satışı onaylayabilirsiniz.
+                    • <strong>Aynı satışsa:</strong> “Aynı satış, vazgeç” seçin. Yeni satış kaydedilmez, forma dönersiniz.<br>
+                    • <strong>Ayrı bir satış yapıldıysa:</strong> “Yeni satış, devam et” seçerek kaydı onaylayın.
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 <button type="button" onclick="closeDuplicateWarning(false)" class="w-full py-3 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold rounded-2xl transition active:scale-95 border border-slate-200 text-center flex flex-col items-center justify-center gap-0.5">
-                    <span class="text-sm">Tamam</span>
-                    <span class="text-[10px] text-slate-500 font-medium">Mükerreri İptal Et</span>
+                    <span class="text-sm">Aynı satış, vazgeç</span>
+                    <span class="text-[10px] text-slate-500 font-medium">Forma dön</span>
                 </button>
                 <button type="button" onclick="closeDuplicateWarning(true)" class="w-full py-3 px-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold rounded-2xl shadow-lg shadow-amber-500/25 transition active:scale-95 text-center flex flex-col items-center justify-center gap-0.5">
-                    <span class="text-sm">Devam Et</span>
-                    <span class="text-[10px] text-amber-100 font-medium">İkinci Satışı Onayla</span>
+                    <span class="text-sm">Yeni satış, devam et</span>
+                    <span class="text-[10px] text-amber-100 font-medium">Ayrı satışı onayla</span>
                 </button>
             </div>
         </div>
@@ -868,119 +869,107 @@
         let pendingSubmitAfterConfirm = false;
         window.customerSalesMap = {};
 
-        function findDuplicateSale(targetAmount) {
-            const numericTarget = parseCurrency(targetAmount);
-            if (!numericTarget || numericTarget <= 0) return null;
+        let duplicateConfirmation = null;
+        let duplicateDialog = null;
+        const duplicateDialogs = [];
 
-            const currentRowIndex = String(document.getElementById('m_rowIndex').value || '').trim();
-            const name = document.getElementById('m_name').value;
-            const contact = document.getElementById('m_contact').value;
-            const customerNo = document.getElementById('m_customerNo').value;
-
-            const currentItem = {
-                rowIndex: currentRowIndex,
-                name: name,
-                contact: contact,
-                customerNo: customerNo
+        function getSaleCandidate(scope = 'edit') {
+            if (scope === 'add') return {
+                branch: currentBranch, name:document.getElementById('sale_name').value, contact: document.getElementById('sale_contact').value,
+                customerNo: document.getElementById('sale_customerNo').value,
+                amount: document.getElementById('sale_amount').value,
+                month: document.getElementById('sale_date').value.slice(0,7), rowIndex: ''
             };
-            const custKey = getCustomerKey(currentItem);
-            const compContact = getCompareNum(contact);
-
-            // 1. Düzenlenen kaydın existingSales geçmişini kontrol et (Aynı aydaki diğer satışları)
-            let currentRec = allRecords.find(r => String(r.rowIndex).trim() === currentRowIndex);
-            if (currentRec && Array.isArray(currentRec.existingSales)) {
-                for (const s of currentRec.existingSales) {
-                    if (String(s.rowIndex).trim() !== currentRowIndex && Math.abs(parseCurrency(s.amount) - numericTarget) < 0.01) {
-                        return s;
-                    }
-                }
-            }
-
-            // 2. window.customerSalesMap varsa kontrol et
-            if (window.customerSalesMap) {
-                let salesList = (custKey && window.customerSalesMap[custKey]) ? window.customerSalesMap[custKey] : [];
-                if (salesList.length === 0 && compContact && compContact.length >= 7) {
-                    salesList = window.customerSalesMap['tel:' + compContact] || [];
-                }
-                for (const s of salesList) {
-                    if (String(s.rowIndex).trim() !== currentRowIndex && Math.abs(parseCurrency(s.amount) - numericTarget) < 0.01) {
-                        return s;
-                    }
-                }
-            }
-
-            // 3. allRecords içinde aynı müşteriye ait diğer satış kayıtlarını kontrol et
-            for (const r of allRecords) {
-                if (String(r.rowIndex).trim() === currentRowIndex) continue;
-                const rKey = getCustomerKey(r);
-                const rComp = getCompareNum(r.contact);
-                const isSameCustomer = (custKey && rKey === custKey) || (compContact && compContact.length >= 7 && rComp === compContact);
-                if (isSameCustomer) {
-                    const isSold = String(r.isOrder || "").toLowerCase() === 'evet' || String(r.result || "").toLowerCase() === 'satışa döndü';
-                    const rAmount = parseCurrency(getRevenue(r));
-                    if (isSold && Math.abs(rAmount - numericTarget) < 0.01) {
-                        return {
-                            rowIndex: r.rowIndex,
-                            amount: rAmount,
-                            date: r.date || '-'
-                        };
-                    }
-                }
-            }
-
-            return null;
+            return {
+                branch: document.getElementById('m_branch').value || currentBranch,
+                name:document.getElementById('m_name').value,
+                sheetName: document.getElementById('m_sheetName').value,
+                contact: document.getElementById('m_contact').value,
+                customerNo: document.getElementById('m_customerNo').value,
+                amount: document.getElementById('m_amount').value,
+                month: document.getElementById('monthFilter').value,
+                rowIndex: document.getElementById('m_rowIndex').value
+            };
         }
 
-        function showDuplicateWarning(dupSale, isSubmit = false) {
-            pendingSubmitAfterConfirm = isSubmit;
-            const modal = document.getElementById('duplicateWarningModal');
-            const amtEl = document.getElementById('duplicateWarningAmount');
-            const dateEl = document.getElementById('duplicateWarningDate');
-            const dateRow = document.getElementById('duplicateWarningDateRow');
+        function saleCandidateSignature(scope = 'edit') {
+            const item = getSaleCandidate(scope);
+            return JSON.stringify([scope,item.branch,item.month,item.sheetName || '',String(item.rowIndex),
+                getCompareNum(item.contact),String(item.customerNo).trim().toLocaleLowerCase('tr-TR'),Math.round(parseCurrency(item.amount)*100)]);
+        }
 
-            if (amtEl) amtEl.textContent = formatMoney(dupSale.amount || 0);
-            if (dateEl) {
-                if (dupSale.date && dupSale.date !== '-') {
-                    dateEl.textContent = dupSale.date;
-                    if (dateRow) dateRow.style.display = 'flex';
-                } else {
-                    if (dateRow) dateRow.style.display = 'none';
+        function findDuplicateSale(targetAmount, candidate = getSaleCandidate()) {
+            const cents = Math.round(parseCurrency(targetAmount) * 100);
+            if (!(cents > 0) || !Number.isFinite(cents)) return null;
+            if (candidate.branch !== currentBranch || candidate.month !== document.getElementById('monthFilter').value) return null;
+            const phone = getCompareNum(candidate.contact);
+            const number = String(candidate.customerNo || '').trim().toLocaleLowerCase('tr-TR').replace(/^'/, '');
+            const matches = new Map();
+            const existingRow = allRecords.flatMap(record => getReferralHistory(record)).find(row =>
+                String(row.rowIndex) === String(candidate.rowIndex) && row.sheetName === candidate.sheetName);
+            if (existingRow && isSaleRecord(existingRow) && Math.round(parseCurrency(existingRow.amount)*100) === cents &&
+                getCompareNum(existingRow.contact) === phone &&
+                String(existingRow.customerNo || '').trim().toLocaleLowerCase('tr-TR').replace(/^'/, '') === number) return null;
+            for (const record of allRecords) {
+                const parentMatches = (phone.length >= 7 && getCompareNum(record.contact) === phone) ||
+                    (number && String(record.customerNo || '').trim().toLocaleLowerCase('tr-TR').replace(/^'/, '') === number);
+                for (const sale of getReferralHistory(record)) {
+                    const salePhone = getCompareNum(sale.contact);
+                    const saleNumber = String(sale.customerNo || '').trim().toLocaleLowerCase('tr-TR').replace(/^'/, '');
+                    const sameCustomer = (salePhone.length >= 7 && phone.length >= 7 && salePhone === phone) ||
+                        (number && saleNumber === number) || (!salePhone && !saleNumber && parentMatches);
+                    const sheetName = sale.sheetName || record.sheetName;
+                    if (candidate.sheetName && sheetName !== candidate.sheetName) continue;
+                    if (String(sale.rowIndex) === String(candidate.rowIndex) && (!candidate.sheetName || sheetName === candidate.sheetName)) continue;
+                    if (sameCustomer && isSaleRecord(sale) && Math.round(parseCurrency(sale.amount)*100) === cents) {
+                        matches.set(referralRowKey(sale,sheetName), {...sale,sheetName});
+                    }
                 }
             }
+            const sales = Array.from(matches.values()).sort((a,b) => Number(a.rowIndex)-Number(b.rowIndex));
+            if (!sales.length) return null;
+            const sale = sales[sales.length-1];
+            const duplicateKey = JSON.stringify([sale.sheetName,phone,number,cents,sales.map(row => Number(row.rowIndex))]);
+            return {...sale,duplicateKey};
+        }
 
-            if (modal) {
-                modal.classList.remove('hidden');
-                modal.style.display = 'flex';
-            }
+        function showDuplicateWarning(dupSale, isSubmit = false, options = {}) {
+            const scope = options.scope || 'edit';
+            const dialog = {dupSale,isSubmit,scope,signature:saleCandidateSignature(scope),...options};
+            if (duplicateDialog) { duplicateDialogs.push(dialog); return; }
+            duplicateDialog = dialog;
+            pendingSubmitAfterConfirm = isSubmit;
+            const modal = document.getElementById('duplicateWarningModal');
+            const candidate = getSaleCandidate(scope);
+            document.getElementById('duplicateWarningCustomer').textContent = dialog.customerLabel || [candidate.name,candidate.contact].filter(Boolean).join(' · ');
+            document.getElementById('duplicateWarningAmount').textContent = formatMoney(dupSale.amount || 0);
+            document.getElementById('duplicateWarningDate').textContent = dupSale.date || '-';
+            document.getElementById('duplicateWarningDateRow').style.display = dupSale.date ? 'flex' : 'none';
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
         }
 
         function closeDuplicateWarning(proceed) {
+            const dialog = duplicateDialog;
+            if (!dialog) return;
+            duplicateDialog = null;
             const modal = document.getElementById('duplicateWarningModal');
-            if (modal) {
-                modal.classList.add('hidden');
-                modal.style.display = 'none';
-            }
-
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            pendingSubmitAfterConfirm = false;
             if (proceed) {
-                // "Devam Et" tıklandı: Kullanıcı bilerek aynı tutarı girmek istiyor
+                duplicateConfirmation = {signature:dialog.signature,key:dialog.duplicateKey || dialog.dupSale.duplicateKey};
                 isDuplicateConfirmed = true;
-                if (pendingSubmitAfterConfirm) {
-                    pendingSubmitAfterConfirm = false;
-                    const editForm = document.getElementById('editForm');
-                    if (editForm) {
-                        editForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-                    }
-                }
+                if (dialog.onProceed) dialog.onProceed();
+                else if (dialog.isSubmit) document.getElementById(dialog.scope === 'add' ? 'addSaleForm' : 'editForm').requestSubmit();
             } else {
-                // "Tamam" tıklandı: Mükerrer giriş engellenir, tutar temizlenir
-                pendingSubmitAfterConfirm = false;
                 isDuplicateConfirmed = false;
-                const amountInput = document.getElementById('m_amount');
-                if (amountInput) {
-                    amountInput.value = '';
-                    amountInput.focus();
-                }
-                showToast("Mükerrer satış girişi iptal edildi. Tutar temizlendi.", "error");
+                duplicateConfirmation = null;
+                if (dialog.onCancel) dialog.onCancel();
+            }
+            if (!duplicateDialog && duplicateDialogs.length) {
+                const next = duplicateDialogs.shift();
+                showDuplicateWarning(next.dupSale,next.isSubmit,next);
             }
         }
 
@@ -1111,9 +1100,10 @@
                 });
                 amtEl.addEventListener('change', () => {
                     const isOrder = document.getElementById('m_isOrder').value;
-                    if (isOrder === 'Evet' && !isDuplicateConfirmed && amtEl.value) {
+                    if (isOrder === 'Evet' && amtEl.value) {
                         const dup = findDuplicateSale(amtEl.value);
-                        if (dup) {
+                        const approved = duplicateConfirmation && duplicateConfirmation.signature === saleCandidateSignature('edit') ? duplicateConfirmation.key : undefined;
+                        if (dup && approved !== dup.duplicateKey) {
                             showDuplicateWarning(dup, false);
                         }
                     }
@@ -1225,7 +1215,7 @@
                     setEnabled(resultEl, 'step2box', false);
                     setEnabled(noteEl, 'step3box', true);
                     setEnabled(orderEl, 'step4box', false);
-                    document.getElementById('m_amount').disabled = true;
+                    toggleAmount();
                     return;
                 }
 
@@ -1244,6 +1234,7 @@
                     document.getElementById('m_amount').disabled = true;
                     document.getElementById('m_amount').value = '';
                 }
+                toggleAmount();
             };
 
             statusEl.addEventListener('change', updateFlow);
@@ -1253,23 +1244,24 @@
         }
 
         function toggleAmount() {
-            const isOrder = document.getElementById('m_isOrder').value;
+            const orderEl = document.getElementById('m_isOrder');
+            const isSale = document.getElementById('m_status').value === 'arandı' &&
+                document.getElementById('m_result').value === 'Satışa Döndü';
             const input = document.getElementById('m_amount');
             const custNoBadge = document.getElementById('customerNoRequiredBadge');
             const custNoInput = document.getElementById('m_customerNo');
+            const amountBadge = document.getElementById('amountRequiredBadge');
 
-            if(document.getElementById('m_isOrder').disabled) {
-                input.disabled = true; 
-                if (custNoBadge) custNoBadge.classList.add('hidden');
-                if (custNoInput) { custNoInput.placeholder = "Opsiyonel"; custNoInput.classList.remove('input-error'); }
-                return;
-            }
+            // Görüşme sonucu satış ise onay ayrı bir seçim değildir.
+            orderEl.value = isSale ? 'Evet' : '';
+            orderEl.disabled = true;
+            input.disabled = !isSale;
+            input.required = isSale;
+            if (!isSale) input.value = '';
+            if (amountBadge) amountBadge.classList.toggle('hidden', !isSale);
+            if (custNoInput) custNoInput.required = isSale;
 
-            input.disabled = isOrder !== 'Evet';
-            if(isOrder !== 'Evet') input.value = '';
-
-            // Sadece Satış Onayı 'Evet' olduğunda Müşteri No zorunlu
-            if (isOrder === 'Evet') {
+            if (isSale) {
                 if (custNoBadge) custNoBadge.classList.remove('hidden');
                 if (custNoInput) custNoInput.placeholder = "Zorunlu (Satış Yapıldı)";
             } else {
@@ -1521,6 +1513,31 @@
             state.inFlight = true;
             state.promise = Promise.resolve().then(async () => {
                 const result = await safeFetch(state.payload);
+                if (result.status === 'duplicate' && customerSaves.get(key) === state) {
+                    state.blocked = true;
+                    showDuplicateWarning(result.duplicateSale, true, {
+                        duplicateKey: result.duplicateKey,
+                        customerLabel: [state.data.name,state.data.contact].filter(Boolean).join(' · '),
+                        onProceed() {
+                            if (customerSaves.get(key) !== state) return;
+                            state.blocked = false;
+                            state.payload.duplicateConfirmation = result.duplicateKey;
+                            sendCustomerSave(key, state);
+                        },
+                        onCancel() {
+                            if (customerSaves.get(key) !== state) return;
+                            customerSaves.delete(key);
+                            const index = allRecords.findIndex(record => recordSaveKey(record) === key);
+                            if (index >= 0 && state.previousRecord) {
+                                allRecords[index] = state.previousRecord;
+                                updateDashboardMetrics(); renderTable();
+                            }
+                            recordsRequestVersion++; activeRecordsRequest = null;
+                            refreshData(true, false, true);
+                        }
+                    });
+                    return;
+                }
                 if (result.status !== 'success') {
                     const error = new Error(result.message || 'Kayıt başarısız.');
                     error.permanent = !result.retryable && /zorunlu|geçersiz|yetkisiz|bulunamadı|eksik/i.test(error.message);
@@ -1576,15 +1593,16 @@
             });
         }
 
-        function saveCustomerInBackground(formData) {
+        function saveCustomerInBackground(formData, options = {}) {
             const key = recordSaveKey(formData);
             const previous = customerSaves.get(key);
             if (previous) clearTimeout(previous.retryTimer);
             const sequence = ++saveSequence;
             const data = { ...formData };
-            const state = { data, promise: null, error: null, attempts: 0, inFlight: false, blocked: false, retryTimer: null,
+            const state = { data, previousRecord: options.previousRecord, promise: null, error: null, attempts: 0, inFlight: false, blocked: false, retryTimer: null,
                 payload: {action:'updateCustomer',data,token:sessionStorage.getItem('authToken'),
-                    clientId:saveClientId,sequence,operationId:saveClientId+'-'+sequence} };
+                    clientId:saveClientId,sequence,operationId:saveClientId+'-'+sequence,
+                    duplicateConfirmation: options.duplicateConfirmation} };
             customerSaves.set(key, state);
             return sendCustomerSave(key, state);
         }
@@ -1914,6 +1932,7 @@
             document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
             isDuplicateConfirmed = false;
             pendingSubmitAfterConfirm = false;
+            duplicateConfirmation = null;
             const item = allRecords[index];
             if(!item) return;
             renderCustomerHistory(item);
@@ -1997,6 +2016,14 @@
                 vals.amount = '';
             }
 
+            if (vals.result === 'Satışa Döndü') {
+                vals.order = 'Evet';
+                els.order.value = 'Evet';
+                els.order.disabled = true;
+                els.amount.disabled = false;
+                els.amount.required = true;
+            }
+
             if(!vals.status) {
                 els.status.classList.add('input-error'); showToast("Aranma Durumunu seçiniz.", "error"); return;
             }
@@ -2009,12 +2036,11 @@
                 els.order.classList.add('input-error'); showToast("Satış Onay Durumunu (Evet / Hayır) seçiniz.", "error"); return;
             }
 
-            // SADECE Satış Yapıldı (Evet) seçildiğinde ve tutar girildiğinde Müşteri No ZORUNLU!
-            // Sipariş durumu Hayır ise Müşteri No zorunlu DEĞİL!
             if (vals.order === 'Evet') {
                 const numAmt = parseCurrency(vals.amount);
-                if (!vals.amount || numAmt <= 0) {
-                    els.amount.classList.add('input-error'); showToast("Satış Tutarı zorunludur.", "error"); return;
+                if (!vals.amount || !Number.isFinite(numAmt) || numAmt <= 0) {
+                    els.amount.classList.add('input-error'); els.amount.focus();
+                    showToast("Satış tutarı zorunludur ve sıfırdan büyük olmalıdır.", "error"); return;
                 }
                 if (!vals.customerNo) {
                     els.customerNo.classList.add('input-error'); showToast("Satış yapıldığında Müşteri No girmek zorunludur!", "error"); return;
@@ -2039,9 +2065,10 @@
             }
 
             // Mükerrer satış kontrolü: Aynı müşteriye bu ay aynı tutarda satış işlenmiş mi?
-            if (finalIsOrder === 'Evet' && numericAmount > 0 && !isDuplicateConfirmed) {
+            const saleConfirmation = duplicateConfirmation && duplicateConfirmation.signature === saleCandidateSignature('edit') ? duplicateConfirmation.key : undefined;
+            if (finalIsOrder === 'Evet' && numericAmount > 0) {
                 const dup = findDuplicateSale(numericAmount);
-                if (dup) {
+                if (dup && saleConfirmation !== dup.duplicateKey) {
                     showDuplicateWarning(dup, true);
                     return;
                 }
@@ -2067,13 +2094,14 @@
             closeEditModal();
             const key = recordSaveKey(formData);
             const targetIndex = allRecords.findIndex(record => recordSaveKey(record) === key);
+            const previousRecord = targetIndex !== -1 ? allRecords[targetIndex] : null;
             if (targetIndex !== -1) {
                 allRecords[targetIndex] = { ...allRecords[targetIndex], ...formData };
                 updateDashboardMetrics(); renderTable();
                 checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords);
             }
             showToast('Değişiklikler ekrana uygulandı; arka planda kaydediliyor.');
-            saveCustomerInBackground(formData);
+            saveCustomerInBackground(formData, {duplicateConfirmation: saleConfirmation, previousRecord});
 
         });
 
@@ -2108,7 +2136,14 @@
                 if (!(Number(data.amount)>0) || !Number.isFinite(Number(data.amount))) { message.textContent = 'Geçerli satış tutarı girin.'; return; }
                 if (data.contact.replace(/\D/g,'').length<10) { message.textContent = 'Geçerli telefon girin.'; return; }
                 if (hasCallbackNote(data.note)) { message.textContent = 'Ulaşılamama notuyla satış eklenemez.'; return; }
-                pendingSale = {action:'addSale',data,token:sessionStorage.getItem('authToken'),operationId:'sale-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)};
+                const dup = findDuplicateSale(data.amount, getSaleCandidate('add'));
+                const approved = duplicateConfirmation && duplicateConfirmation.signature === saleCandidateSignature('add') ? duplicateConfirmation.key : undefined;
+                if (dup && approved !== dup.duplicateKey) {
+                    showDuplicateWarning(dup, true, {scope:'add'});
+                    return;
+                }
+                pendingSale = {action:'addSale',data,token:sessionStorage.getItem('authToken'),duplicateConfirmation:approved,
+                    operationId:'sale-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)};
             }
             saleSaving = true;
             document.getElementById('saleFields').disabled = true;
@@ -2116,6 +2151,25 @@
             message.textContent = 'Satış kaydediliyor...';
             try {
                 const result = await safeFetch(pendingSale);
+                if (result.status === 'duplicate') {
+                    const waitingSale = pendingSale;
+                    message.textContent = 'Aynı tutarda satış bulundu. Yeni satış olup olmadığını onaylayın.';
+                    showDuplicateWarning(result.duplicateSale, true, {
+                        scope:'add', duplicateKey:result.duplicateKey,
+                        onProceed() {
+                            if (pendingSale !== waitingSale) return;
+                            pendingSale.duplicateConfirmation = result.duplicateKey;
+                            document.getElementById('addSaleForm').requestSubmit();
+                        },
+                        onCancel() {
+                            if (pendingSale !== waitingSale) return;
+                            pendingSale = null;
+                            document.getElementById('saleFields').disabled = false;
+                            message.textContent = 'Aynı satış için yeni kayıt oluşturulmadı.';
+                        }
+                    });
+                    return;
+                }
                 if (result.status !== 'success') {
                     pendingSale = null;
                     document.getElementById('saleFields').disabled = false;
