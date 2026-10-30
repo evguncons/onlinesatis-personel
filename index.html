@@ -249,14 +249,14 @@
             #metricConversionDetail { font-size:12px; line-height:1.5; }
             #mainApp .panel-header-actions button { min-height:48px; padding:12px 14px; }
             #mainApp .panel-header-actions #lastTime { font-size:12px; margin-left:0; }
-            #overdueNotification, #missingInfoNotification { animation:none; transform:none; }
-            #overdueNotification > div, #missingInfoNotification > div { display:grid; grid-template-columns:40px minmax(0,1fr); gap:12px; align-items:start; padding:16px; }
-            #overdueNotification > div > div:nth-child(2), #missingInfoNotification > div > div:nth-child(2) { text-align:left; min-width:0; }
-            #overdueNotification h4, #missingInfoNotification h4 { font-size:15px; line-height:1.5; color:#9f1239; }
+            #missingInfoNotification { animation:none; transform:none; }
+            #missingInfoNotification > div { display:grid; grid-template-columns:40px minmax(0,1fr); gap:12px; align-items:start; padding:16px; }
+            #missingInfoNotification > div > div:nth-child(2) { text-align:left; min-width:0; }
+            #missingInfoNotification h4 { font-size:15px; line-height:1.5; }
             #missingInfoNotification h4 { color:#92400e; }
-            #overdueMessage, #missingInfoMessage { font-size:13px; line-height:1.6; }
-            #overdueNotification i, #missingInfoNotification i { animation:none; }
-            #overdueNotification button, #missingInfoNotification button { grid-column:1/-1; width:100%; min-height:44px; font-size:14px; }
+            #missingInfoMessage { font-size:13px; line-height:1.6; }
+            #missingInfoNotification i { animation:none; }
+            #missingInfoNotification button { grid-column:1/-1; width:100%; min-height:44px; font-size:14px; }
             #mainApp .crm-list { min-height:0; padding-bottom:0; }
             #mainApp .crm-toolbar { padding:16px; gap:16px; border:1px solid #fce7f3; border-radius:20px; margin-bottom:14px; background:#fff; }
             #mainApp .crm-heading > div { display:block; }
@@ -321,6 +321,30 @@
         @media (max-width:360px) {
             #mainApp .crm-filter-month, #mainApp .crm-filter-status { grid-column:1/-1; }
             #mainApp .custom-table td { grid-template-columns:64px minmax(0,1fr); gap:8px; padding-inline:14px; }
+        }
+
+        #uncalledNotification { border:1px solid #f4bed3; border-left:5px solid #db2777; border-radius:20px; background:#fff; box-shadow:0 6px 20px rgba(157,23,77,.06); }
+        .call-alert-layout { display:flex; align-items:center; gap:18px; padding:20px 22px; }
+        .call-alert-number { display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; min-width:76px; padding:12px; border-radius:14px; background:#fff1f6; color:#be185d; }
+        .call-alert-number strong { font-size:32px; font-weight:800; line-height:1.1; font-variant-numeric:tabular-nums; }
+        .call-alert-number span { font-size:11px; font-weight:700; margin-top:5px; }
+        .call-alert-copy { flex:1; min-width:0; }
+        .call-alert-copy h4 { margin:0; display:flex; align-items:baseline; gap:8px; color:#831843; font-size:19px; font-weight:800; line-height:1.5; }
+        .call-alert-copy h4 i { font-size:15px; color:#db2777; flex-shrink:0; }
+        .call-alert-copy p { margin:5px 0 0; color:#64748b; font-size:14px; line-height:1.7; }
+        .call-alert-scope { display:inline-flex; align-items:center; gap:5px; color:#9d174d; background:#fdf2f8; border-radius:6px; padding:2px 7px; font-size:12px; font-weight:600; margin-right:6px; }
+        .call-alert-button { display:inline-flex; align-items:center; justify-content:center; gap:9px; min-height:48px; min-width:132px; flex-shrink:0; padding:12px 20px; border:1px solid #be185d; border-radius:12px; background:#be185d; color:#fff; font-size:14px; font-weight:700; transition:background-color .15s; }
+        .call-alert-button:hover { background:#9d174d; }
+        .call-alert-button:focus-visible { outline:3px solid #db2777; outline-offset:4px; }
+        @media (max-width:640px) {
+            #uncalledNotification { border-radius:16px; }
+            .call-alert-layout { display:grid; grid-template-columns:max-content minmax(0,1fr); align-items:start; gap:14px; padding:16px; }
+            .call-alert-number { min-width:64px; padding:11px 9px; border-radius:11px; }
+            .call-alert-number strong { font-size:28px; }
+            .call-alert-copy h4 { font-size:16px; gap:6px; }
+            .call-alert-copy p { font-size:13px; }
+            .call-alert-scope { display:table; margin:0 0 4px; }
+            .call-alert-button { grid-column:1/-1; width:100%; }
         }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -441,14 +465,14 @@
                                 <div class="w-8 h-8 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center shrink-0"><i class="fas fa-bullseye text-sm"></i></div>
                                 <div class="panel-metric-label text-[10px] md:text-xs uppercase font-bold text-pink-500 tracking-wider">Bugün Arama Hedefi</div>
                             </div>
-                            <div class="text-sm md:text-base font-extrabold text-slate-800" id="metricDailyCalls">0 / 30</div>
+                            <div class="text-sm md:text-base font-extrabold text-slate-800" id="metricDailyCalls">0 / 60</div>
                         </div>
                         <div class="w-full bg-slate-100 h-2 rounded-full mt-2 overflow-hidden">
                             <div id="metricDailyProgressBar" class="bg-gradient-to-r from-pink-500 to-rose-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
                         <div class="text-[10px] text-slate-400 font-semibold mt-1 flex justify-between">
                             <span id="metricDailyPct">%0 tamamlandı</span>
-                            <span id="metricDailyStatus" class="font-bold text-pink-600">Hedefe 30 kaldı</span>
+                            <span id="metricDailyStatus" class="font-bold text-pink-600">Hedefe 60 kaldı</span>
                         </div>
                     </div>
                     <div class="bg-white/80 p-3 rounded-2xl border border-purple-100 shadow-sm flex items-center gap-3">
@@ -484,17 +508,17 @@
 
         <!-- BİLDİRİM ALANI -->
         <div class="space-y-4 mb-6">
-            <div id="overdueNotification" class="hidden bg-gradient-to-br from-rose-500 via-pink-600 to-purple-600 rounded-[20px] md:rounded-[28px] p-[2px] shadow-lg shadow-pink-500/20 transform hover:scale-[1.01] transition-transform animate-pulse-slow">
-                <div class="bg-white/95 backdrop-blur-xl rounded-[18px] md:rounded-[26px] p-4 md:p-5 flex flex-col sm:flex-row items-center sm:items-start gap-4 md:gap-5">
-                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 border border-rose-200 shadow-inner">
-                        <i class="fas fa-clock fa-lg animate-bounce"></i>
+            <div id="uncalledNotification" class="hidden">
+                <div class="call-alert-layout">
+                    <div class="call-alert-number" aria-hidden="true">
+                        <strong id="uncalledCount">0</strong><span>Aranmadı</span>
                     </div>
-                    <div class="flex-1 text-center sm:text-left">
-                        <h4 class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-purple-600 text-base md:text-lg tracking-tight">Dikkat: Takip Gerektiren Kayıtlar Var!</h4>
-                        <p class="text-slate-500 text-xs md:text-sm mt-1 font-medium leading-relaxed" id="overdueMessage">...</p>
+                    <div class="call-alert-copy">
+                        <h4><i class="fas fa-phone-slash" aria-hidden="true"></i><span id="uncalledMessage" role="status" aria-live="polite" aria-atomic="true">Aranmayı bekleyen müşteriler</span></h4>
+                        <p><span class="call-alert-scope">Seçili şube ve ay</span>Listeyi açıp aramalarınızı tamamlayabilirsiniz.</p>
                     </div>
-                    <button onclick="filterOverdue()" class="w-full sm:w-auto px-5 py-3 bg-rose-500 text-white text-sm font-bold rounded-xl hover:shadow-lg transition flex items-center justify-center gap-2 active:scale-95">
-                        <i class="fas fa-list-ul"></i> Listele
+                    <button type="button" onclick="filterUncalled()" class="call-alert-button" aria-label="Aranmayan müşterileri listele">
+                        <i class="fas fa-list-ul" aria-hidden="true"></i> Listele
                     </button>
                 </div>
             </div>
@@ -516,7 +540,7 @@
             </div>
         </div>
 
-        <div class="crm-list glass-card flex flex-col overflow-hidden min-h-[500px]">
+        <div id="customerList" class="crm-list glass-card flex flex-col overflow-hidden min-h-[500px]">
             <div class="crm-toolbar p-5 md:p-8 border-b border-pink-100 bg-white/60 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
                 
                 <div class="crm-heading w-full xl:w-auto flex items-center justify-between xl:justify-start gap-4">
@@ -1117,7 +1141,6 @@
         let branchList = [];
         let leaderboardData = []; 
         let allRecords = []; 
-        let overdueRecords = [];
         let missingInfoRecords = []; 
         let currentFilteredData = [];
         let currentPage = 1;
@@ -1643,7 +1666,7 @@
                 allRecords = deduplicateRecords(normalizeCustomerRecords(initialData.records));
                 window.customerSalesMap = initialData.customerSales || {};
                 loadedRecordsKey = branch + ':' + initialMonth;
-                updateDashboardMetrics(); checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords); renderTable();
+                updateDashboardMetrics(); checkUncalledCustomers(allRecords); checkMissingInfo(allRecords); renderTable();
                 document.getElementById('lastTime').textContent = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
             } else { refreshData(false, true); } 
             
@@ -1699,7 +1722,7 @@
             if(metricConvDetail) metricConvDetail.textContent = `${salesCount} / ${calledCount} Müşteri`;
 
             // Günlük Hedef Metrikleri (Gamification)
-            const dailyTarget = 30;
+            const dailyTarget = 60;
             const pct = Math.min(100, Math.round((todayCalledCount / dailyTarget) * 100));
             const metricDailyCalls = document.getElementById('metricDailyCalls');
             const metricDailyProgressBar = document.getElementById('metricDailyProgressBar');
@@ -1886,7 +1909,7 @@
             if (!hasData) {
                 allRecords = []; window.customerSalesMap = {};
                 loadedRecordsKey = null;
-                updateDashboardMetrics(); checkOverdueFollowUps([]); checkMissingInfo([]);
+                updateDashboardMetrics(); checkUncalledCustomers([]); checkMissingInfo([]);
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-20 text-slate-400"><i class="fas fa-spinner fa-spin"></i> Veriler yükleniyor...</td></tr>';
             }
             if (timeSpan) timeSpan.textContent = 'Güncelleniyor...';
@@ -1907,7 +1930,7 @@
                     reconcileCustomerSaves(records);
                     window.customerSalesMap = data.customerSales || {};
                     allRecords = deduplicateRecords(mergePendingSaves(records));
-                    updateDashboardMetrics(); checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords); renderTable();
+                    updateDashboardMetrics(); checkUncalledCustomers(allRecords); checkMissingInfo(allRecords); renderTable();
                     loadedRecordsKey = key;
                     recordsRetryCount = 0;
                     recordsRenderFailureKey = null;
@@ -1974,31 +1997,33 @@
             showToast("Eksik bilgili satışlar listelendi.", "success");
         }
 
-        function checkOverdueFollowUps(records) {
-            const now = new Date();
-            const limit = 5 * 24 * 60 * 60 * 1000; 
-            overdueRecords = records.filter(item => {
-                const updatedParts = String(item.lastUpdatedAt || '').match(/^(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})(?::(\d{2}))?$/);
-                const itemDate = updatedParts ? new Date(`${updatedParts[3]}-${updatedParts[2]}-${updatedParts[1]}T${updatedParts[4]}:${updatedParts[5]}:${updatedParts[6] || '00'}+03:00`) : parseDateTR(item.date);
-                if (itemDate.getTime() === 0) return false; 
-                const res = String(item.result == null ? '' : item.result).toLowerCase();
-                const followUpLimit = hasCallbackNote(item.note) && res.includes('tekrar') ? 48*60*60*1000 : limit;
-                return (res.includes("gelecek") || res.includes("tekrar") || res.includes("ara")) && (now - itemDate > followUpLimit);
-            });
-
-            const notifBox = document.getElementById('overdueNotification');
-            if (overdueRecords.length > 0) {
-                document.getElementById('overdueMessage').innerHTML = `<strong>${overdueRecords.length}</strong> müşterinin takip süresi doldu. Lütfen tekrar arayınız.`;
-                notifBox.classList.remove('hidden');
-            } else { notifBox.classList.add('hidden'); }
+        function isUncalledRecord(item) {
+            const status = String(item.status == null ? '' : item.status).trim().toLocaleLowerCase('tr-TR');
+            return status === '' || status === 'aranmadı';
         }
 
-        function filterOverdue() {
-            activeFilterMode = 'overdue';
+        function checkUncalledCustomers(records) {
+            const count = records.filter(item => item && isUncalledRecord(item) &&
+                [item.name,item.contact,item.customerNo].some(value => String(value == null ? '' : value).trim())).length;
+            const counter = document.getElementById('uncalledCount');
+            const message = document.getElementById('uncalledMessage');
+            const text = count + ' müşteri henüz aranmadı';
+            if (counter.textContent !== String(count)) counter.textContent = String(count);
+            if (message.textContent !== text) message.textContent = text;
+            const notification = document.getElementById('uncalledNotification');
+            if (count > 0) notification.classList.remove('hidden');
+            else notification.classList.add('hidden');
+        }
+
+        function filterUncalled() {
+            activeFilterMode = 'default';
             document.getElementById('searchInput').value = '';
-            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterStatus').value = 'aranmadı';
+            currentPage = 1;
             renderTable();
-            showToast("Takip gerektiren müşteriler listelendi.");
+            const list = document.getElementById('customerList');
+            if (list && typeof list.scrollIntoView === 'function') list.scrollIntoView({block:'start'});
+            showToast('Aranmadı durumundaki müşteriler listelendi.');
         }
 
         function renderTable() {
@@ -2012,9 +2037,7 @@
             const statusFilter = document.getElementById('filterStatus').value.toLocaleLowerCase('tr-TR');
             
             let sourceData = allRecords;
-            if (activeFilterMode === 'overdue') {
-                sourceData = overdueRecords;
-            } else if (activeFilterMode === 'missingInfo') {
+            if (activeFilterMode === 'missingInfo') {
                 sourceData = missingInfoRecords;
             }
 
@@ -2025,7 +2048,7 @@
                                 
                 if (!hasData) return false;
                 
-                if ((activeFilterMode === 'overdue' || activeFilterMode === 'missingInfo') && rawTerm === '') return true; 
+                if ((activeFilterMode === 'missingInfo') && rawTerm === '') return true; 
 
                 const nameNorm = normalizeSearchText(item.name);
                 const productNorm = normalizeSearchText(item.product);
@@ -2062,7 +2085,8 @@
                 const rawResult = (item.result || "").toString().trim().toLocaleLowerCase('tr-TR');
                 
                 let matchesStatus = true;
-                if (statusFilter === "aranmadı" || statusFilter === "arandı") matchesStatus = rawStatus === statusFilter;
+                if (statusFilter === "aranmadı") matchesStatus = isUncalledRecord(item);
+                else if (statusFilter === "arandı") matchesStatus = rawStatus === statusFilter;
                 else if (statusFilter === "satışa döndü") matchesStatus = getCustomerHistorySummary(item).saleCount > 0;
                 else if (statusFilter === "gelecek") matchesStatus = rawResult.includes("gelecek") || rawResult.includes("mağaza");
                 else if (statusFilter === "tekrar") matchesStatus = rawResult.includes("tekrar") || rawResult.includes("ara");
@@ -2086,7 +2110,6 @@
                     </div>
                 </td></tr>`;
                 updatePaginationControls(0);
-                if (activeFilterMode === 'overdue' && overdueRecords.length === 0) activeFilterMode = 'default';
                 if (activeFilterMode === 'missingInfo' && missingInfoRecords.length === 0) activeFilterMode = 'default';
                 return;
             }
@@ -2366,7 +2389,7 @@
             if (targetIndex !== -1) {
                 allRecords[targetIndex] = { ...allRecords[targetIndex], ...formData };
                 updateDashboardMetrics(); renderTable();
-                checkOverdueFollowUps(allRecords); checkMissingInfo(allRecords);
+                checkUncalledCustomers(allRecords); checkMissingInfo(allRecords);
             }
             showToast('Değişiklikler ekrana uygulandı; arka planda kaydediliyor.');
             saveCustomerInBackground(formData, {duplicateConfirmation: saleConfirmation, previousRecord});
