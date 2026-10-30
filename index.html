@@ -44,7 +44,7 @@
     </script>
 
     <style>
-        :root { --bg-color: #fff1f2; }
+        :root { --bg-color: #fff1f2; --mobile-overlay-clearance:76px; }
         
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
@@ -227,6 +227,102 @@
             .mobile-filter-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; }
         }
 
+        #mainApp .crm-toolbar { flex-direction:column; align-items:stretch; }
+        #mainApp .crm-filters { display:grid; grid-template-columns:minmax(200px,1.5fr) minmax(150px,1fr) minmax(170px,1fr) auto auto auto; width:100%; min-width:0; align-items:center; }
+        #mainApp .crm-filters > * { min-width:0; width:100%; }
+        #mainApp .crm-add { order:5; min-height:52px; }
+        #mainApp .crm-export { order:6; }
+        #mainApp .crm-filters button > span { display:inline; }
+        @media (min-width:1025px) and (max-width:1279px) {
+            #mainApp .crm-filters { grid-template-columns:repeat(3,minmax(0,1fr)); }
+        }
+
+        /* Alt sağdaki yüzen logolar için cihaz güvenli alanından bağımsız boşluk. */
+        @media (max-width:1024px) {
+            #mainApp { padding:12px; padding-bottom:calc(var(--mobile-overlay-clearance) + 28px + env(safe-area-inset-bottom,0px)); }
+            #mainApp > header { gap:14px; margin-bottom:18px; }
+            #headerTitle { font-size:clamp(19px,5vw,25px); overflow-wrap:anywhere; }
+            #networkStatusBadge { font-size:12px; }
+            #mainApp .panel-metrics > * { min-width:0; }
+            #mainApp .panel-metric-label { font-size:12px; line-height:1.5; letter-spacing:0; }
+            #metricMonthRevenue, #metricConversion { font-size:19px; line-height:1.5; overflow-wrap:anywhere; }
+            #metricConversionDetail { font-size:12px; line-height:1.5; }
+            #mainApp .panel-header-actions button { min-height:48px; padding:12px 14px; }
+            #mainApp .panel-header-actions #lastTime { font-size:12px; margin-left:0; }
+            #overdueNotification, #missingInfoNotification { animation:none; transform:none; }
+            #overdueNotification > div, #missingInfoNotification > div { display:grid; grid-template-columns:40px minmax(0,1fr); gap:12px; align-items:start; padding:16px; }
+            #overdueNotification > div > div:nth-child(2), #missingInfoNotification > div > div:nth-child(2) { text-align:left; min-width:0; }
+            #overdueNotification h4, #missingInfoNotification h4 { font-size:15px; line-height:1.5; color:#9f1239; }
+            #missingInfoNotification h4 { color:#92400e; }
+            #overdueMessage, #missingInfoMessage { font-size:13px; line-height:1.6; }
+            #overdueNotification i, #missingInfoNotification i { animation:none; }
+            #overdueNotification button, #missingInfoNotification button { grid-column:1/-1; width:100%; min-height:44px; font-size:14px; }
+            #mainApp .crm-list { min-height:0; padding-bottom:0; }
+            #mainApp .crm-toolbar { padding:16px; gap:16px; border:1px solid #fce7f3; border-radius:20px; margin-bottom:14px; background:#fff; }
+            #mainApp .crm-heading > div { display:block; }
+            #mainApp .crm-heading h3 { font-size:18px; }
+            #mainApp .crm-heading p { margin:5px 0 0 0; font-size:13px; }
+            #mainApp .crm-filters { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+            #mainApp .crm-filters > * { width:100%; min-width:0; }
+            #mainApp .crm-filter-search { grid-column:1/-1; order:1; }
+            #mainApp .crm-filter-month { order:2; }
+            #mainApp .crm-filter-status { order:3; }
+            #mainApp .crm-reset { order:4; }
+            #mainApp .crm-export { order:5; }
+            #mainApp .crm-add { grid-column:1/-1; order:0; min-height:48px; font-size:15px; }
+            #mainApp .crm-filters input, #mainApp .crm-filters select { height:50px; min-height:50px; font-size:16px; }
+            #mainApp .crm-filters button { min-height:48px; border-radius:13px; }
+            #mainApp .crm-filters button > span { display:inline; }
+            #mainApp .crm-records { overflow-x:visible; background:transparent; padding-bottom:0; }
+            #mainApp .custom-table tr { border-radius:18px; margin-bottom:14px; padding-bottom:0; }
+            #mainApp .custom-table td { display:grid; grid-template-columns:76px minmax(0,1fr); gap:12px; padding:14px 16px; font-size:14px; }
+            #mainApp .custom-table td::before { margin:0; align-self:center; font-size:11px; line-height:1.5; letter-spacing:0; }
+            #mainApp .custom-table td > div, #mainApp .custom-table td > span { min-width:0; max-width:100%; overflow-wrap:anywhere; }
+            #mainApp .custom-table td:first-child { display:block; padding:18px 16px; }
+            #mainApp .custom-table td:first-child::before, #mainApp .custom-table td:last-child::before { display:none; }
+            #mainApp .custom-table .customer-identity { width:100%; max-width:100%; text-align:left; gap:12px; }
+            #mainApp .custom-table .customer-identity > div:last-child { min-width:0; flex:1; }
+            #mainApp .custom-table .customer-name { font-size:16px; line-height:1.5; }
+            #mainApp .custom-table .customer-meta { font-size:12px; line-height:1.6; }
+            #mainApp .custom-table .customer-history-link { display:inline-block; max-width:100%; padding:8px 0; min-height:36px; font-size:13px; line-height:1.5; text-align:left; }
+            #mainApp .custom-table .customer-contact { justify-content:flex-end; gap:8px; }
+            #mainApp .custom-table .customer-contact > span { flex-basis:100%; font-size:15px; }
+            #mainApp .custom-table .customer-contact a { width:44px; height:44px; }
+            #mainApp .custom-table .customer-contact a[href^="tel:"] { display:flex; }
+            #mainApp .custom-table .customer-product, #mainApp .custom-table .customer-result, #mainApp .custom-table .customer-sale { align-items:flex-end; }
+            #mainApp .custom-table .customer-product > div { font-size:14px; line-height:1.6; }
+            #mainApp .custom-table .customer-product > div:last-child { font-size:13px; }
+            #mainApp .custom-table .customer-result > span { font-size:12px; line-height:1.5; }
+            #mainApp .custom-table .customer-sale > span:last-child { font-size:12px; }
+            #mainApp .custom-table td:last-child { display:block; padding:12px 16px; background:#fff; }
+            #mainApp .custom-table .mobile-action-btn { width:100%; min-height:48px; justify-content:center; padding:12px; font-size:15px; }
+            #mainApp .custom-table .mobile-action-btn > span { display:inline; }
+            #mainApp .custom-table td[colspan] { display:block; padding:32px 16px; text-align:center; }
+            #mainApp .custom-table td[colspan] > div { max-width:100%; text-align:center; }
+            #mainApp .crm-pagination { padding:16px; border:1px solid #fce7f3; border-radius:18px; gap:12px; }
+            #mainApp .crm-pagination > div { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); width:100%; gap:8px; }
+            #btnPrev, #btnNext { min-width:0; min-height:46px; justify-content:center; padding:10px; font-size:13px; }
+            #pageInfo { min-width:60px; padding:12px 8px; }
+            #editModal .edit-dialog-footer { padding-bottom:calc(var(--mobile-overlay-clearance) + env(safe-area-inset-bottom,0px)); }
+            #editModalScroll { padding-bottom:28px; scroll-padding-bottom:28px; }
+            #addModal { padding:14px; padding-bottom:calc(var(--mobile-overlay-clearance) + 20px + env(safe-area-inset-bottom,0px)); }
+            #addModal .add-dialog { margin:0 auto; padding:20px 16px; border-radius:20px; }
+            #addModal .modern-input { font-size:16px; min-height:50px; }
+            #saleSubmit { width:100%; min-height:50px; }
+            #duplicateWarningModal { padding:16px; padding-bottom:calc(var(--mobile-overlay-clearance) + env(safe-area-inset-bottom,0px)); }
+            #duplicateWarningModal > div { max-height:calc(100vh - var(--mobile-overlay-clearance) - 32px - env(safe-area-inset-bottom,0px)); max-height:calc(100dvh - var(--mobile-overlay-clearance) - 32px - env(safe-area-inset-bottom,0px)); overflow-y:auto; overscroll-behavior-y:contain; }
+        }
+        @media (max-width:640px) {
+            #mainApp .panel-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+            #mainApp .panel-daily-target { grid-column:1/-1; }
+            #mainApp .panel-conversion-values { flex-wrap:wrap; gap:2px 8px; }
+            #mainApp .panel-metric-label { font-size:11px; }
+        }
+        @media (max-width:360px) {
+            #mainApp .crm-filter-month, #mainApp .crm-filter-status { grid-column:1/-1; }
+            #mainApp .custom-table td { grid-template-columns:64px minmax(0,1fr); gap:8px; padding-inline:14px; }
+        }
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #fbcfe8; border-radius: 10px; }
@@ -295,7 +391,7 @@
 
 
     <div id="addModal" class="hidden fixed inset-0 z-[80] bg-slate-900/60 p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="addSaleTitle">
-      <div class="max-w-2xl mx-auto bg-white rounded-3xl p-6 my-8">
+      <div class="add-dialog max-w-2xl mx-auto bg-white rounded-3xl p-6 my-8">
         <div class="flex justify-between items-center"><h2 id="addSaleTitle" class="text-xl font-bold">Müşteri Ekle</h2><button type="button" onclick="closeAddSale()" aria-label="Kapat">✕</button></div>
         <p class="text-sm text-slate-500 mt-2 mb-4">Tüm alanlar zorunludur. Satış, şubenize yeni satır olarak eklenir.</p>
         <form id="addSaleForm"><fieldset id="saleFields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -338,12 +434,12 @@
             </div>
             
             <div class="flex-1 w-full xl:w-auto mt-2 xl:mt-0">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
-                    <div class="bg-white/80 p-3 rounded-2xl border border-pink-100 shadow-sm flex flex-col justify-between">
+                <div class="panel-metrics grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
+                    <div class="panel-daily-target bg-white/80 p-3 rounded-2xl border border-pink-100 shadow-sm flex flex-col justify-between">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center shrink-0"><i class="fas fa-bullseye text-sm"></i></div>
-                                <div class="text-[10px] md:text-xs uppercase font-bold text-pink-500 tracking-wider">Bugün Arama Hedefi</div>
+                                <div class="panel-metric-label text-[10px] md:text-xs uppercase font-bold text-pink-500 tracking-wider">Bugün Arama Hedefi</div>
                             </div>
                             <div class="text-sm md:text-base font-extrabold text-slate-800" id="metricDailyCalls">0 / 30</div>
                         </div>
@@ -358,15 +454,15 @@
                     <div class="bg-white/80 p-3 rounded-2xl border border-purple-100 shadow-sm flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-500 flex items-center justify-center shrink-0 hidden sm:flex"><i class="fas fa-wallet text-lg"></i></div>
                         <div>
-                            <div class="text-[10px] md:text-xs uppercase font-bold text-purple-400 tracking-wider">Bu Ay Ciro</div>
+                            <div class="panel-metric-label text-[10px] md:text-xs uppercase font-bold text-purple-400 tracking-wider">Bu Ay Ciro</div>
                             <div class="text-base md:text-lg font-extrabold text-slate-800" id="metricMonthRevenue">0 ₺</div>
                         </div>
                     </div>
                     <div class="bg-white/80 p-3 rounded-2xl border border-emerald-100 shadow-sm flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-500 flex items-center justify-center shrink-0 hidden sm:flex"><i class="fas fa-chart-pie text-lg"></i></div>
                         <div>
-                            <div class="text-[10px] md:text-xs uppercase font-bold text-emerald-500 tracking-wider">Dönüşüm (Satış)</div>
-                            <div class="flex items-baseline gap-2">
+                            <div class="panel-metric-label text-[10px] md:text-xs uppercase font-bold text-emerald-500 tracking-wider">Dönüşüm (Satış)</div>
+                            <div class="panel-conversion-values flex items-baseline gap-2">
                                 <div class="text-base md:text-lg font-extrabold text-slate-800" id="metricConversion">%0</div>
                                 <div class="text-[10px] text-slate-400 font-semibold" id="metricConversionDetail">0 / 0 Müşteri</div>
                             </div>
@@ -374,7 +470,7 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3 mt-4 w-full">
+                <div class="panel-header-actions flex justify-end gap-3 mt-4 w-full">
                     <button onclick="refreshData(false, true)" class="w-full sm:w-auto px-6 py-3 rounded-2xl font-bold bg-white text-slate-600 shadow-sm border border-slate-200 text-sm hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition flex justify-center items-center gap-2 group active:scale-95">
                         <i class="fas fa-sync-alt group-hover:rotate-180 transition-transform duration-500"></i> 
                         <span>Yenile</span><span id="lastTime" class="text-[10px] md:text-xs font-normal text-slate-400 ml-2 bg-slate-50 px-2 py-0.5 rounded-lg">--:--</span>
@@ -420,10 +516,10 @@
             </div>
         </div>
 
-        <div class="glass-card flex flex-col overflow-hidden min-h-[500px]">
-            <div class="p-5 md:p-8 border-b border-pink-100 bg-white/60 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+        <div class="crm-list glass-card flex flex-col overflow-hidden min-h-[500px]">
+            <div class="crm-toolbar p-5 md:p-8 border-b border-pink-100 bg-white/60 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
                 
-                <div class="w-full xl:w-auto flex items-center justify-between xl:justify-start gap-4">
+                <div class="crm-heading w-full xl:w-auto flex items-center justify-between xl:justify-start gap-4">
                     <div class="hidden md:block">
                         <h3 class="font-bold text-slate-800 text-lg md:text-xl flex items-center gap-3">
                             <span class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-100 to-purple-100 text-pink-600 flex items-center justify-center text-lg shadow-sm border border-pink-50"><i class="fas fa-users"></i></span>
@@ -433,18 +529,18 @@
                     </div>
                 </div>
                 
-                <div class="mobile-filter-grid lg:flex gap-3 w-full xl:w-auto">
-                    <div class="relative w-full lg:w-64 order-1">
+                <div class="crm-filters mobile-filter-grid lg:flex gap-3 w-full xl:w-auto">
+                    <div class="crm-filter-search relative w-full lg:w-64 order-1">
                         <input type="text" id="searchInput" oninput="handleSearch()" placeholder="İsim veya Telefon..." class="modern-input pl-11 pr-4">
                         <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-pink-400"></i>
                     </div>
 
-                    <div class="relative w-full lg:w-40 order-2">
+                    <div class="crm-filter-month relative w-full lg:w-40 order-2">
                         <input type="month" id="monthFilter" onchange="refreshData(false, true)" class="modern-input pl-10 pr-2 text-sm">
                         <i class="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-pink-400"></i>
                     </div>
 
-                    <div class="relative w-full lg:w-48 order-3">
+                    <div class="crm-filter-status relative w-full lg:w-48 order-3">
                         <select id="filterStatus" onchange="renderTable()" class="modern-input pl-4 pr-10 cursor-pointer text-sm">
                             <option value="">Tüm Durumlar</option>
                             <option value="aranmadı">🔴 Aranmadı</option>
@@ -457,18 +553,18 @@
                         <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-pink-500"><i class="fas fa-filter text-xs"></i></div>
                     </div>
 
-                    <button onclick="resetFilters()" class="w-full lg:w-auto px-4 py-3 bg-white border border-slate-200 rounded-[16px] text-slate-500 hover:text-pink-600 hover:border-pink-300 hover:bg-pink-50 transition shadow-sm flex items-center justify-center gap-2 group whitespace-nowrap font-bold text-sm h-[52px] order-4" title="Sıfırla">
+                    <button onclick="resetFilters()" class="crm-reset w-full lg:w-auto px-4 py-3 bg-white border border-slate-200 rounded-[16px] text-slate-500 hover:text-pink-600 hover:border-pink-300 hover:bg-pink-50 transition shadow-sm flex items-center justify-center gap-2 group whitespace-nowrap font-bold text-sm h-[52px] order-4" title="Sıfırla">
                         <i class="fas fa-undo group-hover:rotate-180 transition-transform duration-500"></i> <span class="md:hidden lg:inline">Sıfırla</span>
                     </button>
 
-                    <button type="button" onclick="openAddSale()" class="px-4 py-3 bg-pink-600 text-white rounded-2xl font-bold whitespace-nowrap">+ Müşteri Ekle</button>
-                    <button onclick="exportToExcel()" class="w-full lg:w-auto px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-[16px] text-emerald-600 hover:text-white hover:bg-emerald-500 transition shadow-sm flex items-center justify-center gap-2 group whitespace-nowrap font-bold text-sm h-[52px] order-5" title="Excel İndir">
+                    <button type="button" onclick="openAddSale()" class="crm-add px-4 py-3 bg-pink-600 text-white rounded-2xl font-bold whitespace-nowrap">+ Müşteri Ekle</button>
+                    <button onclick="exportToExcel()" class="crm-export w-full lg:w-auto px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-[16px] text-emerald-600 hover:text-white hover:bg-emerald-500 transition shadow-sm flex items-center justify-center gap-2 group whitespace-nowrap font-bold text-sm h-[52px] order-5" title="Excel İndir">
                         <i class="fas fa-file-excel group-hover:scale-110 transition-transform duration-300"></i> <span class="md:hidden lg:inline">Excel</span>
                     </button>
                 </div>
             </div>
             
-            <div class="flex-1 p-0 overflow-x-auto bg-[#fafafa] lg:bg-white/40 pb-4">
+            <div class="crm-records flex-1 p-0 overflow-x-auto bg-[#fafafa] lg:bg-white/40 pb-4">
                 <table class="custom-table w-full">
                     <thead>
                         <tr>
@@ -486,7 +582,7 @@
                 </table>
             </div>
 
-            <div class="p-4 md:p-6 border-t border-pink-100 bg-white flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="crm-pagination p-4 md:p-6 border-t border-pink-100 bg-white flex flex-col sm:flex-row justify-between items-center gap-4">
                 <span class="text-xs font-bold text-slate-500 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 shadow-sm order-2 sm:order-1" id="recordCountInfo">0 kayıt bulundu</span>
                 <div class="flex items-center gap-2 w-full sm:w-auto justify-center order-1 sm:order-2">
                     <button onclick="changePage(-1)" id="btnPrev" class="px-5 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm font-bold shadow-sm" disabled><i class="fas fa-chevron-left text-[10px]"></i> Önceki</button>
@@ -2009,18 +2105,18 @@
 
                 tr.innerHTML = `
                     <td data-label="Müşteri" class="pl-6 md:pl-8">
-                        <div class="flex items-center gap-4">
+                        <div class="customer-identity flex items-center gap-4">
                             <div class="avatar-initials shrink-0">${initials}</div>
                             <div>
-                                <div class="font-bold text-slate-800 text-base">${safeName}</div>
-                                ${item.customerNo ? `<div class="text-[10px] text-indigo-400 font-mono font-bold mt-0.5">#${escapeHTML(item.customerNo)}</div>` : ''}
-                                <div class="text-xs text-slate-400 font-medium mt-0.5">${escapeHTML(item.date)}</div>
-                                ${historySummary.referralCount > 1 ? `<button type="button" onclick="openEditModal(${originalIndex})" class="text-xs text-indigo-600 font-semibold underline underline-offset-2 mt-2 text-left">${historySummary.referralCount} yönlendirme · Geçmişi gör</button>` : ''}
+                                <div class="customer-name font-bold text-slate-800 text-base">${safeName}</div>
+                                ${item.customerNo ? `<div class="customer-meta text-[10px] text-indigo-400 font-mono font-bold mt-0.5">#${escapeHTML(item.customerNo)}</div>` : ''}
+                                <div class="customer-meta text-xs text-slate-400 font-medium mt-0.5">${escapeHTML(item.date)}</div>
+                                ${historySummary.referralCount > 1 ? `<button type="button" onclick="openEditModal(${originalIndex})" class="customer-history-link text-xs text-indigo-600 font-semibold underline underline-offset-2 mt-2 text-left">${historySummary.referralCount} yönlendirme · Geçmişi gör</button>` : ''}
                             </div>
                         </div>
                     </td>
                     <td data-label="İletişim">
-                        <div class="text-sm font-semibold text-slate-600 flex items-center justify-end md:justify-start gap-2 flex-wrap">
+                        <div class="customer-contact text-sm font-semibold text-slate-600 flex items-center justify-end md:justify-start gap-2 flex-wrap">
                             <span>${escapeHTML(item.contact) || '-'}</span> 
                             ${item.contact ? `
                                 <a href="${getWhatsAppUrl(item.contact, item.name, item.product, item.category)}" target="_blank" class="w-8 h-8 flex items-center justify-center bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-full transition shadow-sm border border-emerald-200" title="WhatsApp Mesajı Gönder"><i class="fab fa-whatsapp text-base"></i></a>
@@ -2029,13 +2125,13 @@
                         </div>
                     </td>
                     <td data-label="Ürün">
-                        <div class="flex flex-col items-end md:items-start">
+                        <div class="customer-product flex flex-col items-end md:items-start">
                             <div class="text-sm text-slate-700 font-bold">${escapeHTML(item.category)}</div>
                             <div class="text-xs text-slate-500 mt-0.5">${escapeHTML(item.product) || '-'}</div>
                         </div>
                     </td>
                     <td data-label="Durum">
-                        <div class="flex flex-col gap-2 items-end md:items-start w-full">
+                        <div class="customer-result flex flex-col gap-2 items-end md:items-start w-full">
                             ${statusBadge}
                             ${item.result ? `<span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200">${escapeHTML(item.result)}</span>` : ''}
                             ${historySummary.previousSaleCount ? '<span class="text-xs font-semibold text-emerald-700">Önceki satış var</span>' : ''}
@@ -2043,7 +2139,7 @@
                     </td>
                     <td data-label="Satış">
                         ${historySummary.saleCount ? 
-                            `<div class="flex flex-col items-end md:items-start gap-1">
+                            `<div class="customer-sale flex flex-col items-end md:items-start gap-1">
                                 <span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-lg text-xs font-bold inline-flex items-center gap-1"><i class="fas fa-check-circle"></i> ${historySummary.saleCount} SATIŞ</span>
                                 <span class="text-emerald-600 font-bold text-sm tracking-tight">${formatMoney(historySummary.totalRevenue)}</span>
                                 <span class="text-[10px] text-slate-400">Seçili ay toplamı</span>
