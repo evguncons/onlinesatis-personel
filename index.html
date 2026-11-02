@@ -1293,7 +1293,7 @@
                 try {
                     google.script.run
                         .withSuccessHandler(result => {
-                            if (!result || typeof result !== 'object') finish(reject, new Error('Geçersiz sunucu yanıtı.'));
+                            if (!result || typeof result !== 'object' || Array.isArray(result)) finish(reject, Object.assign(new Error('Geçersiz sunucu yanıtı.'), {retryable: true}));
                             else if (result.retryable) finish(reject, Object.assign(new Error(result.message || 'Sunucu meşgul.'), {retryable: true}));
                             else finish(resolve, result);
                         })
@@ -1323,16 +1323,16 @@
                 const text = await response.text();
                 let result;
                 try { result = JSON.parse(text); }
-                catch (_) { throw new Error("Sunucudan geçersiz yanıt alındı. Apps Script dağıtımını kontrol edin."); }
-                if (!result || typeof result !== 'object' || Array.isArray(result)) throw new Error("Sunucu yanıtı geçersiz.");
+                catch (_) { throw Object.assign(new Error("Sunucudan geçersiz yanıt alındı. Apps Script dağıtımını kontrol edin."), {retryable: true}); }
+                if (!result || typeof result !== 'object' || Array.isArray(result)) throw Object.assign(new Error("Sunucu yanıtı geçersiz."), {retryable: true});
                 if (result.code === 'METHOD_NOT_ALLOWED' || /Sadece POST desteklenir/i.test(result.message || '')) {
-                    throw new Error('Veri isteği POST yerine GET olarak karşılandı. Güncel HTML dosyasını ve Apps Script web uygulamasının yeni sürümünü birlikte yayınlayıp sayfayı yenileyin.');
+                    throw Object.assign(new Error('Veri isteği POST yerine GET olarak karşılandı. Güncel HTML dosyasını ve Apps Script web uygulamasının yeni sürümünü birlikte yayınlayıp sayfayı yenileyin.'), {retryable:false});
                 }
                 if (result.retryable) throw Object.assign(new Error(result.message || 'Sunucu meşgul.'), { retryable: true });
                 return result;
             } catch (err) {
                 if (err.name === 'AbortError') {
-                    const writing = ['updateCustomer', 'deleteCustomer', 'addCustomersBulk'].includes(payload.action);
+                    const writing = ['updateCustomer', 'deleteCustomer', 'addCustomersBulk', 'addSale'].includes(payload.action);
                     throw Object.assign(new Error(writing
                         ? "Yanıt zaman aşımına uğradı. İşlem kaydedilmiş olabilir; yeniden kaydetmeden önce listeyi yenileyin."
                         : "Sunucu zamanında yanıt vermedi. Tekrar deneyin."), { retryable: true });
@@ -1362,6 +1362,7 @@
                 badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online';
             }
             if(currentBranch) { recordsRetryCount = 0; resumeCustomerSync(); refreshData(true); }
+            if (pendingSale && !saleBlocked) sendPendingSale();
         });
 
 
@@ -2398,6 +2399,9 @@
 
         let pendingSale = null;
         let saleSaving = false;
+        let saleBlocked = false;
+        let saleRetryTimer = null;
+        let saleRetryCount = 0;
         function openAddSale() {
             if (!currentBranch) return;
             if (!pendingSale) {
@@ -2435,26 +2439,44 @@
                 }
                 pendingSale = {action:'addSale',data,token:sessionStorage.getItem('authToken'),duplicateConfirmation:approved,
                     operationId:'sale-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)};
+                saleRetryCount = 0;
+                saleBlocked = false;
             }
+            await sendPendingSale();
+        });
+
+        async function sendPendingSale() {
+            if (!pendingSale || saleSaving) return;
+            clearTimeout(saleRetryTimer); saleRetryTimer = null;
+            const operation = pendingSale;
+            const message = document.getElementById('saleMessage');
+            saleBlocked = false;
             saleSaving = true;
             document.getElementById('saleFields').disabled = true;
             document.getElementById('saleSubmit').disabled = true;
-            message.textContent = 'Satış kaydediliyor...';
+            message.textContent = 'Müşteri kaydediliyor... Bu pencereyi kapatıp paneli kullanabilirsiniz.';
             try {
-                const result = await safeFetch(pendingSale);
+                const result = await safeFetch(operation);
+                if (!result || !['success','duplicate','error'].includes(result.status)) {
+                    throw Object.assign(new Error('Kayıt yanıtı eksik.'), {retryable:true});
+                }
+                if (result.retryable) throw Object.assign(new Error(result.message || 'Kayıt kontrol ediliyor.'), {retryable:true});
                 if (result.status === 'duplicate') {
                     const waitingSale = pendingSale;
+                    saleBlocked = true;
                     message.textContent = 'Aynı tutarda satış bulundu. Yeni satış olup olmadığını onaylayın.';
                     showDuplicateWarning(result.duplicateSale, true, {
                         scope:'add', duplicateKey:result.duplicateKey,
                         onProceed() {
                             if (pendingSale !== waitingSale) return;
                             pendingSale.duplicateConfirmation = result.duplicateKey;
+                            saleBlocked = false;
                             document.getElementById('addSaleForm').requestSubmit();
                         },
                         onCancel() {
                             if (pendingSale !== waitingSale) return;
                             pendingSale = null;
+                            saleBlocked = false;
                             document.getElementById('saleFields').disabled = false;
                             message.textContent = 'Aynı satış için yeni kayıt oluşturulmadı.';
                         }
@@ -2462,23 +2484,35 @@
                     return;
                 }
                 if (result.status !== 'success') {
-                    pendingSale = null;
-                    document.getElementById('saleFields').disabled = false;
-                    throw new Error(result.message || 'Satış kaydedilemedi.');
+                    // Yazma başlamışsa kimliği sakla: izin düzeltildikten sonra aynı işlem kontrol edilir.
+                    if (!result.operationPending) pendingSale = null;
+                    document.getElementById('saleFields').disabled = !!pendingSale;
+                    throw Object.assign(new Error(result.message || 'Müşteri kaydedilemedi.'), {retryable:false});
                 }
                 pendingSale = null;
-                closeAddSale();
-                showToast('Satış şubenize yeni satır olarak eklendi.');
-                document.getElementById('monthFilter').value = result.month;
-                recordsRequestVersion++; activeRecordsRequest = null;
-                refreshData(false,true,true);
+                saleRetryCount = 0;
+                if (currentBranch === operation.data.branch) {
+                    closeAddSale();
+                    showToast('Müşteri şubenize yeni satır olarak eklendi.');
+                    document.getElementById('monthFilter').value = result.month || operation.data.date.slice(0,7);
+                    recordsRequestVersion++; activeRecordsRequest = null;
+                    refreshData(false,true,true);
+                }
             } catch(error) {
-                message.textContent = pendingSale ? 'Yanıt doğrulanamadı. Tekrar kaydettiğinizde aynı işlem kontrol edilir; ikinci satır eklenmez.' : error.message;
+                if (pendingSale && error.retryable !== false) {
+                    console.warn('Müşteri kaydı yeniden denenecek:', error.message);
+                    message.textContent = 'Bağlantı bekleniyor. Kaydınız arka planda otomatik tamamlanacak; paneli kullanabilirsiniz.';
+                    const delay = Math.min(60000, 5000 * Math.pow(2, Math.min(saleRetryCount++,4)));
+                    saleRetryTimer = setTimeout(() => sendPendingSale(), delay);
+                } else {
+                    saleBlocked = !!pendingSale;
+                    message.textContent = error.message;
+                }
             } finally {
                 saleSaving = false;
                 document.getElementById('saleSubmit').disabled = false;
             }
-        });
+        }
 
         function exportToExcel() {
             if (!currentFilteredData || currentFilteredData.length === 0) {
