@@ -847,21 +847,33 @@
         const MEDIAS = ['Instagram', 'Whatsapp', 'Facebook', 'Çağrı', 'Web Sitesi Form', 'SMS LİNK'];
 
         const parseCurrency = (val) => {
-            if (typeof val === 'number') return val;
-            if (!val) return 0;
-            let str = val.toString().trim().replace(/\s/g, '').replace(/TL/gi, '').replace(/[^\d.,-]/g, '');
-            if (str.includes(',')) { str = str.replace(/\./g, '').replace(',', '.'); } 
-            else if (str.includes('.')) { 
-                if ((str.match(/\./g) || []).length > 1 || (str.split('.')[1] && str.split('.')[1].length === 3)) { 
-                    str = str.replace(/\./g, ''); 
-                } 
-            }
-            return parseFloat(str) || 0;
+          if (typeof val === 'number') return Number.isFinite(val) ? val : 0;
+          let text = String(val == null ? '' : val).trim().replace(/^'/,'').replace(/TRY|TL|₺/gi,'').replace(/\s/g,'');
+          if (!/^[+-]?\d[\d.,]*$/.test(text)) return 0;
+          const sign = text[0] === '-' ? -1 : 1;
+          text = text.replace(/^[+-]/,'');
+          const dot = text.lastIndexOf('.'), comma = text.lastIndexOf(',');
+          if (dot >= 0 && comma >= 0) {
+            const decimal = dot > comma ? '.' : ',';
+            const group = decimal === '.' ? ',' : '.';
+            const parts = text.split(decimal);
+            if (parts.length !== 2 || !/^\d{1,2}$/.test(parts[1])) return 0;
+            const groups = parts[0].split(group);
+            if (groups.length > 1 && (!/^\d{1,3}$/.test(groups[0]) || groups.slice(1).some(value=>!/^\d{3}$/.test(value)))) return 0;
+            text = groups.join('') + '.' + parts[1];
+          } else if (dot >= 0 || comma >= 0) {
+            const parts = text.split(dot >= 0 ? '.' : ',');
+            if (parts.length > 1 && /^\d{1,3}$/.test(parts[0]) && parts.slice(1).every(value=>/^\d{3}$/.test(value))) text = parts.join('');
+            else if (parts.length === 2 && /^\d+$/.test(parts[0]) && /^\d{1,2}$/.test(parts[1])) text = parts.join('.');
+            else return 0;
+          }
+          const amount = sign * Number(text);
+          return Number.isFinite(amount) ? amount : 0;
         };
 
         const getRevenue = (item) => {
-            if (item.revenue !== undefined && item.revenue !== null && item.revenue !== '') return item.revenue;
-            if (item.amount !== undefined && item.amount !== null && item.amount !== '') return item.amount;
+            if (item.amount != null && String(item.amount).trim() !== '') return item.amount;
+            if (item.revenue != null && String(item.revenue).trim() !== '') return item.revenue;
             return 0;
         };
 
@@ -950,7 +962,8 @@
         }
 
         function formatMoney(amount) {
-            return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(parseCurrency(amount));
+            const value = Math.round(parseCurrency(amount)*100)/100;
+            return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits:Number.isInteger(value)?0:2, maximumFractionDigits:2 }).format(value);
         }
 
         function getCompareNum(str) {
@@ -992,7 +1005,7 @@
                 ['branch','date','lastUpdatedAt','name','status','contact','customerNo','media','category','product','result','note','isOrder'].forEach(field => {
                     entry[field] = String(record[field] == null ? '' : record[field]);
                 });
-                entry.amount = parseCurrency(record.amount !== undefined && record.amount !== '' ? record.amount : record.revenue);
+                entry.amount = parseCurrency(getRevenue(record));
                 rows.set(referralRowKey(entry), entry);
             };
             // Eski sunucu yanıtlarında da mevcut satış geçmişi görünür kalır.
@@ -1012,7 +1025,7 @@
             const sales = history.filter(isSaleRecord);
             return {
                 history, sales, saleCount: sales.length,
-                totalRevenue: sales.reduce((sum, sale) => sum + Math.max(0, sale.amount), 0),
+                totalRevenue: sales.reduce((sum, sale) => sum + Math.max(0, Math.round(sale.amount*100)), 0)/100,
                 referralCount: Math.max(history.length, Number(item.referralCount) || 0),
                 previousSaleCount: sales.filter(sale => referralRowKey(sale) !== referralRowKey(item)).length
             };
@@ -1269,7 +1282,7 @@
         async function safeFetch(payload) {
             // Liste okumalarının yeniden denemesi refreshData tarafından yönetilir.
             // İki katmanlı tekrar 30 saniyelik isteği dakikalarca uzatıyordu.
-            const retryableAction = ['login', 'getLeaderboard', 'updateCustomer', 'addSale'].includes(payload.action);
+            const retryableAction = ['login', 'getLeaderboard', 'updateCustomer'].includes(payload.action);
             if (payload.action === 'updateCustomer' && !payload.operationId) {
                 payload = { ...payload, operationId: Date.now().toString(36) + '-' + Math.random().toString(36).slice(2) };
             }
@@ -1289,7 +1302,7 @@
                     if (settled) return;
                     settled = true; clearTimeout(timer); fn(value);
                 };
-                const timer = setTimeout(() => finish(reject, Object.assign(new Error('Sunucu yanıtı bekleniyor.'), {retryable: true})), 60000);
+                const timer = setTimeout(() => finish(reject, Object.assign(new Error('Sunucu yanıtı bekleniyor.'), {retryable: true})), payload.action === 'addSale' ? 30000 : 60000);
                 try {
                     google.script.run
                         .withSuccessHandler(result => {
@@ -1602,7 +1615,7 @@
         async function loadLeaderboard() {
             if (leaderboardRequest) return leaderboardRequest;
             const now = new Date();
-            const cacheKey = 'leaderboard-top3-' + now.getFullYear() + '-' + now.getMonth();
+            const cacheKey = 'leaderboard-top3-v3-all-sales-' + now.getFullYear() + '-' + now.getMonth();
             try {
                 const cached = JSON.parse(localStorage.getItem(cacheKey) || 'null');
                 if (cached && Array.isArray(cached.list) && Date.now() - cached.time < 120000) {
@@ -1709,11 +1722,11 @@
                 if (called.length || summary.saleCount) calledCount++;
                 if (summary.saleCount) salesCount++;
                 if (called.some(entry => (entry.lastUpdatedAt || entry.date).includes(todayPrefix))) todayCalledCount++;
-                monthRevenue += summary.totalRevenue;
+                monthRevenue += Math.round(summary.totalRevenue * 100);
             });
 
             const metricMonth = document.getElementById('metricMonthRevenue');
-            if(metricMonth) metricMonth.textContent = formatMoney(monthRevenue);
+            if(metricMonth) metricMonth.textContent = formatMoney(monthRevenue / 100);
             
             const metricConv = document.getElementById('metricConversion');
             const metricConvDetail = document.getElementById('metricConversionDetail');
@@ -2454,6 +2467,7 @@
             saleSaving = true;
             document.getElementById('saleFields').disabled = true;
             document.getElementById('saleSubmit').disabled = true;
+            document.getElementById('saleSubmit').textContent = 'Kaydediliyor…';
             message.textContent = 'Müşteri kaydediliyor... Bu pencereyi kapatıp paneli kullanabilirsiniz.';
             try {
                 const result = await safeFetch(operation);
@@ -2484,6 +2498,7 @@
                     return;
                 }
                 if (result.status !== 'success') {
+                    console.warn('Müşteri kaydı durdu:', result.code || 'SALE_ERROR', result.stage || '', result.message || '');
                     // Yazma başlamışsa kimliği sakla: izin düzeltildikten sonra aynı işlem kontrol edilir.
                     if (!result.operationPending) pendingSale = null;
                     document.getElementById('saleFields').disabled = !!pendingSale;
@@ -2511,6 +2526,7 @@
             } finally {
                 saleSaving = false;
                 document.getElementById('saleSubmit').disabled = false;
+                document.getElementById('saleSubmit').textContent = pendingSale ? 'Kaydı kontrol et' : 'Satışı Kaydet';
             }
         }
 
