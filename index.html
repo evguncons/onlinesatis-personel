@@ -417,7 +417,8 @@
     <div id="addModal" class="hidden fixed inset-0 z-[80] bg-slate-900/60 p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="addSaleTitle">
       <div class="add-dialog max-w-2xl mx-auto bg-white rounded-3xl p-6 my-8">
         <div class="flex justify-between items-center"><h2 id="addSaleTitle" class="text-xl font-bold">Müşteri Ekle</h2><button type="button" onclick="closeAddSale()" aria-label="Kapat">✕</button></div>
-        <p class="text-sm text-slate-500 mt-2 mb-4">Tüm alanlar zorunludur. Satış, şubenize yeni satır olarak eklenir.</p>
+        <p class="text-sm text-slate-500 mt-2 mb-2">Tüm alanlar zorunludur. Kayıt, şubenizin içinde bulunduğumuz aya ait listesine yeni satır olarak eklenir.</p>
+        <p id="addSaleDestination" class="text-sm font-semibold text-pink-700 mb-4"></p>
         <form id="addSaleForm"><fieldset id="saleFields" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <label>Şube<input id="sale_branch" class="modern-input" readonly required></label>
         <label>Satış Tarihi<input id="sale_date" type="datetime-local" class="modern-input" required></label>
@@ -1169,12 +1170,18 @@
         let duplicateDialog = null;
         const duplicateDialogs = [];
 
+        function getCurrentSalePeriod() {
+            const local = new Date(Date.now()+3*3600000);
+            const months = ['OCAK','ŞUBAT','MART','NİSAN','MAYIS','HAZİRAN','TEMMUZ','AĞUSTOS','EYLÜL','EKİM','KASIM','ARALIK'];
+            return {month:local.toISOString().slice(0,7),sheetName:months[local.getUTCMonth()]+' '+local.getUTCFullYear(),dateTime:local.toISOString().slice(0,16)};
+        }
+
         function getSaleCandidate(scope = 'edit') {
             if (scope === 'add') return {
                 branch: currentBranch, name:document.getElementById('sale_name').value, contact: document.getElementById('sale_contact').value,
                 customerNo: document.getElementById('sale_customerNo').value,
                 amount: document.getElementById('sale_amount').value,
-                month: document.getElementById('sale_date').value.slice(0,7), rowIndex: ''
+                month: getCurrentSalePeriod().month, rowIndex: ''
             };
             return {
                 branch: document.getElementById('m_branch').value || currentBranch,
@@ -2420,14 +2427,15 @@
             if (!pendingSale) {
                 document.getElementById('addSaleForm').reset();
                 document.getElementById('sale_branch').value = currentBranch;
-                const date = new Date();
-                document.getElementById('sale_date').value = new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16);
+                const period = getCurrentSalePeriod();
+                document.getElementById('sale_date').value = period.dateTime;
                 [['category',CATEGORIES],['media',MEDIAS]].forEach(([key,values]) => {
                     document.getElementById('sale_'+key).innerHTML = '<option value="">Seçiniz...</option>' + values.map(value => '<option>'+escapeHTML(value)+'</option>').join('');
                 });
                 document.getElementById('saleFields').disabled = false;
                 document.getElementById('saleMessage').textContent = '';
             }
+            document.getElementById('addSaleDestination').textContent = currentBranch+' · '+(pendingSale ? pendingSale.targetSheetName : getCurrentSalePeriod().sheetName);
             document.getElementById('addModal').classList.remove('hidden');
         }
         function closeAddSale() { document.getElementById('addModal').classList.add('hidden'); }
@@ -2450,7 +2458,9 @@
                     showDuplicateWarning(dup, true, {scope:'add'});
                     return;
                 }
+                const period = getCurrentSalePeriod();
                 pendingSale = {action:'addSale',data,token:sessionStorage.getItem('authToken'),duplicateConfirmation:approved,
+                    targetMonth:period.month,targetSheetName:period.sheetName,
                     operationId:'sale-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)};
                 saleRetryCount = 0;
                 saleBlocked = false;
@@ -2509,7 +2519,7 @@
                 if (currentBranch === operation.data.branch) {
                     closeAddSale();
                     showToast('Müşteri şubenize yeni satır olarak eklendi.');
-                    document.getElementById('monthFilter').value = result.month || operation.data.date.slice(0,7);
+                    document.getElementById('monthFilter').value = result.month || operation.targetMonth;
                     recordsRequestVersion++; activeRecordsRequest = null;
                     refreshData(false,true,true);
                 }
