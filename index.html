@@ -1419,7 +1419,7 @@
             document.getElementById('loginForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const branch = document.getElementById('loginBranch').value;
-                const password = document.getElementById('loginPassword').value;
+                const password = document.getElementById('loginPassword').value.normalize('NFC').replace(/^[\s\u200B-\u200F\u2060\uFEFF]+|[\s\u200B-\u200F\u2060\uFEFF]+$/g,'');
                 const errorMsg = document.getElementById('loginError');
                 const btn = document.getElementById('loginBtn');
                 
@@ -2480,7 +2480,7 @@
                 }
                 if (result.retryable) throw Object.assign(new Error(result.message || 'Kayıt kontrol ediliyor.'), {retryable:true});
                 if (result.status !== 'success') {
-                    console.warn('Müşteri kaydı durdu:', result.code || 'SALE_ERROR', result.stage || '', result.message || '');
+                    console.warn('Müşteri kaydı durdu:', result.code || 'SALE_ERROR', result.stage || '', result.diagnostic && result.diagnostic.message || result.message || '');
                     // Yazma başlamışsa kimliği sakla: izin düzeltildikten sonra aynı işlem kontrol edilir.
                     if (!result.operationPending) pendingSale = null;
                     document.getElementById('saleFields').disabled = !!pendingSale;
