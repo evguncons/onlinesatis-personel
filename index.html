@@ -2452,16 +2452,10 @@
                 if (!(Number(data.amount)>0) || !Number.isFinite(Number(data.amount))) { message.textContent = 'Geçerli satış tutarı girin.'; return; }
                 if (data.contact.replace(/\D/g,'').length<10) { message.textContent = 'Geçerli telefon girin.'; return; }
                 if (hasCallbackNote(data.note)) { message.textContent = 'Ulaşılamama notuyla satış eklenemez.'; return; }
-                const dup = findDuplicateSale(data.amount, getSaleCandidate('add'));
-                const approved = duplicateConfirmation && duplicateConfirmation.signature === saleCandidateSignature('add') ? duplicateConfirmation.key : undefined;
-                if (dup && approved !== dup.duplicateKey) {
-                    showDuplicateWarning(dup, true, {scope:'add'});
-                    return;
-                }
                 const period = getCurrentSalePeriod();
-                pendingSale = {action:'addSale',data,token:sessionStorage.getItem('authToken'),duplicateConfirmation:approved,
+                pendingSale = {action:'addSale',data,token:sessionStorage.getItem('authToken'),
                     targetMonth:period.month,targetSheetName:period.sheetName,
-                    operationId:'sale-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)};
+                    operationId:'sale2-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)};
                 saleRetryCount = 0;
                 saleBlocked = false;
             }
@@ -2485,28 +2479,6 @@
                     throw Object.assign(new Error('Kayıt yanıtı eksik.'), {retryable:true});
                 }
                 if (result.retryable) throw Object.assign(new Error(result.message || 'Kayıt kontrol ediliyor.'), {retryable:true});
-                if (result.status === 'duplicate') {
-                    const waitingSale = pendingSale;
-                    saleBlocked = true;
-                    message.textContent = 'Aynı tutarda satış bulundu. Yeni satış olup olmadığını onaylayın.';
-                    showDuplicateWarning(result.duplicateSale, true, {
-                        scope:'add', duplicateKey:result.duplicateKey,
-                        onProceed() {
-                            if (pendingSale !== waitingSale) return;
-                            pendingSale.duplicateConfirmation = result.duplicateKey;
-                            saleBlocked = false;
-                            document.getElementById('addSaleForm').requestSubmit();
-                        },
-                        onCancel() {
-                            if (pendingSale !== waitingSale) return;
-                            pendingSale = null;
-                            saleBlocked = false;
-                            document.getElementById('saleFields').disabled = false;
-                            message.textContent = 'Aynı satış için yeni kayıt oluşturulmadı.';
-                        }
-                    });
-                    return;
-                }
                 if (result.status !== 'success') {
                     console.warn('Müşteri kaydı durdu:', result.code || 'SALE_ERROR', result.stage || '', result.message || '');
                     // Yazma başlamışsa kimliği sakla: izin düzeltildikten sonra aynı işlem kontrol edilir.
