@@ -1035,15 +1035,17 @@
         function renderCustomerHistory(item) {
             const container = document.getElementById('customerHistory');
             if (!container) return;
-            const sales = getReferralHistory(item).filter(entry => isSaleRecord(entry) &&
+            const history = getReferralHistory(item).filter(entry =>
+                (isSaleRecord(entry) || entry.result.trim().toLocaleLowerCase('tr-TR').includes('olumsuz')) &&
                 String(entry.sheetName || '') === String(item.sheetName || ''));
-            if (!sales.length) {
+            if (!history.length) {
                 container.innerHTML = '';
                 container.classList.add('hidden');
                 return;
             }
+            const sales = history.filter(isSaleRecord);
             const summary = {
-                history: sales, sales, saleCount: sales.length,
+                history, sales, saleCount: sales.length,
                 previousSaleCount: sales.filter(entry => referralRowKey(entry) !== referralRowKey(item)).length,
                 totalRevenue: sales.reduce((sum, sale) => sum + Math.max(0, Math.round(sale.amount * 100)), 0) / 100
             };
@@ -1053,10 +1055,11 @@
                 <div class="history-heading">
                     <div class="history-title">
                         <span class="history-title-icon" aria-hidden="true"><i class="fas fa-clock-rotate-left"></i></span>
-                        <div><h4>Satış Geçmişi</h4><p>Bu şube · Yalnızca seçili ayın satışları</p></div>
+                        <div><h4>Satış ve Görüşme Geçmişi</h4><p>Bu şube · Seçili ayın satışları ve olumsuz yanıtları</p></div>
                     </div>
                     <div class="history-counts" aria-label="Geçmiş özeti">
                         <span class="history-chip history-chip--sale"><i class="fas fa-bag-shopping" aria-hidden="true"></i>${summary.saleCount} satış</span>
+                        ${history.length > sales.length ? `<span class="history-badge history-badge--negative"><i class="fas fa-circle-minus" aria-hidden="true"></i>${history.length - sales.length} olumsuz yanıt</span>` : ''}
                     </div>
                 </div>
                 ${summary.saleCount ? `<div class="history-sales-summary">
@@ -1065,7 +1068,7 @@
                     <div class="history-total">${summary.totalRevenue > 0 ? `<strong>${formatMoney(summary.totalRevenue)}</strong><span class="history-total-label">${missingAmounts ? 'Tutarı girilen satışların toplamı' : 'Bu ayki satış toplamı'}</span>` : ''}
                         ${missingAmounts ? `<span class="history-amount-missing"><i class="fas fa-circle-exclamation" aria-hidden="true"></i>${missingAmounts === 1 ? 'Satış tutarı girilmemiş' : missingAmounts + ' satışın tutarı girilmemiş'}</span>` : ''}</div>
                 </div>` : ''}
-                <ol class="history-list" aria-label="Seçili aydaki satışlar">
+                <ol class="history-list" aria-label="Seçili aydaki satışlar ve olumsuz yanıtlar">
                     ${summary.history.map(entry => {
                         const isCurrent = referralRowKey(entry) === referralRowKey(item);
                         const sold = isSaleRecord(entry);
@@ -1095,7 +1098,7 @@
                         </li>`;
                     }).join('')}
                 </ol>
-                <p class="history-edit-hint"><i class="fas fa-arrow-down" aria-hidden="true"></i><span>Kaydı düzenlemek için aşağı kaydırın. Geçmiş satışlar bilgi amaçlı gösterilir.</span></p>`;
+                <p class="history-edit-hint"><i class="fas fa-arrow-down" aria-hidden="true"></i><span>Kaydı düzenlemek için aşağı kaydırın. Geçmiş kayıtlar bilgi amaçlı gösterilir.</span></p>`;
         }
 
         function deduplicateRecords(records) {
